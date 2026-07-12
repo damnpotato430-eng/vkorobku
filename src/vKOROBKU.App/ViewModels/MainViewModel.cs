@@ -21,6 +21,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly CompressionStatusStore _compressionStatusStore = new();
     private readonly GameCompressionDetector _compressionDetector = new();
     private readonly OperationJournalStore _operationJournal = new();
+    private readonly UserPreferencesStore _preferences = new();
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
     private CompressionEstimate? _selectedEstimate;
@@ -34,12 +35,14 @@ public sealed class MainViewModel : ObservableObject
     private bool _isAnalyzing;
     private bool _isOperating;
     private bool _isCheckingCompression;
+    private bool _isExpertMode;
     private double _operationProgress;
     private string _operationSummary = "Сжатие изменяет только способ хранения файлов на NTFS.";
 
     public MainViewModel()
     {
         _computer = _computerInfoService.GetComputerInfo();
+        _isExpertMode = _preferences.LoadExpertMode();
         _coverService = new IgdbCoverService(_igdbCredentialStore);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
@@ -192,8 +195,30 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    public bool IsExpertMode
+    {
+        get => _isExpertMode;
+        set
+        {
+            if (!SetProperty(ref _isExpertMode, value))
+                return;
+            try { _preferences.SaveExpertMode(value); } catch { }
+            NotifyCompressionPanelVisibility();
+        }
+    }
+
     public Visibility UncompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Collapsed : Visibility.Visible;
+
+    public Visibility AutoOptimizationVisibility =>
+        SelectedGame?.CompressionState == GameCompressionState.Compressed || IsExpertMode
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
+    public Visibility ExpertOptimizationVisibility =>
+        SelectedGame?.CompressionState == GameCompressionState.Compressed || !IsExpertMode
+            ? Visibility.Collapsed
+            : Visibility.Visible;
 
     public Visibility CompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Visible : Visibility.Collapsed;
@@ -543,6 +568,8 @@ public sealed class MainViewModel : ObservableObject
     private void NotifyCompressionPanelVisibility()
     {
         OnPropertyChanged(nameof(UncompressedPanelVisibility));
+        OnPropertyChanged(nameof(AutoOptimizationVisibility));
+        OnPropertyChanged(nameof(ExpertOptimizationVisibility));
         OnPropertyChanged(nameof(CompressedPanelVisibility));
     }
 
