@@ -9,7 +9,7 @@ namespace vKOROBKU.App.Services;
 
 public sealed class IgdbCoverService
 {
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(20) };
+    private static readonly HttpClient Http = CreateHttpClient();
     private readonly IgdbCredentialStore _credentialStore;
     private readonly SemaphoreSlim _apiGate = new(1, 1);
     private readonly string _cacheDirectory = Path.Combine(
@@ -18,6 +18,14 @@ public sealed class IgdbCoverService
     private string? _accessToken;
     private DateTimeOffset _tokenExpiresAt;
     private DateTimeOffset _lastRequestAt;
+
+    private static HttpClient CreateHttpClient()
+    {
+        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("vKOROBKU/0.1 (+https://github.com/damnpotato430-eng/vkorobku)");
+        client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.8");
+        return client;
+    }
 
     public IgdbCoverService(IgdbCredentialStore credentialStore)
     {
@@ -67,7 +75,7 @@ public sealed class IgdbCoverService
             if (imageId is null)
             {
                 await File.WriteAllTextAsync(metadataPath,
-                    JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, null)), cancellationToken);
+                    JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, null, 2)), cancellationToken);
                 return null;
             }
 
@@ -98,28 +106,58 @@ public sealed class IgdbCoverService
 
         foreach (var url in urls)
         {
-            try
-            {
-                using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                if (!response.IsSuccessStatusCode ||
-                    response.Content.Headers.ContentType?.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
-                    continue;
+            var downloaded = await TryDownloadImageAsync(url, imagePath, cancellationToken);
+            if (!downloaded)
+                continue;
+            await WriteMetadataAsync(metadataPath, $"steam:{appId}", cancellationToken);
+            return imagePath;
+        }
 
-                var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-                if (bytes.Length < 1024)
-                    continue;
-
-                await SaveImageAsync(imagePath, bytes, cancellationToken);
-                await WriteMetadataAsync(metadataPath, $"steam:{appId}", cancellationToken);
-                return imagePath;
-            }
-            catch (HttpRequestException)
-            {
-                // IGDB remains available as a fallback.
-            }
+        var fallbackUrl = await TryGetSteamFallbackImageUrlAsync(appId, cancellationToken);
+        if (fallbackUrl is not null && await TryDownloadImageAsync(fallbackUrl, imagePath, cancellationToken))
+        {
+            await WriteMetadataAsync(metadataPath, $"steam-header:{appId}", cancellationToken);
+            return imagePath;
         }
 
         return null;
+    }
+
+    private static async Task<bool> TryDownloadImageAsync(
+        string url,
+        string imagePath,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            if (!response.IsSuccessStatusCode ||
+                response.Content.Headers.ContentType?.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
+                return false;
+            var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+            if (bytes.Length < 1024)
+                return false;
+            await SaveImageAsync(imagePath, bytes, cancellationToken);
+            return true;
+        }
+        catch (HttpRequestException) { return false; }
+    }
+
+    private static async Task<string?> TryGetSteamFallbackImageUrlAsync(string appId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l=english&cc=US";
+            using var document = JsonDocument.Parse(await Http.GetStringAsync(url, cancellationToken));
+            if (!document.RootElement.TryGetProperty(appId, out var app) ||
+                !app.TryGetProperty("success", out var success) || !success.GetBoolean() ||
+                !app.TryGetProperty("data", out var data) ||
+                !data.TryGetProperty("header_image", out var headerImage))
+                return null;
+            return headerImage.GetString();
+        }
+        catch (HttpRequestException) { return null; }
+        catch (JsonException) { return null; }
     }
 
     private static async Task SaveImageAsync(string imagePath, byte[] bytes, CancellationToken cancellationToken)
@@ -131,7 +169,7 @@ public sealed class IgdbCoverService
 
     private static Task WriteMetadataAsync(string metadataPath, string? imageId, CancellationToken cancellationToken) =>
         File.WriteAllTextAsync(metadataPath,
-            JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, imageId)), cancellationToken);
+            JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, imageId, 2)), cancellationToken);
 
     public void ClearCache()
     {
@@ -191,7 +229,8 @@ public sealed class IgdbCoverService
             if (!File.Exists(metadataPath))
                 return false;
             var metadata = JsonSerializer.Deserialize<CacheMetadata>(File.ReadAllText(metadataPath));
-            return metadata?.ImageId is null && metadata?.CheckedAt > DateTimeOffset.UtcNow.AddDays(-7);
+            return metadata?.Version >= 2 && metadata.ImageId is null &&
+                   metadata.CheckedAt > DateTimeOffset.UtcNow.AddDays(-7);
         }
         catch (IOException) { return false; }
         catch (JsonException) { return false; }
@@ -203,5 +242,5 @@ public sealed class IgdbCoverService
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity))).ToLowerInvariant();
     }
 
-    private sealed record CacheMetadata(DateTimeOffset CheckedAt, string? ImageId);
+    private sealed record CacheMetadata(DateTimeOffset CheckedAt, string? ImageId, int Version);
 }

@@ -13,6 +13,8 @@ public enum GameCompressionState
 
 public sealed class GameInfo : INotifyPropertyChanged
 {
+    private string _name;
+    private string? _steamAppId;
     private string? _coverPath;
     private GameCompressionState _compressionState;
     private string? _compressionAlgorithm;
@@ -33,11 +35,11 @@ public sealed class GameInfo : INotifyPropertyChanged
         GameCompressionState compressionState = GameCompressionState.Unknown,
         string? compressionAlgorithm = null)
     {
-        Name = name;
+        _name = name;
         InstallPath = installPath;
         LogicalSizeBytes = logicalSizeBytes;
         Source = source;
-        SteamAppId = steamAppId;
+        _steamAppId = steamAppId;
         SteamBuildId = steamBuildId;
         _coverPath = coverPath;
         _compressionState = compressionState;
@@ -46,12 +48,31 @@ public sealed class GameInfo : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Name { get; }
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (SetProperty(ref _name, value))
+                OnPropertyChanged(nameof(NeedsIdentityReview));
+        }
+    }
+
     public string InstallPath { get; }
     public long LogicalSizeBytes { get; }
     public string Source { get; }
-    public string? SteamAppId { get; }
+    public string? SteamAppId
+    {
+        get => _steamAppId;
+        set
+        {
+            if (SetProperty(ref _steamAppId, value))
+                OnPropertyChanged(nameof(NeedsIdentityReview));
+        }
+    }
+
     public string? SteamBuildId { get; }
+    public bool NeedsIdentityReview => Source == "Добавлено вручную" && string.IsNullOrWhiteSpace(SteamAppId);
 
     public string? CoverPath
     {

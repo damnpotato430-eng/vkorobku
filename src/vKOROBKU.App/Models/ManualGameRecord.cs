@@ -5,7 +5,8 @@ public sealed record ManualGameRecord(
     string Name,
     string? SteamAppId,
     long LogicalSizeBytes,
-    DateTimeOffset AddedAt);
+    DateTimeOffset AddedAt,
+    int IdentityVersion = 0);
 
 public sealed record DetectedGameIdentity(
     string Name,

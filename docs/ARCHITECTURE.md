@@ -9,7 +9,7 @@ WPF-клиент на .NET 8 с MVVM. Отвечает за библиотеку
 ### Сканеры
 
 - `SteamLibraryScanner` читает реестр, `libraryfolders.vdf` и `appmanifest_*.acf`;
-- ручной источник принимает выбранный каталог, определяет игру по GOG-метаданным, `steam_appid.txt`, EXE и каталогу Steam, а затем сохраняет её в `%LOCALAPPDATA%\\vKOROBKU\\manual-games.json`;
+- ручной источник принимает выбранный каталог, определяет игру по основному GOG ID, `steam_appid.txt`, EXE, имени папки и каталогу Steam, а затем сохраняет её в `%LOCALAPPDATA%\\vKOROBKU\\manual-games.json`; для неоднозначных папок доступно ручное уточнение названия;
 - `FileTreeService` безопасно обходит дерево без перехода через reparse points.
 
 ### Analyzer

@@ -192,10 +192,15 @@
                                        Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
                             <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,4,0,0" FontSize="10"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
-                            <ToggleButton Content="Экспертный режим" IsChecked="{Binding IsExpertMode}"
-                                          Margin="0,10,0,0" HorizontalAlignment="Left"
-                                          Visibility="{Binding UncompressedPanelVisibility}"
-                                          Style="{StaticResource ExpertToggle}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <ToggleButton Content="Экспертный режим" IsChecked="{Binding IsExpertMode}"
+                                              Visibility="{Binding UncompressedPanelVisibility}"
+                                              Style="{StaticResource ExpertToggle}" />
+                                <Button Content="Уточнить игру" Command="{Binding ReviewIdentityCommand}"
+                                        Margin="8,0,0,0" Padding="10,6"
+                                        Visibility="{Binding IdentityReviewVisibility}"
+                                        Style="{StaticResource SecondaryButton}" />
+                            </StackPanel>
                             <StackPanel Visibility="{Binding UncompressedPanelVisibility}">
                                 <TextBlock Text="{Binding AnalysisSummary}" Margin="0,7,0,0" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" FontSize="12" />

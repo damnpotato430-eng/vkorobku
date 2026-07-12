@@ -10,6 +10,7 @@ namespace vKOROBKU.App.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
+    private const int CurrentIdentityVersion = 4;
     private readonly SteamLibraryScanner _steamScanner = new();
     private readonly ComputerInfoService _computerInfoService = new();
     private readonly FileTreeService _fileTreeService = new();
@@ -54,6 +55,8 @@ public sealed class MainViewModel : ObservableObject
         ScanSteamCommand = new AsyncRelayCommand(RefreshSteamLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
         ConfigureIgdbCommand = new AsyncRelayCommand(ConfigureIgdbAsync);
+        ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
+            () => SelectedGame?.NeedsIdentityReview == true);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -79,6 +82,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand ScanSteamCommand { get; }
     public AsyncRelayCommand AddFolderCommand { get; }
     public AsyncRelayCommand ConfigureIgdbCommand { get; }
+    public AsyncRelayCommand ReviewIdentityCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -98,6 +102,8 @@ public sealed class MainViewModel : ObservableObject
             if (!SetProperty(ref _selectedGame, value))
                 return;
             NotifyCompressionPanelVisibility();
+            OnPropertyChanged(nameof(IdentityReviewVisibility));
+            ReviewIdentityCommand.RaiseCanExecuteChanged();
             if (sameGame)
                 return;
             Estimates.Clear();
@@ -209,6 +215,9 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    public Visibility IdentityReviewVisibility =>
+        SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
+
     public Visibility UncompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Collapsed : Visibility.Visible;
 
@@ -290,7 +299,9 @@ public sealed class MainViewModel : ObservableObject
                 Games.Add(game);
             }
 
-            foreach (var savedManualGame in _manualGameStore.Load())
+            var savedManualGames = await Task.WhenAll(
+                _manualGameStore.Load().Select(RefreshManualGameIdentityAsync));
+            foreach (var savedManualGame in savedManualGames)
             {
                 if (Games.Any(current => string.Equals(current.InstallPath, savedManualGame.InstallPath, StringComparison.OrdinalIgnoreCase)))
                     continue;
@@ -356,7 +367,7 @@ public sealed class MainViewModel : ObservableObject
         try
         {
             _manualGameStore.Save(new ManualGameRecord(
-                game.InstallPath, game.Name, game.SteamAppId, game.LogicalSizeBytes, DateTimeOffset.Now));
+                game.InstallPath, game.Name, game.SteamAppId, game.LogicalSizeBytes, DateTimeOffset.Now, CurrentIdentityVersion));
         }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
@@ -365,6 +376,60 @@ public sealed class MainViewModel : ObservableObject
         StatusText = $"Добавлена игра «{game.Name}»";
         RefreshCoversCommand.RaiseCanExecuteChanged();
         _ = await LoadCoverAsync(game, false);
+    }
+
+    private async Task<ManualGameRecord> RefreshManualGameIdentityAsync(ManualGameRecord record)
+    {
+        if (record.IdentityVersion >= CurrentIdentityVersion)
+            return record;
+        try
+        {
+            var identity = await _gameIdentityService.DetectAsync(record.InstallPath);
+            var updated = record with
+            {
+                Name = identity.Name,
+                SteamAppId = identity.SteamAppId,
+                IdentityVersion = CurrentIdentityVersion
+            };
+            _manualGameStore.Save(updated);
+            return updated;
+        }
+        catch
+        {
+            return record;
+        }
+    }
+
+    private async Task ReviewSelectedGameIdentityAsync()
+    {
+        var game = SelectedGame;
+        if (game is null || game.Source != "Добавлено вручную")
+            return;
+
+        var dialog = new ManualGameIdentityWindow(game.Name) { Owner = Application.Current.MainWindow };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        StatusText = "Ищем игру и подходящую обложку…";
+        var identity = await _gameIdentityService.FindByNameAsync(dialog.GameName);
+        game.Name = identity.Name;
+        game.SteamAppId = identity.SteamAppId;
+        game.CoverPath = null;
+        try
+        {
+            _manualGameStore.Save(new ManualGameRecord(
+                game.InstallPath, game.Name, game.SteamAppId,
+                game.LogicalSizeBytes, DateTimeOffset.Now, CurrentIdentityVersion));
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        OnPropertyChanged(nameof(IdentityReviewVisibility));
+        ReviewIdentityCommand.RaiseCanExecuteChanged();
+        _ = await LoadCoverAsync(game, true);
+        StatusText = identity.SteamAppId is null
+            ? $"Название сохранено: «{game.Name}». Для обложки можно настроить IGDB."
+            : $"Игра определена: «{game.Name}»";
     }
 
     private async Task ConfigureIgdbAsync()
