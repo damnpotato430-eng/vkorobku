@@ -3,7 +3,7 @@
 ## Сборка portable-пакета
 
 ```powershell
-./scripts/build-release.ps1 -Version 0.1.0
+./scripts/build-release.ps1 -Version 0.1.1
 ```
 
 Скрипт создаёт в `artifacts/`:
