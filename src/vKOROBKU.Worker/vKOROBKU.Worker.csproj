@@ -5,8 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\vKOROBKU.App\Assets\vkorobku.ico</ApplicationIcon>
     <AssemblyName>vKOROBKU.Worker</AssemblyName>
     <RootNamespace>vKOROBKU.Worker</RootNamespace>
+    <Version>0.1.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion>0.1.0</InformationalVersion>
+    <Product>vKOROBKU Worker</Product>
+    <Authors>damnpotato430-eng</Authors>
+    <RepositoryUrl>https://github.com/damnpotato430-eng/vkorobku</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />

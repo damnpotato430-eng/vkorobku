@@ -6,10 +6,18 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\vkorobku.ico</ApplicationIcon>
     <AssemblyName>vKOROBKU</AssemblyName>
     <RootNamespace>vKOROBKU.App</RootNamespace>
+    <Version>0.1.0</Version>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion>0.1.0</InformationalVersion>
+    <Product>vKOROBKU</Product>
+    <Authors>damnpotato430-eng</Authors>
+    <RepositoryUrl>https://github.com/damnpotato430-eng/vkorobku</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Assets\vkorobku.ico" />
     <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />
     <ProjectReference Include="..\vKOROBKU.Worker\vKOROBKU.Worker.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
