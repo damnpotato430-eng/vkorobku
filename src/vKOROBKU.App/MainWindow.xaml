@@ -243,7 +243,7 @@
                                             <Run Text="Экономия: " /><Run Text="{Binding SavingsText, Mode=OneWay}" />
                                         </TextBlock>
                                         <TextBlock Text="{Binding PerformanceText}" Margin="0,4,0,0" FontSize="10"
-                                                   Foreground="{StaticResource TextBrush}" />
+                                                   TextWrapping="Wrap" Foreground="{StaticResource TextBrush}" />
                                         <Grid Margin="0,3,0,0">
                                             <TextBlock Text="{Binding RatioText}" FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
                                             <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="{StaticResource MutedTextBrush}">

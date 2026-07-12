@@ -134,7 +134,8 @@ public sealed class GameAnalysisService
             ratio,
             confidence,
             compressedReadSpeed,
-            performanceImpact);
+            performanceImpact,
+            baselineReadSpeed);
     }
 
     private static async Task<IReadOnlyList<string>> CopySampleAsync(

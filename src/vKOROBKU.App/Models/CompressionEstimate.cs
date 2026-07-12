@@ -16,7 +16,8 @@ public sealed record CompressionEstimate(
     double SampleRatio,
     string Confidence,
     double ReadMegabytesPerSecond,
-    string PerformanceImpact)
+    string PerformanceImpact,
+    double BaselineReadMegabytesPerSecond = 0)
 {
     public string AlgorithmText => Algorithm switch
     {
@@ -30,7 +31,13 @@ public sealed record CompressionEstimate(
     public string EstimatedSizeText => ByteFormatter.Format(EstimatedPhysicalBytes);
     public string SavingsText => $"{ByteFormatter.Format(MinimumSavingsBytes)}–{ByteFormatter.Format(MaximumSavingsBytes)}";
     public string RatioText => $"Сжатие выборки: {(1 - SampleRatio) * 100:0.#}%";
-    public string PerformanceText => $"{PerformanceImpact} · {ReadMegabytesPerSecond:0} МБ/с";
+    public double ReadSpeedChangePercent => BaselineReadMegabytesPerSecond <= 0
+        ? 0
+        : (ReadMegabytesPerSecond / BaselineReadMegabytesPerSecond - 1) * 100;
+
+    public string PerformanceText => BaselineReadMegabytesPerSecond <= 0
+        ? "Повторите анализ для сравнения скорости"
+        : $"{PerformanceImpact}: без сжатия {BaselineReadMegabytesPerSecond:0} → {ReadMegabytesPerSecond:0} МБ/с ({ReadSpeedChangePercent:+0;-0;0}%)";
 }
 
 public sealed record GameAnalysisResult(
