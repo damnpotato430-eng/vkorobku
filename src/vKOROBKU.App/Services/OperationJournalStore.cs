@@ -1,0 +1,117 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using vKOROBKU.App.Models;
+using vKOROBKU.Protocol;
+
+namespace vKOROBKU.App.Services;
+
+public sealed class OperationJournalStore
+{
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() }
+    };
+    private readonly string _path = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "vKOROBKU", "operations.json");
+    private readonly object _sync = new();
+
+    public Guid Begin(WorkerJob job)
+    {
+        var id = Guid.NewGuid();
+        lock (_sync)
+        {
+            var entries = Read();
+            entries.Add(new OperationJournalEntry(
+                id, job.RootPath, job.Operation, job.Algorithm, DateTimeOffset.Now, null,
+                OperationJournalState.Running, 0, 0, 0, 0, 0, "Ожидание Worker"));
+            Write(entries);
+        }
+        return id;
+    }
+
+    public void Update(Guid id, WorkerMessage message)
+    {
+        lock (_sync)
+        {
+            var entries = Read();
+            var index = entries.FindIndex(entry => entry.Id == id);
+            if (index < 0)
+                return;
+            var current = entries[index];
+            entries[index] = current with
+            {
+                ProcessedBytes = message.ProcessedBytes,
+                TotalBytes = message.TotalBytes,
+                ProcessedFiles = message.ProcessedFiles,
+                TotalFiles = message.TotalFiles,
+                ErrorCount = message.ErrorCount,
+                Message = message.Text
+            };
+            Write(entries);
+        }
+    }
+
+    public void Finish(Guid id, OperationJournalState state, string? message)
+    {
+        lock (_sync)
+        {
+            var entries = Read();
+            var index = entries.FindIndex(entry => entry.Id == id);
+            if (index < 0)
+                return;
+            entries[index] = entries[index] with
+            {
+                FinishedAt = DateTimeOffset.Now,
+                State = state,
+                Message = message
+            };
+            Write(entries);
+        }
+    }
+
+    public int MarkInterrupted()
+    {
+        lock (_sync)
+        {
+            var entries = Read();
+            var count = 0;
+            for (var index = 0; index < entries.Count; index++)
+            {
+                if (entries[index].State != OperationJournalState.Running)
+                    continue;
+                entries[index] = entries[index] with
+                {
+                    FinishedAt = DateTimeOffset.Now,
+                    State = OperationJournalState.Interrupted,
+                    Message = "Приложение было закрыто до завершения операции"
+                };
+                count++;
+            }
+            if (count > 0)
+                Write(entries);
+            return count;
+        }
+    }
+
+    private List<OperationJournalEntry> Read()
+    {
+        try
+        {
+            if (!File.Exists(_path))
+                return [];
+            return JsonSerializer.Deserialize<List<OperationJournalEntry>>(File.ReadAllText(_path), JsonOptions) ?? [];
+        }
+        catch (IOException) { return []; }
+        catch (JsonException) { return []; }
+    }
+
+    private void Write(List<OperationJournalEntry> entries)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+        var temporary = _path + ".tmp";
+        File.WriteAllText(temporary, JsonSerializer.Serialize(entries.TakeLast(200), JsonOptions));
+        File.Move(temporary, _path, true);
+    }
+}

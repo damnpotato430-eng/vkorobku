@@ -187,7 +187,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <StackPanel>
-                            <TextBlock Text="АНАЛИЗ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                            <TextBlock Text="ОПТИМИЗАЦИЯ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
                             <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue=Игра не выбрана}"
                                        Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
                             <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,4,0,0" FontSize="10"
@@ -195,17 +195,12 @@
                             <StackPanel Visibility="{Binding UncompressedPanelVisibility}">
                                 <TextBlock Text="{Binding AnalysisSummary}" Margin="0,7,0,0" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
-                                <TextBlock Text="ТОЧНОСТЬ АНАЛИЗА" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
-                                           Foreground="{StaticResource MutedTextBrush}" />
-                                <ComboBox ItemsSource="{Binding AnalysisModes}" SelectedItem="{Binding SelectedAnalysisMode}"
-                                          DisplayMemberPath="DisplayText" Height="34" Padding="8,4"
-                                          Style="{StaticResource DarkComboBox}" />
                             </StackPanel>
                         </StackPanel>
 
                         <ListBox Grid.Row="2" Margin="0,16,0,12" ItemsSource="{Binding Estimates}"
                                  SelectedItem="{Binding SelectedEstimate}" Background="Transparent" BorderThickness="0"
-                                 Visibility="{Binding UncompressedPanelVisibility}">
+                                 Visibility="Collapsed">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
@@ -256,6 +251,19 @@
                         </ListBox>
 
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
+                                VerticalAlignment="Top" Visibility="{Binding UncompressedPanelVisibility}">
+                            <StackPanel>
+                                <TextBlock Text="АВТОМАТИЧЕСКАЯ ОПТИМИЗАЦИЯ" Foreground="{StaticResource AccentBrush}"
+                                           FontSize="11" FontWeight="Bold" />
+                                <TextBlock Margin="0,12,0,0" FontSize="13" LineHeight="21" TextWrapping="Wrap"
+                                           Text="vKOROBKU проанализирует файлы, проверит скорость чтения и самостоятельно выберет подходящий режим XPRESS или LZX." />
+                                <TextBlock Text="Перед изменением файлов программа покажет прогноз и попросит подтверждение."
+                                           Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding CompressedPanelVisibility}">
                             <StackPanel>
                                 <TextBlock Text="ИГРА УЖЕ СЖАТА" Foreground="{StaticResource AccentBrush}"
@@ -284,19 +292,8 @@
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelAnalysisCommand}"
-                                        Style="{StaticResource SecondaryButton}" />
-                            </Grid>
-
-                            <Grid Margin="0,8,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="Сжать" Command="{Binding CompressCommand}" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                <Button Content="Оптимизировать игру" Command="{Binding OptimizeCommand}" />
+                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
                                         Background="#A83A3A" Foreground="White" />
                             </Grid>
                         </StackPanel>

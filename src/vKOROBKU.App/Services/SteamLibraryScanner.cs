@@ -37,6 +37,7 @@ public sealed partial class SteamLibraryScanner
                 {
                     var content = File.ReadAllText(manifest);
                     var appId = ReadValue(content, "appid");
+                    var buildId = ReadValue(content, "buildid");
                     var name = ReadValue(content, "name");
                     var installDirectory = ReadValue(content, "installdir");
                     if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(installDirectory))
@@ -46,7 +47,7 @@ public sealed partial class SteamLibraryScanner
                     _ = long.TryParse(sizeText, out var size);
                     var path = Path.Combine(steamApps, "common", installDirectory);
                     if (Directory.Exists(path))
-                        games.Add(new GameInfo(name, path, size, "Steam", appId));
+                        games.Add(new GameInfo(name, path, size, "Steam", appId, buildId));
                 }
                 catch (IOException) { }
                 catch (UnauthorizedAccessException) { }

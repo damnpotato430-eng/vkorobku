@@ -20,6 +20,8 @@ public sealed class MainViewModel : ObservableObject
     private readonly AnalysisCacheStore _analysisCache = new();
     private readonly CompressionStatusStore _compressionStatusStore = new();
     private readonly GameCompressionDetector _compressionDetector = new();
+    private readonly OperationJournalStore _operationJournal = new();
+    private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
     private CompressionEstimate? _selectedEstimate;
     private AnalysisModeOption? _selectedAnalysisMode;
@@ -37,7 +39,7 @@ public sealed class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
-        Computer = _computerInfoService.GetComputerInfo();
+        _computer = _computerInfoService.GetComputerInfo();
         _coverService = new IgdbCoverService(_igdbCredentialStore);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
@@ -50,27 +52,36 @@ public sealed class MainViewModel : ObservableObject
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        OptimizeCommand = new AsyncRelayCommand(OptimizeSelectedGameAsync,
+            () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         CancelAnalysisCommand = new RelayCommand(CancelAnalysis, () => IsAnalyzing);
         CompressCommand = new AsyncRelayCommand(CompressSelectedGameAsync,
-            () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && SelectedEstimate is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame is { CompressionState: not GameCompressionState.Compressed, IsAnalysisStale: false } && SelectedEstimate is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         DecompressCommand = new AsyncRelayCommand(DecompressSelectedGameAsync,
-            () => SelectedGame is { CompressionState: GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame is { CompressionState: GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         CancelOperationCommand = new AsyncRelayCommand(_workerClient.CancelAsync, () => IsOperating);
+        CancelCurrentCommand = new AsyncRelayCommand(CancelCurrentAsync, () => IsAnalyzing || IsOperating);
     }
 
     public ObservableCollection<GameInfo> Games { get; } = [];
     public ObservableCollection<CompressionEstimate> Estimates { get; } = [];
     public ObservableCollection<AnalysisModeOption> AnalysisModes { get; } = [];
-    public ComputerInfo Computer { get; }
+    public ComputerInfo Computer
+    {
+        get => _computer;
+        private set => SetProperty(ref _computer, value);
+    }
     public AsyncRelayCommand ScanSteamCommand { get; }
     public AsyncRelayCommand AddFolderCommand { get; }
     public AsyncRelayCommand ConfigureIgdbCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
+    public AsyncRelayCommand OptimizeCommand { get; }
     public RelayCommand CancelAnalysisCommand { get; }
     public AsyncRelayCommand CompressCommand { get; }
     public AsyncRelayCommand DecompressCommand { get; }
     public AsyncRelayCommand CancelOperationCommand { get; }
+    public AsyncRelayCommand CancelCurrentCommand { get; }
 
     public GameInfo? SelectedGame
     {
@@ -89,7 +100,7 @@ public sealed class MainViewModel : ObservableObject
             AnalysisButtonText = "Рассчитать экономию";
             AnalysisSummary = value is null
                 ? "Выберите игру и запустите безопасный анализ выборки."
-                : $"Будет исследована репрезентативная выборка без изменения файлов игры «{value.Name}».";
+                : "Автоматический режим оценит игру и подберёт оптимальный способ экономии места.";
             if (value is not null)
                 RestoreSavedAnalysis(value);
             AnalyzeCommand.RaiseCanExecuteChanged();
@@ -160,6 +171,8 @@ public sealed class MainViewModel : ObservableObject
             CancelAnalysisCommand.RaiseCanExecuteChanged();
             CompressCommand.RaiseCanExecuteChanged();
             DecompressCommand.RaiseCanExecuteChanged();
+            OptimizeCommand.RaiseCanExecuteChanged();
+            CancelCurrentCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -174,6 +187,8 @@ public sealed class MainViewModel : ObservableObject
             CompressCommand.RaiseCanExecuteChanged();
             DecompressCommand.RaiseCanExecuteChanged();
             CancelOperationCommand.RaiseCanExecuteChanged();
+            OptimizeCommand.RaiseCanExecuteChanged();
+            CancelCurrentCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -211,7 +226,14 @@ public sealed class MainViewModel : ObservableObject
         private set => SetProperty(ref _operationSummary, value);
     }
 
-    public async Task InitializeAsync() => await RefreshSteamLibraryAsync();
+    public async Task InitializeAsync()
+    {
+        var interrupted = 0;
+        try { interrupted = _operationJournal.MarkInterrupted(); } catch { }
+        await RefreshSteamLibraryAsync();
+        if (interrupted > 0)
+            StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
+    }
 
     private async Task RefreshSteamLibraryAsync()
     {
@@ -357,7 +379,10 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    private async Task AnalyzeSelectedGameAsync()
+    private Task AnalyzeSelectedGameAsync() =>
+        AnalyzeSelectedGameAsync(SelectedAnalysisMode?.MaximumSampleBytes ?? 0);
+
+    private async Task AnalyzeSelectedGameAsync(long maximumSampleBytes)
     {
         var game = SelectedGame;
         if (game is null)
@@ -380,7 +405,7 @@ public sealed class MainViewModel : ObservableObject
                 game,
                 progress,
                 _analysisCancellation.Token,
-                SelectedAnalysisMode?.MaximumSampleBytes ?? 0);
+                maximumSampleBytes);
             foreach (var estimate in result.Estimates)
                 Estimates.Add(estimate);
             SelectedEstimate = Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress16K);
@@ -389,7 +414,8 @@ public sealed class MainViewModel : ObservableObject
             var cacheSaved = true;
             try
             {
-                _analysisCache.Save(new SavedGameAnalysis(game.InstallPath, analyzedAt, result));
+                _analysisCache.Save(new SavedGameAnalysis(game.InstallPath, analyzedAt, result, game.SteamBuildId));
+                game.IsAnalysisStale = false;
             }
             catch (IOException)
             {
@@ -435,6 +461,11 @@ public sealed class MainViewModel : ObservableObject
             game.CompressedPhysicalBytes = saved.PhysicalBytes;
             game.CompressedFileCount = saved.CompressedFiles;
             game.CompressionCheckedAt = saved.CheckedAt;
+            if (saved.State == GameCompressionState.Compressed &&
+                !string.IsNullOrWhiteSpace(saved.SteamBuildId) &&
+                !string.IsNullOrWhiteSpace(game.SteamBuildId) &&
+                !string.Equals(saved.SteamBuildId, game.SteamBuildId, StringComparison.Ordinal))
+                game.CompressionState = GameCompressionState.PartiallyCompressed;
         }
         return game;
     }
@@ -449,15 +480,29 @@ public sealed class MainViewModel : ObservableObject
             if (SelectedGame?.InstallPath.Equals(game.InstallPath, StringComparison.OrdinalIgnoreCase) != true)
                 return;
 
+            var savedStatus = _compressionStatusStore.Load(game.InstallPath);
+            var state = detected.State;
+            var buildChanged = state == GameCompressionState.Compressed &&
+                               savedStatus?.State is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed &&
+                               !string.IsNullOrWhiteSpace(savedStatus.SteamBuildId) &&
+                               !string.IsNullOrWhiteSpace(game.SteamBuildId) &&
+                               !string.Equals(savedStatus.SteamBuildId, game.SteamBuildId, StringComparison.Ordinal);
+            if (buildChanged)
+                state = GameCompressionState.PartiallyCompressed;
+
             UpdateGameCompressionStatus(
-                game.InstallPath, detected.State, detected.Algorithm,
+                game.InstallPath, state, detected.Algorithm,
                 detected.SavedBytes, detected.PhysicalBytes, detected.CompressedFiles, DateTimeOffset.Now);
             TrySaveCompressionStatus(
-                game.InstallPath, detected.State, detected.Algorithm,
-                detected.SavedBytes, detected.PhysicalBytes, detected.LogicalBytes, detected.CompressedFiles);
-            StatusText = detected.State == GameCompressionState.Compressed
-                ? $"Игра «{game.Name}» уже сжата: {detected.Algorithm ?? "Windows"}"
-                : $"Игра «{game.Name}» не сжата";
+                game.InstallPath, state, detected.Algorithm,
+                detected.SavedBytes, detected.PhysicalBytes, detected.LogicalBytes, detected.CompressedFiles,
+                buildChanged ? savedStatus?.SteamBuildId : game.SteamBuildId);
+            StatusText = state switch
+            {
+                GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {detected.Algorithm ?? "Windows"}",
+                GameCompressionState.PartiallyCompressed => $"Игра «{game.Name}» обновилась и требует дообработки",
+                _ => $"Игра «{game.Name}» не сжата"
+            };
         }
         catch (OperationCanceledException) { }
         catch (Exception exception)
@@ -508,13 +553,14 @@ public sealed class MainViewModel : ObservableObject
         long savedBytes = 0,
         long physicalBytes = 0,
         long logicalBytes = 0,
-        int compressedFiles = 0)
+        int compressedFiles = 0,
+        string? steamBuildId = null)
     {
         try
         {
             _compressionStatusStore.Save(new SavedCompressionStatus(
                 installPath, state, algorithm, DateTimeOffset.Now,
-                savedBytes, physicalBytes, logicalBytes, compressedFiles));
+                savedBytes, physicalBytes, logicalBytes, compressedFiles, steamBuildId));
         }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
@@ -523,6 +569,7 @@ public sealed class MainViewModel : ObservableObject
     private void RaiseActionCommands()
     {
         AnalyzeCommand.RaiseCanExecuteChanged();
+        OptimizeCommand.RaiseCanExecuteChanged();
         CompressCommand.RaiseCanExecuteChanged();
         DecompressCommand.RaiseCanExecuteChanged();
     }
@@ -533,11 +580,17 @@ public sealed class MainViewModel : ObservableObject
         if (saved is null)
             return;
 
+        game.IsAnalysisStale = !string.IsNullOrWhiteSpace(saved.SteamBuildId) &&
+                               !string.IsNullOrWhiteSpace(game.SteamBuildId) &&
+                               !string.Equals(saved.SteamBuildId, game.SteamBuildId, StringComparison.Ordinal);
+
         foreach (var estimate in saved.Result.Estimates)
             Estimates.Add(estimate);
         SelectedEstimate = Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress16K)
                            ?? Estimates.FirstOrDefault();
-        AnalysisSummary = BuildSavedAnalysisSummary(saved.Result, saved.AnalyzedAt);
+        AnalysisSummary = game.IsAnalysisStale
+            ? "Игра обновилась — перед оптимизацией нужен новый быстрый анализ."
+            : BuildSavedAnalysisSummary(saved.Result, saved.AnalyzedAt);
         AnalysisButtonText = "Повторить анализ";
         StatusText = $"Загружен сохранённый анализ игры «{game.Name}»";
     }
@@ -545,6 +598,35 @@ public sealed class MainViewModel : ObservableObject
     private static string BuildSavedAnalysisSummary(GameAnalysisResult result, DateTimeOffset analyzedAt) =>
         $"Анализ от {analyzedAt:dd.MM.yyyy HH:mm} · {result.FileCount:N0} файлов · " +
         $"выборка {ByteFormatter.Format(result.SampleBytes)} · физически занято {ByteFormatter.Format(result.CurrentPhysicalBytes)}";
+
+    private async Task OptimizeSelectedGameAsync()
+    {
+        var game = SelectedGame;
+        if (game is null)
+            return;
+
+        if (Estimates.Count == 0 || game.IsAnalysisStale)
+            await AnalyzeSelectedGameAsync(0);
+
+        if (SelectedGame is null || Estimates.Count == 0 || SelectedGame.IsAnalysisStale)
+            return;
+
+        var acceptable = Estimates
+            .Where(estimate => estimate.BaselineReadMegabytesPerSecond <= 0 || estimate.ReadSpeedChangePercent >= -5)
+            .OrderByDescending(estimate => estimate.MinimumSavingsBytes)
+            .ToArray();
+        SelectedEstimate = acceptable.FirstOrDefault()
+                           ?? Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress8K)
+                           ?? Estimates.FirstOrDefault();
+
+        await CompressSelectedGameAsync();
+    }
+
+    private async Task CancelCurrentAsync()
+    {
+        _analysisCancellation?.Cancel();
+        await _workerClient.CancelAsync();
+    }
 
     private async Task CompressSelectedGameAsync()
     {
@@ -587,6 +669,9 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task ExecuteWorkerOperationAsync(WorkerJob job)
     {
+        Guid? journalId = null;
+        try { journalId = _operationJournal.Begin(job); } catch { }
+
         IsOperating = true;
         OperationProgress = 0;
         OperationSummary = "Ожидаем подтверждение прав администратора…";
@@ -601,6 +686,10 @@ public sealed class MainViewModel : ObservableObject
                 : string.Empty;
             OperationSummary = $"{message.Text}{counters}";
             StatusText = OperationSummary;
+            if (journalId is not null)
+            {
+                try { _operationJournal.Update(journalId.Value, message); } catch { }
+            }
         });
 
         try
@@ -610,12 +699,16 @@ public sealed class MainViewModel : ObservableObject
             {
                 OperationSummary = result.Text ?? "Операция отменена";
                 StatusText = OperationSummary;
+                if (journalId is not null)
+                {
+                    try { _operationJournal.Finish(journalId.Value, OperationJournalState.Cancelled, OperationSummary); } catch { }
+                }
                 return;
             }
 
             OperationProgress = 100;
             var newState = job.Operation == "compress"
-                ? GameCompressionState.Compressed
+                ? (result.ErrorCount == 0 ? GameCompressionState.Compressed : GameCompressionState.PartiallyCompressed)
                 : GameCompressionState.Uncompressed;
             var newAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
             var difference = result.PhysicalBefore - result.PhysicalAfter;
@@ -624,24 +717,40 @@ public sealed class MainViewModel : ObservableObject
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now);
+            var processedGame = Games.FirstOrDefault(game =>
+                string.Equals(game.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
-                savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles);
+                savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
+                processedGame?.SteamBuildId);
 
             OperationSummary = job.Operation == "compress"
                 ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}"
                 : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
             StatusText = OperationSummary;
+            Computer = _computerInfoService.GetComputerInfo();
+            if (journalId is not null)
+            {
+                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Completed, OperationSummary); } catch { }
+            }
         }
         catch (OperationCanceledException exception)
         {
             OperationSummary = exception.Message;
             StatusText = "Операция отменена";
+            if (journalId is not null)
+            {
+                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Cancelled, OperationSummary); } catch { }
+            }
         }
         catch (Exception exception)
         {
             OperationSummary = $"Операция не выполнена: {exception.Message}";
             StatusText = "Ошибка системной операции";
+            if (journalId is not null)
+            {
+                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Failed, OperationSummary); } catch { }
+            }
         }
         finally
         {

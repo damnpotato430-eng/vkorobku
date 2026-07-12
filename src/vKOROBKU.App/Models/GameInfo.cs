@@ -7,6 +7,7 @@ public enum GameCompressionState
 {
     Unknown,
     Uncompressed,
+    PartiallyCompressed,
     Compressed
 }
 
@@ -19,6 +20,7 @@ public sealed class GameInfo : INotifyPropertyChanged
     private long _compressedPhysicalBytes;
     private int _compressedFileCount;
     private DateTimeOffset? _compressionCheckedAt;
+    private bool _isAnalysisStale;
 
     public GameInfo(
         string name,
@@ -26,6 +28,7 @@ public sealed class GameInfo : INotifyPropertyChanged
         long logicalSizeBytes,
         string source,
         string? steamAppId = null,
+        string? steamBuildId = null,
         string? coverPath = null,
         GameCompressionState compressionState = GameCompressionState.Unknown,
         string? compressionAlgorithm = null)
@@ -35,6 +38,7 @@ public sealed class GameInfo : INotifyPropertyChanged
         LogicalSizeBytes = logicalSizeBytes;
         Source = source;
         SteamAppId = steamAppId;
+        SteamBuildId = steamBuildId;
         _coverPath = coverPath;
         _compressionState = compressionState;
         _compressionAlgorithm = compressionAlgorithm;
@@ -47,6 +51,7 @@ public sealed class GameInfo : INotifyPropertyChanged
     public long LogicalSizeBytes { get; }
     public string Source { get; }
     public string? SteamAppId { get; }
+    public string? SteamBuildId { get; }
 
     public string? CoverPath
     {
@@ -122,9 +127,16 @@ public sealed class GameInfo : INotifyPropertyChanged
         }
     }
 
+    public bool IsAnalysisStale
+    {
+        get => _isAnalysisStale;
+        set => SetProperty(ref _isAnalysisStale, value);
+    }
+
     public string CompressionStatusText => CompressionState switch
     {
         GameCompressionState.Compressed => $"Сжата · {CompressionAlgorithm ?? "Windows"}",
+        GameCompressionState.PartiallyCompressed => $"Сжата частично · {CompressionAlgorithm ?? "Windows"}",
         GameCompressionState.Uncompressed => "Не сжата",
         _ => "Статус не проверен"
     };
