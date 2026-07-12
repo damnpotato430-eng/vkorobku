@@ -1,14 +1,37 @@
-# vKOROBKU
+<p align="center">
+  <img src="assets/vkorobku-icon.png" width="140" alt="vKOROBKU" />
+</p>
 
-Игровое Windows-приложение для оценки и прозрачного сжатия установленных игр штатными алгоритмами Windows.
+<h1 align="center">vKOROBKU</h1>
 
-> Проект находится на ранней стадии. Приложение обнаруживает игры, рассчитывает экономию XPRESS/LZX на безопасной временной выборке и выполняет реальное прозрачное сжатие или распаковку через отдельный UAC-worker. Перед использованием на ценных данных необходимы дополнительные полевые тесты.
+<p align="center">
+  Сжатие игр штатными средствами Windows для экономии места на диске.
+</p>
+
+<p align="center">
+  <a href="https://github.com/damnpotato430-eng/vkorobku/releases/tag/v0.1.0"><img src="https://img.shields.io/badge/release-v0.1.0-8BFF4D?style=for-the-badge&logo=github&logoColor=white" alt="Release v0.1.0" /></a>
+  <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows" alt="Windows 10/11" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-555555?style=for-the-badge" alt="GPL-3.0" /></a>
+</p>
+
+Игровое Windows-приложение для оценки и прозрачного сжатия установленных игр алгоритмами XPRESS и LZX.
+
+> Проект находится на ранней стадии. Приложение обнаруживает игры, рассчитывает экономию на безопасной временной выборке и выполняет прозрачное сжатие или распаковку через отдельный UAC-worker.
+
+## Скачать
+
+### [Скачать vKOROBKU v0.1.0 для Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases/tag/v0.1.0)
+
+Рекомендуется скачивать архив `vKOROBKU-v0.1.0-win-x64.zip`, полностью распаковать его и запустить `vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен находиться рядом.
+
+Релиз является self-contained: устанавливать .NET Runtime отдельно не требуется.
+
+> Это предварительная тестовая версия. Начинайте с игр, которые можно восстановить через проверку файлов Steam.
 
 ## Целевая платформа
 
 - Windows 10/11 x64
 - NTFS для операций XPRESS/LZX
-- .NET 8 Desktop Runtime
 
 ## Возможности MVP
 
