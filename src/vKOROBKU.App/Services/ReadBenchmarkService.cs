@@ -1,0 +1,85 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+
+namespace vKOROBKU.App.Services;
+
+/// <summary>Measures one-pass physical reads while bypassing the Windows file cache.</summary>
+public sealed class ReadBenchmarkService
+{
+    private const uint GenericRead = 0x80000000;
+    private const uint ShareRead = 0x00000001;
+    private const uint ShareWrite = 0x00000002;
+    private const uint ShareDelete = 0x00000004;
+    private const uint OpenExisting = 3;
+    private const uint FlagNoBuffering = 0x20000000;
+    private const uint FlagSequentialScan = 0x08000000;
+    private const int BufferSize = 4 * 1024 * 1024;
+
+    public double MeasureLogicalMegabytesPerSecond(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    {
+        long totalRead = 0;
+        var timer = Stopwatch.StartNew();
+        var buffer = VirtualAlloc(IntPtr.Zero, BufferSize, 0x1000 | 0x2000, 0x04);
+        if (buffer == IntPtr.Zero)
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+
+        try
+        {
+            foreach (var path in paths)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using var handle = CreateFileW(
+                    path,
+                    GenericRead,
+                    ShareRead | ShareWrite | ShareDelete,
+                    IntPtr.Zero,
+                    OpenExisting,
+                    FlagNoBuffering | FlagSequentialScan,
+                    IntPtr.Zero);
+                if (handle.IsInvalid)
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), $"Не удалось прочитать {path}");
+
+                while (true)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!ReadFile(handle, buffer, BufferSize, out var bytesRead, IntPtr.Zero))
+                    {
+                        var error = Marshal.GetLastWin32Error();
+                        // ERROR_HANDLE_EOF is a normal end condition for an unbuffered read.
+                        if (error == 38)
+                            break;
+                        throw new Win32Exception(error);
+                    }
+                    if (bytesRead == 0)
+                        break;
+                    totalRead += bytesRead;
+                }
+            }
+        }
+        finally
+        {
+            VirtualFree(buffer, UIntPtr.Zero, 0x8000);
+            timer.Stop();
+        }
+
+        return totalRead / 1024d / 1024d / Math.Max(0.001, timer.Elapsed.TotalSeconds);
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern SafeFileHandle CreateFileW(
+        string fileName, uint desiredAccess, uint shareMode, IntPtr securityAttributes,
+        uint creationDisposition, uint flagsAndAttributes, IntPtr templateFile);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ReadFile(SafeFileHandle file, IntPtr buffer, int bytesToRead, out int bytesRead, IntPtr overlapped);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr VirtualAlloc(IntPtr address, int size, uint allocationType, uint protection);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool VirtualFree(IntPtr address, UIntPtr size, uint freeType);
+}

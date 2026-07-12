@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>vKOROBKU</AssemblyName>
+    <RootNamespace>vKOROBKU.App</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />
+    <ProjectReference Include="..\vKOROBKU.Worker\vKOROBKU.Worker.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyWorkerOutput" AfterTargets="Build">
+    <ItemGroup>
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.exe" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.dll" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.deps.json" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.runtimeconfig.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WorkerOutput)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

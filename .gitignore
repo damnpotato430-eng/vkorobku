@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+# Local application data
+*.db
+*.db-shm
+*.db-wal
+logs/
+analysis-cache.json
+
+# OS
+Thumbs.db
+Desktop.ini

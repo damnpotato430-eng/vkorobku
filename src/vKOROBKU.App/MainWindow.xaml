@@ -1,0 +1,332 @@
+<Window x:Class="vKOROBKU.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="vKOROBKU" Width="1180" Height="760" MinWidth="1040" MinHeight="660"
+        Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
+        WindowStartupLocation="CenterScreen">
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#111318" BorderBrush="#252932" BorderThickness="0,0,1,0">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="28" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="vKOROBKU" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="УПАКУЙ ИГРЫ УМНЕЕ" Margin="0,4,0,0" FontSize="10" FontWeight="Bold"
+                               Foreground="{StaticResource MutedTextBrush}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2">
+                    <Border Background="#222B1D" CornerRadius="8" Padding="12,10">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Fill="{StaticResource AccentBrush}" Margin="0,0,9,0" />
+                            <TextBlock Text="Библиотека" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="АНАЛИЗ И СЖАТИЕ" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
+                               Foreground="{StaticResource MutedTextBrush}" />
+                    <TextBlock Text="Оценка XPRESS и LZX доступна после выбора игры" Margin="12,0" TextWrapping="Wrap"
+                               Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                </StackPanel>
+
+                <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="12">
+                    <StackPanel>
+                        <TextBlock Text="СИСТЕМА" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="{Binding Computer.OperatingSystem}" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
+                                   Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="{Binding Computer.MemoryText}" Margin="0,4,0,0" FontSize="11"
+                                   Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="Обложки: Steam / IGDB" Margin="0,8,0,0" FontSize="10"
+                                   Foreground="{StaticResource MutedTextBrush}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="34,28,34,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="22" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Библиотека игр" FontSize="30" FontWeight="Bold" />
+                    <TextBlock Text="Найдите установленные игры и оцените возможную экономию места"
+                               Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" />
+                </StackPanel>
+                <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding ScanSteamCommand}"
+                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
+                <Button Grid.Column="3" Content="+ Добавить папку" Command="{Binding AddFolderCommand}"
+                        VerticalAlignment="Center" />
+                <Button Grid.Column="5" Content="IGDB" Command="{Binding ConfigureIgdbCommand}"
+                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
+                        ToolTip="Настроить загрузку и кэширование обложек" />
+            </Grid>
+
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="18,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="ПРОЦЕССОР" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,6,20,0" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                        <ItemsControl ItemsSource="{Binding Computer.Drives}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayText}" Margin="0,6,0,0" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="350" />
+                </Grid.ColumnDefinitions>
+
+                <ListBox ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}"
+                         Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            <Setter Property="Width" Value="260" />
+                            <Setter Property="Margin" Value="0,0,14,14" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Card" Background="{StaticResource SurfaceBrush}" CornerRadius="12"
+                                                BorderBrush="Transparent" BorderThickness="1" Padding="17">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Card" Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Border Height="120" Background="#101217" CornerRadius="9" ClipToBounds="True">
+                                    <Grid>
+                                        <TextBlock Text="▰" Foreground="{StaticResource AccentBrush}" FontSize="26"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Image Source="{Binding CoverPath, Converter={StaticResource LocalImageConverter}}"
+                                               Stretch="UniformToFill" />
+                                    </Grid>
+                                </Border>
+                                <TextBlock Text="{Binding Name}" Margin="0,14,0,0" FontSize="17" FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding InstallPath}" Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="11" TextTrimming="CharacterEllipsis" />
+                                <Grid Margin="0,15,0,0">
+                                    <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
+                                    <TextBlock Text="{Binding SizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                </Grid>
+                                <TextBlock Text="{Binding CompressionStatusText}" Margin="0,7,0,0" FontSize="10"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="АНАЛИЗ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                            <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue=Игра не выбрана}"
+                                       Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,4,0,0" FontSize="10"
+                                       FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                            <StackPanel Visibility="{Binding UncompressedPanelVisibility}">
+                                <TextBlock Text="{Binding AnalysisSummary}" Margin="0,7,0,0" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                <TextBlock Text="ТОЧНОСТЬ АНАЛИЗА" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                                <ComboBox ItemsSource="{Binding AnalysisModes}" SelectedItem="{Binding SelectedAnalysisMode}"
+                                          DisplayMemberPath="DisplayText" Height="34" Padding="8,4"
+                                          Style="{StaticResource DarkComboBox}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ListBox Grid.Row="2" Margin="0,16,0,12" ItemsSource="{Binding Estimates}"
+                                 SelectedItem="{Binding SelectedEstimate}" Background="Transparent" BorderThickness="0"
+                                 Visibility="{Binding UncompressedPanelVisibility}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Margin" Value="0,0,0,7" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="ModeCard" Background="#111318" BorderBrush="#292D35"
+                                                        BorderThickness="1" CornerRadius="8" Padding="11">
+                                                    <ContentPresenter />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="ModeCard" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                        <Setter TargetName="ModeCard" Property="Background" Value="#1B2518" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock Text="{Binding AlgorithmText}" FontWeight="Bold" />
+                                            <TextBlock Text="{Binding EstimatedSizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                        </Grid>
+                                        <TextBlock Margin="0,5,0,0" Foreground="{StaticResource AccentBrush}">
+                                            <Run Text="Экономия: " /><Run Text="{Binding SavingsText, Mode=OneWay}" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding PerformanceText}" Margin="0,4,0,0" FontSize="10"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                        <Grid Margin="0,3,0,0">
+                                            <TextBlock Text="{Binding RatioText}" FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+                                            <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="{StaticResource MutedTextBrush}">
+                                                <Run Text="Точность: " /><Run Text="{Binding Confidence, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </Grid>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
+                                VerticalAlignment="Top" Visibility="{Binding CompressedPanelVisibility}">
+                            <StackPanel>
+                                <TextBlock Text="ИГРА УЖЕ СЖАТА" Foreground="{StaticResource AccentBrush}"
+                                           FontSize="11" FontWeight="Bold" />
+                                <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
+                                           FontSize="13" LineHeight="22" TextWrapping="Wrap" />
+                                <TextBlock Text="Файлы прозрачно распаковываются Windows во время чтения. Содержимое игры не изменено."
+                                           Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Row="3" Visibility="{Binding UncompressedPanelVisibility}">
+                            <Grid Height="18">
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
+                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
+                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="White" />
+                            </Grid>
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,7,0,10" TextWrapping="Wrap"
+                                       FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}" />
+                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelAnalysisCommand}"
+                                        Style="{StaticResource SecondaryButton}" />
+                            </Grid>
+
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Сжать" Command="{Binding CompressCommand}" />
+                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                        Background="#A83A3A" Foreground="White" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">
+                            <Grid Height="18">
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
+                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
+                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="White" />
+                            </Grid>
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,7,0,10" TextWrapping="Wrap"
+                                       FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Распаковать игру" Command="{Binding DecompressCommand}" />
+                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                        Background="#A83A3A" Foreground="White" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="5" Background="#111318" CornerRadius="8" Padding="12,9">
+                <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,53 @@
+<Window x:Class="vKOROBKU.App.IgdbSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройка IGDB" Width="520" Height="410" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" Background="{StaticResource BackgroundBrush}"
+        Foreground="{StaticResource TextBrush}">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="22" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Обложки IGDB" FontSize="25" FontWeight="Bold" />
+            <TextBlock Margin="0,7,0,0" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"
+                       Text="IGDB использует авторизацию Twitch. Создайте приложение в Twitch Developer Console и укажите его Client ID и Client Secret." />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="CLIENT ID" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBox x:Name="ClientIdBox" Margin="0,7,0,0" Height="38" Padding="10,7"
+                     Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
+                     BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="4">
+            <TextBlock Text="CLIENT SECRET" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+            <PasswordBox x:Name="ClientSecretBox" Margin="0,7,0,0" Height="38" Padding="10,7"
+                         Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
+                         BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="6" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" FontSize="11"
+                   Text="Client Secret шифруется Windows DPAPI и доступен только текущей учётной записи. Он не включается в исходный код и никуда не отправляется, кроме Twitch OAuth." />
+
+        <Grid Grid.Row="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Сохранить и загрузить обложки" Click="SaveClick" />
+            <Button Grid.Column="2" Content="Отмена" Click="CancelClick" Style="{StaticResource SecondaryButton}" />
+        </Grid>
+    </Grid>
+</Window>
