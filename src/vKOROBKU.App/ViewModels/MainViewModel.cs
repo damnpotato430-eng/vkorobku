@@ -22,6 +22,8 @@ public sealed class MainViewModel : ObservableObject
     private readonly GameCompressionDetector _compressionDetector = new();
     private readonly OperationJournalStore _operationJournal = new();
     private readonly UserPreferencesStore _preferences = new();
+    private readonly ManualGameStore _manualGameStore = new();
+    private readonly GameIdentityService _gameIdentityService = new();
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
     private CompressionEstimate? _selectedEstimate;
@@ -288,6 +290,18 @@ public sealed class MainViewModel : ObservableObject
                 Games.Add(game);
             }
 
+            foreach (var savedManualGame in _manualGameStore.Load())
+            {
+                if (Games.Any(current => string.Equals(current.InstallPath, savedManualGame.InstallPath, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+                Games.Add(ApplySavedCompressionStatus(new GameInfo(
+                    savedManualGame.Name,
+                    savedManualGame.InstallPath,
+                    savedManualGame.LogicalSizeBytes,
+                    "Добавлено вручную",
+                    savedManualGame.SteamAppId)));
+            }
+
             foreach (var manualGame in previousGames.Values.Where(game =>
                          !string.Equals(game.Source, "Steam", StringComparison.OrdinalIgnoreCase) &&
                          Games.All(current => !string.Equals(current.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase))))
@@ -324,10 +338,14 @@ public sealed class MainViewModel : ObservableObject
             return;
 
         var path = dialog.FolderName;
-        StatusText = "Рассчитываем размер выбранной игры…";
-        var size = await Task.Run(() => _fileTreeService.CalculateLogicalSize(path));
+        StatusText = "Определяем игру и рассчитываем размер…";
+        var sizeTask = Task.Run(() => _fileTreeService.CalculateLogicalSize(path));
+        var identityTask = _gameIdentityService.DetectAsync(path);
+        await Task.WhenAll(sizeTask, identityTask);
+        var size = await sizeTask;
+        var identity = await identityTask;
         var game = ApplySavedCompressionStatus(
-            new GameInfo(new DirectoryInfo(path).Name, path, size, "Добавлено вручную"));
+            new GameInfo(identity.Name, path, size, "Добавлено вручную", identity.SteamAppId));
 
         var existing = Games.FirstOrDefault(item =>
             string.Equals(item.InstallPath, path, StringComparison.OrdinalIgnoreCase));
@@ -335,6 +353,14 @@ public sealed class MainViewModel : ObservableObject
             Games.Remove(existing);
 
         Games.Add(game);
+        try
+        {
+            _manualGameStore.Save(new ManualGameRecord(
+                game.InstallPath, game.Name, game.SteamAppId, game.LogicalSizeBytes, DateTimeOffset.Now));
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
         SelectedGame = game;
         StatusText = $"Добавлена игра «{game.Name}»";
         RefreshCoversCommand.RaiseCanExecuteChanged();
