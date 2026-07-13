@@ -16,7 +16,6 @@ public sealed class GameAnalysisService
         long maximumSampleBytes = 0)
     {
         progress?.Report("Проверяем файловую систему…");
-        EnsureSupportedFileSystem(game.InstallPath);
 
         var inventoryService = new GameInventoryService(_physicalSizeService);
         var inventory = await Task.Run(
@@ -38,7 +37,7 @@ public sealed class GameAnalysisService
         if (plan.Count == 0)
             throw new InvalidOperationException("Не удалось сформировать выборку файлов.");
 
-        var workspace = CreateWorkspace(plan.Sum(fragment => (long)fragment.Length));
+        var workspace = CreateWorkspace(game.InstallPath, plan.Sum(fragment => (long)fragment.Length));
         try
         {
             var sampleFiles = await CopySampleAsync(plan, workspace, progress, cancellationToken);
@@ -88,9 +87,7 @@ public sealed class GameAnalysisService
         }
         finally
         {
-            try { Directory.Delete(workspace, true); }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
+            DeleteWorkspace(workspace);
         }
     }
 
@@ -175,27 +172,42 @@ public sealed class GameAnalysisService
         return result;
     }
 
-    private static string CreateWorkspace(long requiredBytes)
+    private static string CreateWorkspace(string gamePath, long requiredBytes)
     {
-        var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "vKOROBKU", "Analysis");
-        var drive = new DriveInfo(Path.GetPathRoot(root)!);
+        var gameVolumeRoot = Path.GetPathRoot(Path.GetFullPath(gamePath))
+                             ?? throw new InvalidOperationException("Не удалось определить диск игры.");
+        var drive = new DriveInfo(gameVolumeRoot);
         if (!drive.IsReady || !string.Equals(drive.DriveFormat, "NTFS", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Для временной выборки требуется NTFS-диск.");
+            throw new InvalidOperationException("Анализ XPRESS/LZX поддерживается только для игр на NTFS.");
         if (drive.AvailableFreeSpace < requiredBytes + 256L * 1024 * 1024)
             throw new InvalidOperationException("Недостаточно свободного места для временной выборки.");
 
-        Directory.CreateDirectory(root);
-        var workspace = Path.Combine(root, Guid.NewGuid().ToString("N"));
+        var localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var systemVolumeRoot = Path.GetPathRoot(localApplicationData);
+        var workspaceRoot = string.Equals(gameVolumeRoot, systemVolumeRoot, StringComparison.OrdinalIgnoreCase)
+            ? Path.Combine(localApplicationData, "vKOROBKU", "Analysis")
+            : Path.Combine(gameVolumeRoot, "vKOROBKU-Analysis");
+
+        Directory.CreateDirectory(workspaceRoot);
+        File.SetAttributes(workspaceRoot, File.GetAttributes(workspaceRoot) | FileAttributes.Hidden);
+
+        var workspace = Path.Combine(workspaceRoot, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(workspace);
+        File.SetAttributes(workspace, File.GetAttributes(workspace) | FileAttributes.Hidden);
         return workspace;
     }
 
-    private static void EnsureSupportedFileSystem(string path)
+    private static void DeleteWorkspace(string workspace)
     {
-        var root = Path.GetPathRoot(Path.GetFullPath(path)) ?? throw new InvalidOperationException("Не удалось определить диск игры.");
-        var drive = new DriveInfo(root);
-        if (!drive.IsReady || !string.Equals(drive.DriveFormat, "NTFS", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Анализ XPRESS/LZX поддерживается только для игр на NTFS.");
+        try
+        {
+            Directory.Delete(workspace, true);
+            var root = Directory.GetParent(workspace);
+            if (root is not null && !Directory.EnumerateFileSystemEntries(root.FullName).Any())
+                Directory.Delete(root.FullName);
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     private static long SelectAutomaticSampleLimit(long gameBytes)
