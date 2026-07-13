@@ -16,6 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\vKOROBKU.App\vKOROBKU.App.csproj" />
-    <ProjectReference Include="..\..\src\vKOROBKU.Worker\vKOROBKU.Worker.csproj" />
+    <ProjectReference Include="..\..\src\vKOROBKU.Worker\vKOROBKU.Worker.csproj" Aliases="global,worker" />
   </ItemGroup>
 </Project>

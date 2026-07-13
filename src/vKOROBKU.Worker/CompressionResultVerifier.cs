@@ -52,9 +52,16 @@ internal static class CompressionResultVerifier
                 clusterSizes[volumeRoot] = clusterSize;
             }
 
-            // compact.exe deliberately leaves tiny and already-compressed data without
-            // WOF backing when storing it externally would not save disk space.
-            if (file.Length < clusterSize || IsLikelyIncompressible(file.Path))
+            // compact.exe deliberately leaves files no larger than one compression
+            // chunk without WOF backing when the metadata would cancel out the saving.
+            // The readability check keeps genuinely locked tiny files classified as errors.
+            var smallFileLimit = Math.Max(clusterSize, GetCompressionChunkSize(expectedAlgorithm));
+            if (file.Length <= smallFileLimit && CanRead(file.Path))
+                continue;
+
+            // Already-compressed archives can also remain regular NTFS files when WOF
+            // would not reduce their physical size.
+            if (IsLikelyIncompressible(file.Path))
                 continue;
 
             errors++;
@@ -71,6 +78,28 @@ internal static class CompressionResultVerifier
         "XPRESS16K" => 3,
         _ => null
     };
+
+    private static long GetCompressionChunkSize(uint? algorithm) => algorithm switch
+    {
+        0 => 4 * 1024,
+        1 => 32 * 1024,
+        2 => 8 * 1024,
+        3 => 16 * 1024,
+        _ => 0
+    };
+
+    private static bool CanRead(string path)
+    {
+        try
+        {
+            using var source = new FileStream(
+                path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            _ = source.ReadByte();
+            return true;
+        }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+    }
 
     private static bool TryGetWofAlgorithm(string path, out uint algorithm)
     {
