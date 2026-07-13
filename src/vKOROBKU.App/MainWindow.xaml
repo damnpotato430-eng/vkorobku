@@ -327,6 +327,10 @@
                                 <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
                                         Background="#A83A3A" Foreground="White" />
                             </Grid>
+                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                                    Margin="0,8,0,0" Style="{StaticResource SecondaryButton}"
+                                    Visibility="{Binding PartiallyCompressedVisibility}"
+                                    ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding ExpertOptimizationVisibility}">
@@ -350,6 +354,10 @@
                             </Grid>
                             <Button Content="Сжать выбранным режимом" Command="{Binding CompressCommand}"
                                     Margin="0,8,0,0" />
+                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                                    Margin="0,8,0,0" Style="{StaticResource SecondaryButton}"
+                                    Visibility="{Binding PartiallyCompressedVisibility}"
+                                    ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">

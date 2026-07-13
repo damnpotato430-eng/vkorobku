@@ -255,6 +255,9 @@ public sealed class MainViewModel : ObservableObject
     public Visibility CompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility PartiallyCompressedVisibility =>
+        SelectedGame?.CompressionState == GameCompressionState.PartiallyCompressed ? Visibility.Visible : Visibility.Collapsed;
+
     public bool IsCheckingCompression
     {
         get => _isCheckingCompression;
@@ -298,6 +301,33 @@ public sealed class MainViewModel : ObservableObject
         await RefreshSteamLibraryAsync();
         if (interrupted > 0)
             StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
+        await OfferToResumeInterruptedCompressionAsync();
+    }
+
+    private async Task OfferToResumeInterruptedCompressionAsync()
+    {
+        var latest = Operations.FirstOrDefault();
+        if (latest is not { State: OperationJournalState.Interrupted, Operation: "compress" } ||
+            string.IsNullOrWhiteSpace(latest.Algorithm) || IsAnalyzing || IsOperating)
+            return;
+
+        var game = Games.FirstOrDefault(item =>
+            string.Equals(item.InstallPath, latest.InstallPath, StringComparison.OrdinalIgnoreCase));
+        if (game is null)
+            return;
+
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            $"Сжатие игры «{game.Name}» ({latest.Algorithm}) было прервано.\n\n" +
+            "Продолжить с места остановки? Уже сжатые файлы будут пропущены автоматически.",
+            "Продолжить сжатие",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        SelectedGame = game;
+        await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "compress", latest.Algorithm));
     }
 
     private async Task RefreshSteamLibraryAsync()
@@ -952,6 +982,7 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(AutoOptimizationVisibility));
         OnPropertyChanged(nameof(ExpertOptimizationVisibility));
         OnPropertyChanged(nameof(CompressedPanelVisibility));
+        OnPropertyChanged(nameof(PartiallyCompressedVisibility));
     }
 
     private void TrySaveCompressionStatus(

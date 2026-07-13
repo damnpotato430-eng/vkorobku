@@ -70,7 +70,7 @@ internal static class CompressionResultVerifier
         return errors;
     }
 
-    private static uint? ParseAlgorithm(string? algorithm) => algorithm switch
+    internal static uint? ParseAlgorithm(string? algorithm) => algorithm switch
     {
         "XPRESS4K" => 0,
         "LZX" => 1,
@@ -101,7 +101,7 @@ internal static class CompressionResultVerifier
         catch (UnauthorizedAccessException) { return false; }
     }
 
-    private static bool TryGetWofAlgorithm(string path, out uint algorithm)
+    internal static bool TryGetWofAlgorithm(string path, out uint algorithm)
     {
         algorithm = uint.MaxValue;
         var info = new WofFileCompressionInfo();

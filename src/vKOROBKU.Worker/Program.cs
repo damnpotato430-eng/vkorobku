@@ -76,13 +76,24 @@ internal static class Program
 
         var totalBytes = files.Sum(file => file.Length);
         var physicalBefore = MeasurePhysicalSize(files);
+
+        await SendAsync(writer, new WorkerMessage("status", "Проверяем, какие файлы уже обработаны…"));
+        var (pendingFiles, skippedBytes, skippedFiles) = PartitionPendingFiles(
+            files, file => IsAlreadyProcessed(file, job), cancellationToken);
+        long processedBytes = skippedBytes;
+        var processedFiles = skippedFiles;
         await SendAsync(writer, new WorkerMessage(
-            "progress", "Подготовка завершена", TotalBytes: totalBytes, TotalFiles: files.Count,
+            "progress",
+            skippedFiles > 0
+                ? $"Пропущено уже обработанных файлов: {skippedFiles:N0} — продолжаем с места остановки"
+                : "Подготовка завершена",
+            ProcessedBytes: processedBytes,
+            TotalBytes: totalBytes,
+            ProcessedFiles: processedFiles,
+            TotalFiles: files.Count,
             PhysicalBefore: physicalBefore));
 
-        var batches = BatchPlanner.CreateBatches(files);
-        long processedBytes = 0;
-        var processedFiles = 0;
+        var batches = BatchPlanner.CreateBatches(pendingFiles);
 
         foreach (var batch in batches)
         {
@@ -203,6 +214,47 @@ internal static class Program
             catch (UnauthorizedAccessException) { }
         }
         return result;
+    }
+
+    // A file is either fully converted or untouched at the NTFS level, so an interrupted
+    // operation resumes by skipping files that are already in the target state.
+    internal static (List<WorkerFile> Pending, long SkippedBytes, int SkippedFiles) PartitionPendingFiles(
+        IReadOnlyList<WorkerFile> files,
+        Func<WorkerFile, bool> isAlreadyProcessed,
+        CancellationToken cancellationToken)
+    {
+        var pending = new List<WorkerFile>(files.Count);
+        long skippedBytes = 0;
+        var skippedFiles = 0;
+        foreach (var file in files)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (isAlreadyProcessed(file))
+            {
+                skippedBytes += file.Length;
+                skippedFiles++;
+            }
+            else
+            {
+                pending.Add(file);
+            }
+        }
+        return (pending, skippedBytes, skippedFiles);
+    }
+
+    private static bool IsAlreadyProcessed(WorkerFile file, WorkerJob job)
+    {
+        if (job.Operation == "compress")
+            return CompressionResultVerifier.TryGetWofAlgorithm(file.Path, out var algorithm) &&
+                   algorithm == CompressionResultVerifier.ParseAlgorithm(job.Algorithm);
+
+        try
+        {
+            return (File.GetAttributes(file.Path) & FileAttributes.Compressed) == 0 &&
+                   !CompressionResultVerifier.TryGetWofAlgorithm(file.Path, out _);
+        }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
     }
 
     // compact.exe /U without /EXE removes only NTFS compression, while /U /EXE removes
