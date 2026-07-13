@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: dotnet test vKOROBKU.sln --configuration Release
+
+      - name: Build release package
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          ./scripts/build-release.ps1 -Version $version
+
+      - name: Assemble release notes
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          $notes = "docs/release-notes-v$version.md"
+          if (-not (Test-Path $notes)) {
+            throw "Не найден файл release notes: $notes. Добавьте его в docs/ и пересоздайте тег."
+          }
+          $body = (Get-Content $notes -Raw) + "`n" + (Get-Content "artifacts/vKOROBKU-v$version-win-x64-checksum.md" -Raw)
+          [IO.File]::WriteAllText("artifacts/release-body.md", $body, [Text.UTF8Encoding]::new($false))
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          $arguments = @(
+            $env:GITHUB_REF_NAME,
+            '--title', "vKOROBKU v$version",
+            '--notes-file', 'artifacts/release-body.md',
+            "artifacts/vKOROBKU-v$version-win-x64.zip",
+            "artifacts/vKOROBKU-v$version-win-x64.sha256"
+          )
+          if ($version -like '0.*') { $arguments += '--prerelease' }
+          gh release create @arguments

@@ -59,9 +59,19 @@ public sealed class CompressionWorkerClient
             {
                 using var connectionTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 connectionTimeout.CancelAfter(TimeSpan.FromSeconds(30));
+                var connectTask = pipe.WaitForConnectionAsync(connectionTimeout.Token);
+                var workerExitTask = WaitForWorkerExitAsync(worker, connectionTimeout.Token);
                 try
                 {
-                    await pipe.WaitForConnectionAsync(connectionTimeout.Token);
+                    var first = await Task.WhenAny(connectTask, workerExitTask);
+                    if (first == workerExitTask && !connectTask.IsCompleted)
+                    {
+                        connectionTimeout.Cancel();
+                        try { await connectTask; }
+                        catch (OperationCanceledException) { }
+                        throw new InvalidOperationException(DescribeEarlyWorkerExit(worker.ExitCode));
+                    }
+                    await connectTask;
                 }
                 catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
@@ -111,6 +121,24 @@ public sealed class CompressionWorkerClient
             WorkerTokenFile.Delete(tokenFile);
         }
     }
+
+    private static async Task WaitForWorkerExitAsync(Process worker, CancellationToken cancellationToken)
+    {
+        try { await worker.WaitForExitAsync(cancellationToken); }
+        catch (OperationCanceledException) { }
+        catch (InvalidOperationException) { }
+    }
+
+    // Exit code 2 means the worker could not read the one-time token file. Its ACL and
+    // location are bound to the invoking user, so this happens when UAC is confirmed
+    // by a different Windows account.
+    private static string DescribeEarlyWorkerExit(int exitCode) => exitCode switch
+    {
+        2 => "Системный модуль не смог прочитать одноразовый файл авторизации. Обычно это происходит, " +
+             "когда права администратора подтверждает другая учётная запись Windows. Подтвердите запрос UAC " +
+             "той же учётной записью, под которой запущено приложение, или запустите vKOROBKU от имени администратора.",
+        _ => $"Системный модуль завершился до подключения (код {exitCode})."
+    };
 
     public async Task CancelAsync()
     {

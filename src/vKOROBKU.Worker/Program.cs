@@ -94,11 +94,20 @@ internal static class Program
             PhysicalBefore: physicalBefore));
 
         var batches = BatchPlanner.CreateBatches(pendingFiles);
+        var failedBatches = 0;
 
         foreach (var batch in batches)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _ = await RunCompactAsync(batch, job, cancellationToken);
+            var exitCode = await RunCompactAsync(batch, job, cancellationToken);
+            if (exitCode != 0)
+            {
+                failedBatches++;
+                if (failedBatches == 1)
+                    await SendAsync(writer, new WorkerMessage(
+                        "status",
+                        $"compact.exe сообщил об ошибке (код {exitCode}). Обработка продолжается, пропущенные файлы будут учтены при проверке."));
+            }
 
             processedBytes += batch.Sum(file => file.Length);
             processedFiles += batch.Count;
@@ -113,7 +122,10 @@ internal static class Program
         }
 
         await SendAsync(writer, new WorkerMessage(
-            "status", "Проверяем результат обработки…",
+            "status",
+            failedBatches == 0
+                ? "Проверяем результат обработки…"
+                : $"Проверяем результат обработки (пакетов с ошибками: {failedBatches})…",
             ProcessedBytes: processedBytes,
             TotalBytes: totalBytes,
             ProcessedFiles: processedFiles,

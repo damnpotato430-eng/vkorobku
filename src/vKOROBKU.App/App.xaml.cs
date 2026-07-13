@@ -62,16 +62,29 @@ public partial class App : Application
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetForegroundWindow(IntPtr window);
 
+    private int _unhandledUiExceptionCount;
+
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         WriteCrashLog(e.Exception);
+        e.Handled = true;
+        _unhandledUiExceptionCount++;
+        if (_unhandledUiExceptionCount >= 3)
+        {
+            MessageBox.Show(
+                $"Ошибки повторяются, приложение будет закрыто. Отчёты сохранены в папке logs.\n\n{e.Exception.Message}",
+                "vKOROBKU",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(-1);
+            return;
+        }
+
         MessageBox.Show(
-            $"Произошла непредвиденная ошибка. Отчёт сохранён в папке logs.\n\n{e.Exception.Message}",
+            $"Произошла непредвиденная ошибка, работа продолжается. Отчёт сохранён в папке logs.\n\n{e.Exception.Message}",
             "vKOROBKU",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
-        e.Handled = true;
-        Shutdown(-1);
     }
 
     private static void WriteCrashLog(Exception exception)
