@@ -83,14 +83,11 @@ internal static class Program
         var batches = BatchPlanner.CreateBatches(files);
         long processedBytes = 0;
         var processedFiles = 0;
-        var errorCount = 0;
 
         foreach (var batch in batches)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var exitCode = await RunCompactAsync(batch, job, cancellationToken);
-            if (exitCode != 0)
-                errorCount += batch.Count;
+            _ = await RunCompactAsync(batch, job, cancellationToken);
 
             processedBytes += batch.Sum(file => file.Length);
             processedFiles += batch.Count;
@@ -101,10 +98,17 @@ internal static class Program
                 TotalBytes: totalBytes,
                 ProcessedFiles: processedFiles,
                 TotalFiles: files.Count,
-                ErrorCount: errorCount,
                 PhysicalBefore: physicalBefore));
         }
 
+        await SendAsync(writer, new WorkerMessage(
+            "status", "Проверяем результат обработки…",
+            ProcessedBytes: processedBytes,
+            TotalBytes: totalBytes,
+            ProcessedFiles: processedFiles,
+            TotalFiles: files.Count,
+            PhysicalBefore: physicalBefore));
+        var errorCount = CompressionResultVerifier.CountErrors(files, job, cancellationToken);
         var physicalAfter = MeasurePhysicalSize(files);
         await SendAsync(writer, new WorkerMessage(
             "completed",
