@@ -25,82 +25,90 @@ public sealed class CompressionWorkerClient
 
         var pipeName = $"vkorobku-{Guid.NewGuid():N}";
         var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-        using var pipe = new NamedPipeServerStream(
-            pipeName,
-            PipeDirection.InOut,
-            1,
-            PipeTransmissionMode.Byte,
-            PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
-
-        Process? worker;
+        var tokenFile = WorkerTokenFile.Create(token);
         try
         {
-            worker = Process.Start(new ProcessStartInfo
-            {
-                FileName = workerPath,
-                Arguments = $"--pipe {pipeName} --token {token}",
-                WorkingDirectory = AppContext.BaseDirectory,
-                UseShellExecute = true,
-                Verb = "runas"
-            });
-        }
-        catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
-        {
-            throw new OperationCanceledException("Запрос прав администратора отменён.", exception);
-        }
+            using var pipe = new NamedPipeServerStream(
+                pipeName,
+                PipeDirection.InOut,
+                1,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
 
-        if (worker is null)
-            throw new InvalidOperationException("Не удалось запустить системный модуль.");
-
-        using (worker)
-        {
-            using var connectionTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            connectionTimeout.CancelAfter(TimeSpan.FromSeconds(30));
+            Process? worker;
             try
             {
-                await pipe.WaitForConnectionAsync(connectionTimeout.Token);
-            }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                throw new TimeoutException("Системный модуль не подключился за 30 секунд.");
-            }
-
-            using var reader = new StreamReader(pipe, new UTF8Encoding(false), false, 4096, true);
-            using var writer = new StreamWriter(pipe, new UTF8Encoding(false), 4096, true) { AutoFlush = true };
-            _activeWriter = writer;
-            try
-            {
-                var helloLine = await reader.ReadLineAsync(cancellationToken);
-                var hello = helloLine is null ? null : JsonSerializer.Deserialize<WorkerMessage>(helloLine, JsonOptions);
-                if (hello?.Type != "hello" || !CryptographicOperations.FixedTimeEquals(
-                        Encoding.ASCII.GetBytes(hello.Token ?? string.Empty), Encoding.ASCII.GetBytes(token)))
-                    throw new InvalidOperationException("Не удалось подтвердить подлинность системного модуля.");
-
-                await WriteAsync(writer, JsonSerializer.Serialize(job, JsonOptions), cancellationToken);
-                while (true)
+                worker = Process.Start(new ProcessStartInfo
                 {
-                    var line = await reader.ReadLineAsync(cancellationToken);
-                    if (line is null)
-                        throw new IOException("Системный модуль неожиданно завершил соединение.");
-                    var message = JsonSerializer.Deserialize<WorkerMessage>(line, JsonOptions)
-                        ?? throw new InvalidDataException("Получен некорректный ответ системного модуля.");
-                    progress?.Report(message);
+                    FileName = workerPath,
+                    Arguments = $"--pipe {pipeName} --token-file \"{tokenFile}\"",
+                    WorkingDirectory = AppContext.BaseDirectory,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+            }
+            catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
+            {
+                throw new OperationCanceledException("Запрос прав администратора отменён.", exception);
+            }
 
-                    if (message.Type == "completed" || message.Type == "cancelled")
-                        return message;
-                    if (message.Type == "error")
-                        throw new InvalidOperationException(message.Text ?? "Ошибка системного модуля.");
+            if (worker is null)
+                throw new InvalidOperationException("Не удалось запустить системный модуль.");
+
+            using (worker)
+            {
+                using var connectionTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                connectionTimeout.CancelAfter(TimeSpan.FromSeconds(30));
+                try
+                {
+                    await pipe.WaitForConnectionAsync(connectionTimeout.Token);
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new TimeoutException("Системный модуль не подключился за 30 секунд.");
+                }
+
+                using var reader = new StreamReader(pipe, new UTF8Encoding(false), false, 4096, true);
+                using var writer = new StreamWriter(pipe, new UTF8Encoding(false), 4096, true) { AutoFlush = true };
+                _activeWriter = writer;
+                try
+                {
+                    var helloLine = await reader.ReadLineAsync(cancellationToken);
+                    var hello = helloLine is null ? null : JsonSerializer.Deserialize<WorkerMessage>(helloLine, JsonOptions);
+                    if (hello?.Type != "hello" || !CryptographicOperations.FixedTimeEquals(
+                            Encoding.ASCII.GetBytes(hello.Token ?? string.Empty), Encoding.ASCII.GetBytes(token)))
+                        throw new InvalidOperationException("Не удалось подтвердить подлинность системного модуля.");
+
+                    await WriteAsync(writer, JsonSerializer.Serialize(job, JsonOptions), cancellationToken);
+                    while (true)
+                    {
+                        var line = await reader.ReadLineAsync(cancellationToken);
+                        if (line is null)
+                            throw new IOException("Системный модуль неожиданно завершил соединение.");
+                        var message = JsonSerializer.Deserialize<WorkerMessage>(line, JsonOptions)
+                            ?? throw new InvalidDataException("Получен некорректный ответ системного модуля.");
+                        progress?.Report(message);
+
+                        if (message.Type == "completed" || message.Type == "cancelled")
+                            return message;
+                        if (message.Type == "error")
+                            throw new InvalidOperationException(message.Text ?? "Ошибка системного модуля.");
+                    }
+                }
+                finally
+                {
+                    _activeWriter = null;
+                    if (!worker.HasExited)
+                    {
+                        try { await worker.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)); }
+                        catch { }
+                    }
                 }
             }
-            finally
-            {
-                _activeWriter = null;
-                if (!worker.HasExited)
-                {
-                    try { await worker.WaitForExitAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5)); }
-                    catch { }
-                }
-            }
+        }
+        finally
+        {
+            WorkerTokenFile.Delete(tokenFile);
         }
     }
 

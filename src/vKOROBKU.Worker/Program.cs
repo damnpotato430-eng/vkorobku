@@ -15,7 +15,7 @@ internal static class Program
     public static async Task<int> Main(string[] args)
     {
         var pipeName = ReadArgument(args, "--pipe");
-        var expectedToken = ReadArgument(args, "--token");
+        var expectedToken = ReadAndDeleteToken(args);
         if (string.IsNullOrWhiteSpace(pipeName) || string.IsNullOrWhiteSpace(expectedToken))
             return 2;
 
@@ -273,6 +273,38 @@ internal static class Program
 
     private static Task SendAsync(StreamWriter writer, WorkerMessage message) =>
         writer.WriteLineAsync(JsonSerializer.Serialize(message, JsonOptions));
+
+    private static string? ReadAndDeleteToken(string[] args)
+    {
+        var tokenFile = ReadArgument(args, "--token-file");
+        if (string.IsNullOrWhiteSpace(tokenFile) || !Path.IsPathFullyQualified(tokenFile))
+            return null;
+
+        var fullPath = Path.GetFullPath(tokenFile);
+        var allowedRoot = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "vKOROBKU", "WorkerAuth") + Path.DirectorySeparatorChar;
+        if (!fullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        try
+        {
+            var directory = Path.GetDirectoryName(fullPath);
+            if (directory is null ||
+                (File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0 ||
+                (File.GetAttributes(fullPath) & FileAttributes.ReparsePoint) != 0)
+                return null;
+            return File.ReadAllText(fullPath, Encoding.UTF8).Trim();
+        }
+        catch (IOException) { return null; }
+        catch (UnauthorizedAccessException) { return null; }
+        finally
+        {
+            try { File.Delete(fullPath); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+    }
 
     private static string? ReadArgument(string[] args, string name)
     {
