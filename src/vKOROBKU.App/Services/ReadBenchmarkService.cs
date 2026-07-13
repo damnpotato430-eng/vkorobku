@@ -25,7 +25,10 @@ public sealed class ReadBenchmarkService
     // incidental competing I/O can only increase elapsed time in this uncached benchmark.
     private const int LargeSamplePassCount = 2;
 
-    public double MeasureLogicalMegabytesPerSecond(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    public double MeasureLogicalMegabytesPerSecond(
+        IReadOnlyList<string> paths,
+        CancellationToken cancellationToken,
+        IProgress<ReadBenchmarkProgress>? progress = null)
     {
         long sampleBytes = 0;
         foreach (var path in paths)
@@ -39,7 +42,13 @@ public sealed class ReadBenchmarkService
         for (var pass = 0; pass < passCount; pass++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            measurements[pass] = MeasureSinglePass(paths, cancellationToken);
+            var currentPass = pass;
+            measurements[pass] = MeasureSinglePass(paths, cancellationToken, bytesRead =>
+                progress?.Report(new ReadBenchmarkProgress(
+                    currentPass + 1,
+                    passCount,
+                    Math.Min(sampleBytes, bytesRead),
+                    sampleBytes)));
         }
 
         if (passCount == LargeSamplePassCount)
@@ -49,9 +58,14 @@ public sealed class ReadBenchmarkService
         return measurements[measurements.Length / 2];
     }
 
-    private static double MeasureSinglePass(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    private static double MeasureSinglePass(
+        IReadOnlyList<string> paths,
+        CancellationToken cancellationToken,
+        Action<long>? reportProgress)
     {
+        const long ProgressInterval = 32L * 1024 * 1024;
         long totalRead = 0;
+        long nextProgress = ProgressInterval;
         var timer = Stopwatch.StartNew();
         var buffer = VirtualAlloc(IntPtr.Zero, BufferSize, 0x1000 | 0x2000, 0x04);
         if (buffer == IntPtr.Zero)
@@ -87,8 +101,14 @@ public sealed class ReadBenchmarkService
                     if (bytesRead == 0)
                         break;
                     totalRead += bytesRead;
+                    if (totalRead >= nextProgress)
+                    {
+                        reportProgress?.Invoke(totalRead);
+                        nextProgress = totalRead + ProgressInterval;
+                    }
                 }
             }
+            reportProgress?.Invoke(totalRead);
         }
         finally
         {
@@ -98,6 +118,12 @@ public sealed class ReadBenchmarkService
 
         return totalRead / 1024d / 1024d / Math.Max(0.001, timer.Elapsed.TotalSeconds);
     }
+
+    public sealed record ReadBenchmarkProgress(
+        int Pass,
+        int PassCount,
+        long ProcessedBytes,
+        long TotalBytes);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern SafeFileHandle CreateFileW(

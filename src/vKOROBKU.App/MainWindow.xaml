@@ -34,6 +34,8 @@
                             <TextBlock Text="Библиотека" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>
+                    <Button Content="Операции" Command="{Binding ShowOperationsCommand}"
+                            Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
                     <TextBlock Text="АНАЛИЗ И СЖАТИЕ" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
                                Foreground="{StaticResource MutedTextBrush}" />
                     <TextBlock Text="Оценка XPRESS и LZX доступна после выбора игры" Margin="12,0" TextWrapping="Wrap"

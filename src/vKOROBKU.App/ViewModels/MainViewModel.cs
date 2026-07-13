@@ -29,6 +29,7 @@ public sealed class MainViewModel : ObservableObject
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
     private CompressionEstimate? _selectedEstimate;
+    private OperationJournalEntry? _currentOperation;
     private AnalysisModeOption? _selectedAnalysisMode;
     private CancellationTokenSource? _analysisCancellation;
     private CancellationTokenSource? _compressionCheckCancellation;
@@ -56,6 +57,7 @@ public sealed class MainViewModel : ObservableObject
         ScanSteamCommand = new AsyncRelayCommand(RefreshSteamLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
         ConfigureIgdbCommand = new AsyncRelayCommand(ConfigureIgdbAsync);
+        ShowOperationsCommand = new RelayCommand(ShowOperations);
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
@@ -76,6 +78,7 @@ public sealed class MainViewModel : ObservableObject
 
     public ObservableCollection<GameInfo> Games { get; } = [];
     public ObservableCollection<CompressionEstimate> Estimates { get; } = [];
+    public ObservableCollection<OperationJournalEntry> Operations { get; } = [];
     public ObservableCollection<AnalysisModeOption> AnalysisModes { get; } = [];
     public ComputerInfo Computer
     {
@@ -85,6 +88,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand ScanSteamCommand { get; }
     public AsyncRelayCommand AddFolderCommand { get; }
     public AsyncRelayCommand ConfigureIgdbCommand { get; }
+    public RelayCommand ShowOperationsCommand { get; }
     public AsyncRelayCommand ReviewIdentityCommand { get; }
     public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
@@ -95,6 +99,12 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand DecompressCommand { get; }
     public AsyncRelayCommand CancelOperationCommand { get; }
     public AsyncRelayCommand CancelCurrentCommand { get; }
+
+    public OperationJournalEntry? CurrentOperation
+    {
+        get => _currentOperation;
+        private set => SetProperty(ref _currentOperation, value);
+    }
 
     public GameInfo? SelectedGame
     {
@@ -284,6 +294,7 @@ public sealed class MainViewModel : ObservableObject
 
         var interrupted = 0;
         try { interrupted = _operationJournal.MarkInterrupted(); } catch { }
+        LoadOperationHistory();
         await RefreshSteamLibraryAsync();
         if (interrupted > 0)
             StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
@@ -522,6 +533,59 @@ public sealed class MainViewModel : ObservableObject
         await LoadCoversAsync(true);
     }
 
+    private void ShowOperations()
+    {
+        var existing = Application.Current.Windows.OfType<OperationsWindow>().FirstOrDefault();
+        if (existing is not null)
+        {
+            existing.Activate();
+            return;
+        }
+
+        var window = new OperationsWindow
+        {
+            Owner = Application.Current.MainWindow,
+            DataContext = this
+        };
+        window.Show();
+    }
+
+    private void LoadOperationHistory()
+    {
+        try
+        {
+            Operations.Clear();
+            foreach (var entry in _operationJournal.Load())
+                Operations.Add(entry);
+            CurrentOperation = Operations.FirstOrDefault(entry => entry.State == OperationJournalState.Running);
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+    }
+
+    private void UpsertOperation(OperationJournalEntry entry)
+    {
+        var index = -1;
+        for (var current = 0; current < Operations.Count; current++)
+        {
+            if (Operations[current].Id == entry.Id)
+            {
+                index = current;
+                break;
+            }
+        }
+
+        if (index >= 0)
+            Operations[index] = entry;
+        else
+            Operations.Insert(0, entry);
+
+        if (entry.State == OperationJournalState.Running)
+            CurrentOperation = entry;
+        else if (CurrentOperation?.Id == entry.Id)
+            CurrentOperation = null;
+    }
+
     private async Task LoadCoversAsync(bool forceRefresh)
     {
         if (Games.Count == 0)
@@ -643,12 +707,55 @@ public sealed class MainViewModel : ObservableObject
         Estimates.Clear();
         _analysisCancellation = new CancellationTokenSource();
         IsAnalyzing = true;
+        OperationProgress = 0;
         AnalysisButtonText = "Анализ выполняется…";
         AnalysisSummary = "Инвентаризация файлов…";
-        var progress = new Progress<string>(message =>
+        OperationSummary = AnalysisSummary;
+
+        Guid journalId;
+        var startedAt = DateTimeOffset.Now;
+        try { journalId = _operationJournal.Begin(game.InstallPath, "analysis", null, AnalysisSummary); }
+        catch { journalId = Guid.NewGuid(); }
+        var operation = new OperationJournalEntry(
+            journalId, game.InstallPath, "analysis", null, startedAt, null,
+            OperationJournalState.Running, 0, 0, 0, 0, 0, AnalysisSummary);
+        UpsertOperation(operation);
+        var lastPersistedPercent = -5;
+        var acceptAnalysisProgress = true;
+
+        var progress = new Progress<AnalysisProgressUpdate>(update =>
         {
-            AnalysisSummary = message;
-            StatusText = message;
+            if (!acceptAnalysisProgress)
+                return;
+            OperationProgress = Math.Clamp(update.Percent, 0, 100);
+            AnalysisSummary = update.Stage;
+            OperationSummary = update.Stage;
+            StatusText = update.Stage;
+            operation = operation with
+            {
+                ProcessedBytes = update.ProcessedBytes,
+                TotalBytes = update.TotalBytes,
+                ProcessedFiles = (int)Math.Round(OperationProgress),
+                TotalFiles = 100,
+                Message = update.Stage
+            };
+            UpsertOperation(operation);
+
+            var wholePercent = (int)OperationProgress;
+            if (wholePercent >= lastPersistedPercent + 5)
+            {
+                lastPersistedPercent = wholePercent;
+                try
+                {
+                    _operationJournal.Update(journalId, new WorkerMessage(
+                        "progress", update.Stage,
+                        ProcessedBytes: update.ProcessedBytes,
+                        TotalBytes: update.TotalBytes,
+                        ProcessedFiles: wholePercent,
+                        TotalFiles: 100));
+                }
+                catch { }
+            }
         });
 
         try
@@ -658,6 +765,7 @@ public sealed class MainViewModel : ObservableObject
                 progress,
                 _analysisCancellation.Token,
                 maximumSampleBytes);
+            acceptAnalysisProgress = false;
             foreach (var estimate in result.Estimates)
                 Estimates.Add(estimate);
             SelectedEstimate = Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress16K);
@@ -678,23 +786,68 @@ public sealed class MainViewModel : ObservableObject
                 cacheSaved = false;
             }
 
+            OperationProgress = 100;
             AnalysisSummary = BuildSavedAnalysisSummary(result, analyzedAt);
             StatusText = cacheSaved
                 ? $"Анализ игры «{game.Name}» завершён и сохранён"
                 : $"Анализ игры «{game.Name}» завершён, но кэш записать не удалось";
+            OperationSummary = StatusText;
+            operation = operation with
+            {
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Completed,
+                ProcessedBytes = result.SampleBytes,
+                TotalBytes = result.SampleBytes,
+                ProcessedFiles = 100,
+                TotalFiles = 100,
+                Message = StatusText
+            };
+            UpsertOperation(operation);
+            try
+            {
+                _operationJournal.Update(journalId, new WorkerMessage(
+                    "completed", StatusText,
+                    ProcessedBytes: result.SampleBytes,
+                    TotalBytes: result.SampleBytes,
+                    ProcessedFiles: 100,
+                    TotalFiles: 100));
+                _operationJournal.Finish(journalId, OperationJournalState.Completed, StatusText);
+            }
+            catch { }
         }
         catch (OperationCanceledException)
         {
+            acceptAnalysisProgress = false;
             AnalysisSummary = "Анализ отменён. Временные файлы удалены.";
             StatusText = "Анализ отменён";
+            OperationSummary = AnalysisSummary;
+            operation = operation with
+            {
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Cancelled,
+                Message = AnalysisSummary
+            };
+            UpsertOperation(operation);
+            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, AnalysisSummary); } catch { }
         }
         catch (Exception exception)
         {
+            acceptAnalysisProgress = false;
             AnalysisSummary = $"Анализ не выполнен: {exception.Message}";
             StatusText = "Ошибка анализа";
+            OperationSummary = AnalysisSummary;
+            operation = operation with
+            {
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Failed,
+                Message = AnalysisSummary
+            };
+            UpsertOperation(operation);
+            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, AnalysisSummary); } catch { }
         }
         finally
         {
+            acceptAnalysisProgress = false;
             _analysisCancellation.Dispose();
             _analysisCancellation = null;
             IsAnalyzing = false;
@@ -923,8 +1076,15 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task ExecuteWorkerOperationAsync(WorkerJob job)
     {
-        Guid? journalId = null;
-        try { journalId = _operationJournal.Begin(job); } catch { }
+        Guid journalId;
+        var startedAt = DateTimeOffset.Now;
+        try { journalId = _operationJournal.Begin(job); }
+        catch { journalId = Guid.NewGuid(); }
+        var operation = new OperationJournalEntry(
+            journalId, job.RootPath, job.Operation, job.Algorithm, startedAt, null,
+            OperationJournalState.Running, 0, 0, 0, 0, 0, "Ожидание Worker");
+        UpsertOperation(operation);
+        var acceptWorkerProgress = true;
 
         IsOperating = true;
         OperationProgress = 0;
@@ -933,6 +1093,8 @@ public sealed class MainViewModel : ObservableObject
 
         var progress = new Progress<WorkerMessage>(message =>
         {
+            if (!acceptWorkerProgress)
+                return;
             if (message.TotalBytes > 0)
                 OperationProgress = Math.Clamp(message.ProcessedBytes * 100d / message.TotalBytes, 0, 100);
             var counters = message.TotalFiles > 0
@@ -940,23 +1102,45 @@ public sealed class MainViewModel : ObservableObject
                 : string.Empty;
             OperationSummary = $"{message.Text}{counters}";
             StatusText = OperationSummary;
-            if (journalId is not null)
+            operation = operation with
             {
-                try { _operationJournal.Update(journalId.Value, message); } catch { }
-            }
+                ProcessedBytes = message.ProcessedBytes,
+                TotalBytes = message.TotalBytes,
+                ProcessedFiles = message.ProcessedFiles,
+                TotalFiles = message.TotalFiles,
+                ErrorCount = message.ErrorCount,
+                Message = OperationSummary
+            };
+            UpsertOperation(operation);
+            try { _operationJournal.Update(journalId, message); } catch { }
         });
 
         try
         {
             var result = await _workerClient.ExecuteAsync(job, progress);
+            acceptWorkerProgress = false;
             if (result.Type == "cancelled")
             {
                 OperationSummary = result.Text ?? "Операция отменена";
                 StatusText = OperationSummary;
-                if (journalId is not null)
+                operation = operation with
                 {
-                    try { _operationJournal.Finish(journalId.Value, OperationJournalState.Cancelled, OperationSummary); } catch { }
+                    FinishedAt = DateTimeOffset.Now,
+                    State = OperationJournalState.Cancelled,
+                    ProcessedBytes = result.ProcessedBytes,
+                    TotalBytes = result.TotalBytes,
+                    ProcessedFiles = result.ProcessedFiles,
+                    TotalFiles = result.TotalFiles,
+                    ErrorCount = result.ErrorCount,
+                    Message = OperationSummary
+                };
+                UpsertOperation(operation);
+                try
+                {
+                    _operationJournal.Update(journalId, result);
+                    _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary);
                 }
+                catch { }
                 return;
             }
 
@@ -983,31 +1167,56 @@ public sealed class MainViewModel : ObservableObject
                 : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
-            if (journalId is not null)
+            operation = operation with
             {
-                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Completed, OperationSummary); } catch { }
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Completed,
+                ProcessedBytes = result.ProcessedBytes,
+                TotalBytes = result.TotalBytes,
+                ProcessedFiles = result.ProcessedFiles,
+                TotalFiles = result.TotalFiles,
+                ErrorCount = result.ErrorCount,
+                Message = OperationSummary
+            };
+            UpsertOperation(operation);
+            try
+            {
+                _operationJournal.Update(journalId, result);
+                _operationJournal.Finish(journalId, OperationJournalState.Completed, OperationSummary);
             }
+            catch { }
         }
         catch (OperationCanceledException exception)
         {
+            acceptWorkerProgress = false;
             OperationSummary = exception.Message;
             StatusText = "Операция отменена";
-            if (journalId is not null)
+            operation = operation with
             {
-                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Cancelled, OperationSummary); } catch { }
-            }
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Cancelled,
+                Message = OperationSummary
+            };
+            UpsertOperation(operation);
+            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary); } catch { }
         }
         catch (Exception exception)
         {
+            acceptWorkerProgress = false;
             OperationSummary = $"Операция не выполнена: {exception.Message}";
             StatusText = "Ошибка системной операции";
-            if (journalId is not null)
+            operation = operation with
             {
-                try { _operationJournal.Finish(journalId.Value, OperationJournalState.Failed, OperationSummary); } catch { }
-            }
+                FinishedAt = DateTimeOffset.Now,
+                State = OperationJournalState.Failed,
+                Message = OperationSummary
+            };
+            UpsertOperation(operation);
+            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
         }
         finally
         {
+            acceptWorkerProgress = false;
             IsOperating = false;
         }
     }

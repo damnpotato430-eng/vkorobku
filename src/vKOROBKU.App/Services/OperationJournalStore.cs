@@ -17,18 +17,27 @@ public sealed class OperationJournalStore
         "vKOROBKU", "operations.json");
     private readonly object _sync = new();
 
-    public Guid Begin(WorkerJob job)
+    public Guid Begin(WorkerJob job) =>
+        Begin(job.RootPath, job.Operation, job.Algorithm, "Ожидание Worker");
+
+    public Guid Begin(string installPath, string operation, string? algorithm, string message)
     {
         var id = Guid.NewGuid();
         lock (_sync)
         {
             var entries = Read();
             entries.Add(new OperationJournalEntry(
-                id, job.RootPath, job.Operation, job.Algorithm, DateTimeOffset.Now, null,
-                OperationJournalState.Running, 0, 0, 0, 0, 0, "Ожидание Worker"));
+                id, installPath, operation, algorithm, DateTimeOffset.Now, null,
+                OperationJournalState.Running, 0, 0, 0, 0, 0, message));
             Write(entries);
         }
         return id;
+    }
+
+    public IReadOnlyList<OperationJournalEntry> Load()
+    {
+        lock (_sync)
+            return Read().OrderByDescending(entry => entry.StartedAt).ToArray();
     }
 
     public void Update(Guid id, WorkerMessage message)

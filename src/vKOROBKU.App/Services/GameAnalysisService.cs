@@ -11,75 +11,102 @@ public sealed class GameAnalysisService
 
     public async Task<GameAnalysisResult> AnalyzeAsync(
         GameInfo game,
-        IProgress<string>? progress = null,
+        IProgress<AnalysisProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default,
         long maximumSampleBytes = 0)
     {
-        progress?.Report("Проверяем файловую систему…");
+        progress?.Report(new AnalysisProgressUpdate("Проверяем файловую систему…", 0));
 
         var inventoryService = new GameInventoryService(_physicalSizeService);
+        var inventoryProgress = new Progress<string>(message =>
+            progress?.Report(new AnalysisProgressUpdate(message, 3)));
         var inventory = await Task.Run(
-            () => inventoryService.CreateInventory(game.InstallPath, progress, cancellationToken),
+            () => inventoryService.CreateInventory(game.InstallPath, inventoryProgress, cancellationToken),
             cancellationToken);
 
-        var logicalBytes = inventory.Sum(file => file.LogicalBytes);
-        var physicalBytes = inventory.Sum(file => file.PhysicalBytes);
-        var excludedPhysicalBytes = inventory.Where(file => !file.CanSample).Sum(file => file.PhysicalBytes);
-        var eligibleLogicalBytes = inventory.Where(file => file.CanSample).Sum(file => file.LogicalBytes);
-        if (eligibleLogicalBytes == 0)
-            throw new InvalidOperationException("В папке нет доступных файлов для анализа.");
+        progress?.Report(new AnalysisProgressUpdate("Формируем репрезентативную выборку…", 7));
+        var prepared = await Task.Run(() =>
+        {
+            var logicalBytes = inventory.Sum(file => file.LogicalBytes);
+            var physicalBytes = inventory.Sum(file => file.PhysicalBytes);
+            var excludedPhysicalBytes = inventory.Where(file => !file.CanSample).Sum(file => file.PhysicalBytes);
+            var eligibleLogicalBytes = inventory.Where(file => file.CanSample).Sum(file => file.LogicalBytes);
+            if (eligibleLogicalBytes == 0)
+                throw new InvalidOperationException("В папке нет доступных файлов для анализа.");
 
-        if (maximumSampleBytes <= 0)
-            maximumSampleBytes = SelectAutomaticSampleLimit(eligibleLogicalBytes);
+            var sampleLimit = maximumSampleBytes > 0
+                ? maximumSampleBytes
+                : SelectAutomaticSampleLimit(eligibleLogicalBytes);
+            var plan = _samplePlanner.CreatePlan(inventory, sampleLimit);
+            if (plan.Count == 0)
+                throw new InvalidOperationException("Не удалось сформировать выборку файлов.");
 
-        progress?.Report($"Формируем выборку до {ByteFormatter.Format(maximumSampleBytes)}…");
-        var plan = _samplePlanner.CreatePlan(inventory, maximumSampleBytes);
-        if (plan.Count == 0)
-            throw new InvalidOperationException("Не удалось сформировать выборку файлов.");
+            return (logicalBytes, physicalBytes, excludedPhysicalBytes, eligibleLogicalBytes, sampleLimit, plan);
+        }, cancellationToken);
 
-        var workspace = CreateWorkspace(game.InstallPath, plan.Sum(fragment => (long)fragment.Length));
+        progress?.Report(new AnalysisProgressUpdate(
+            $"Формируем выборку до {ByteFormatter.Format(prepared.sampleLimit)}…", 9));
+        var requiredBytes = prepared.plan.Sum(fragment => (long)fragment.Length);
+        var workspace = CreateWorkspace(game.InstallPath, requiredBytes);
         try
         {
-            var sampleFiles = await CopySampleAsync(plan, workspace, progress, cancellationToken);
+            var sampleFiles = await CopySampleAsync(prepared.plan, workspace, progress, cancellationToken);
             var sampleBytes = sampleFiles.Sum(path => new FileInfo(path).Length);
-            progress?.Report("Измеряем скорость чтения без сжатия…");
-            var baselineReadSpeed = _readBenchmark.MeasureLogicalMegabytesPerSecond(sampleFiles, cancellationToken);
+            var baselineReadSpeed = await MeasureReadAsync(
+                sampleFiles,
+                "Измеряем скорость чтения без сжатия…",
+                30,
+                40,
+                progress,
+                cancellationToken);
             var estimates = new List<CompressionEstimate>();
             var algorithms = Enum.GetValues<CompressionAlgorithm>();
 
-            foreach (var algorithm in algorithms)
+            for (var index = 0; index < algorithms.Length; index++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                progress?.Report($"Проверяем {GetAlgorithmName(algorithm)}…");
+                var algorithm = algorithms[index];
+                var stageStart = 40 + index * 15;
+                var algorithmName = GetAlgorithmName(algorithm);
+                progress?.Report(new AnalysisProgressUpdate($"Сжимаем тестовую выборку: {algorithmName}…", stageStart));
                 await _compactService.CompressAsync(workspace, algorithm, cancellationToken);
 
-                long compressedBytes = 0;
-                foreach (var sampleFile in sampleFiles)
-                    compressedBytes += _physicalSizeService.GetAllocatedSize(sampleFile);
+                progress?.Report(new AnalysisProgressUpdate($"Подсчитываем результат {algorithmName}…", stageStart + 4));
+                var compressedBytes = await Task.Run(
+                    () => sampleFiles.Sum(path => _physicalSizeService.GetAllocatedSize(path)),
+                    cancellationToken);
 
                 var ratio = sampleBytes == 0 ? 1 : compressedBytes / (double)sampleBytes;
                 ratio = Math.Clamp(ratio, 0, 1.25);
-                progress?.Report($"Измеряем чтение {GetAlgorithmName(algorithm)}…");
-                var readSpeed = _readBenchmark.MeasureLogicalMegabytesPerSecond(sampleFiles, cancellationToken);
+                var readSpeed = await MeasureReadAsync(
+                    sampleFiles,
+                    $"Измеряем чтение {algorithmName}…",
+                    stageStart + 5,
+                    stageStart + 13,
+                    progress,
+                    cancellationToken);
                 estimates.Add(CreateEstimate(
                     algorithm,
                     ratio,
                     sampleBytes,
-                    eligibleLogicalBytes,
-                    excludedPhysicalBytes,
-                    physicalBytes,
-                    plan.Count,
+                    prepared.eligibleLogicalBytes,
+                    prepared.excludedPhysicalBytes,
+                    prepared.physicalBytes,
+                    prepared.plan.Count,
                     baselineReadSpeed,
                     readSpeed));
 
                 if (algorithm != algorithms[^1])
+                {
+                    progress?.Report(new AnalysisProgressUpdate($"Готовим следующий режим после {algorithmName}…", stageStart + 14));
                     await _compactService.DecompressAsync(workspace, cancellationToken);
+                }
             }
 
-            progress?.Report("Анализ завершён");
+            progress?.Report(new AnalysisProgressUpdate("Анализ завершён", 100, sampleBytes, sampleBytes));
             return new GameAnalysisResult(
-                logicalBytes,
-                physicalBytes,
+                prepared.logicalBytes,
+                prepared.physicalBytes,
                 inventory.Count,
                 inventory.Count(file => !file.CanSample),
                 sampleBytes,
@@ -87,8 +114,35 @@ public sealed class GameAnalysisService
         }
         finally
         {
-            DeleteWorkspace(workspace);
+            await Task.Run(() => DeleteWorkspace(workspace), CancellationToken.None);
         }
+    }
+
+    private async Task<double> MeasureReadAsync(
+        IReadOnlyList<string> paths,
+        string stage,
+        double startPercent,
+        double endPercent,
+        IProgress<AnalysisProgressUpdate>? progress,
+        CancellationToken cancellationToken)
+    {
+        var benchmarkProgress = new Progress<ReadBenchmarkService.ReadBenchmarkProgress>(update =>
+        {
+            var totalWork = Math.Max(1L, update.TotalBytes * update.PassCount);
+            var completedWork = update.TotalBytes * (update.Pass - 1L) + update.ProcessedBytes;
+            var fraction = Math.Clamp(completedWork / (double)totalWork, 0, 1);
+            var percent = startPercent + (endPercent - startPercent) * fraction;
+            progress?.Report(new AnalysisProgressUpdate(
+                $"{stage} Проход {update.Pass} из {update.PassCount}",
+                percent,
+                completedWork,
+                totalWork));
+        });
+
+        progress?.Report(new AnalysisProgressUpdate(stage, startPercent));
+        return await Task.Run(
+            () => _readBenchmark.MeasureLogicalMegabytesPerSecond(paths, cancellationToken, benchmarkProgress),
+            cancellationToken);
     }
 
     private static CompressionEstimate CreateEstimate(
@@ -138,11 +192,14 @@ public sealed class GameAnalysisService
     private static async Task<IReadOnlyList<string>> CopySampleAsync(
         IReadOnlyList<SampleFragment> plan,
         string workspace,
-        IProgress<string>? progress,
+        IProgress<AnalysisProgressUpdate>? progress,
         CancellationToken cancellationToken)
     {
         var result = new List<string>(plan.Count);
         var buffer = new byte[1024 * 1024];
+        var totalBytes = plan.Sum(fragment => (long)fragment.Length);
+        long processedBytes = 0;
+        var lastReportedPercent = -1;
 
         for (var index = 0; index < plan.Count; index++)
         {
@@ -162,11 +219,21 @@ public sealed class GameAnalysisService
                     break;
                 await target.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
                 remaining -= read;
+                processedBytes += read;
+                var percent = totalBytes == 0 ? 29 : 10 + (int)(processedBytes * 19 / totalBytes);
+                if (percent != lastReportedPercent)
+                {
+                    lastReportedPercent = percent;
+                    progress?.Report(new AnalysisProgressUpdate(
+                        $"Подготовка выборки: {index + 1} из {plan.Count}",
+                        percent,
+                        processedBytes,
+                        totalBytes));
+                }
             }
 
             if (target.Length > 0)
                 result.Add(destination);
-            progress?.Report($"Подготовка выборки: {index + 1} из {plan.Count}");
         }
 
         return result;
