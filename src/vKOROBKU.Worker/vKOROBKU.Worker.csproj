@@ -8,9 +8,9 @@
     <ApplicationIcon>..\vKOROBKU.App\Assets\vkorobku.ico</ApplicationIcon>
     <AssemblyName>vKOROBKU.Worker</AssemblyName>
     <RootNamespace>vKOROBKU.Worker</RootNamespace>
-    <Version>0.1.2</Version>
-    <FileVersion>0.1.2.0</FileVersion>
-    <InformationalVersion>0.1.2</InformationalVersion>
+    <Version>0.1.3</Version>
+    <FileVersion>0.1.3.0</FileVersion>
+    <InformationalVersion>0.1.3</InformationalVersion>
     <Product>vKOROBKU Worker</Product>
     <Authors>damnpotato430-eng</Authors>
     <RepositoryUrl>https://github.com/damnpotato430-eng/vkorobku</RepositoryUrl>
