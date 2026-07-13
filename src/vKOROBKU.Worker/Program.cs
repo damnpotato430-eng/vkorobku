@@ -80,7 +80,7 @@ internal static class Program
             "progress", "Подготовка завершена", TotalBytes: totalBytes, TotalFiles: files.Count,
             PhysicalBefore: physicalBefore));
 
-        var batches = CreateBatches(files);
+        var batches = BatchPlanner.CreateBatches(files);
         long processedBytes = 0;
         var processedFiles = 0;
         var errorCount = 0;
@@ -160,9 +160,9 @@ internal static class Program
         }
     }
 
-    private static List<FileItem> EnumerateFiles(string rootPath, CancellationToken cancellationToken)
+    private static List<WorkerFile> EnumerateFiles(string rootPath, CancellationToken cancellationToken)
     {
-        var result = new List<FileItem>();
+        var result = new List<WorkerFile>();
         var pending = new Stack<string>();
         pending.Push(rootPath);
         while (pending.TryPop(out var directory))
@@ -178,7 +178,7 @@ internal static class Program
                         var info = new FileInfo(path);
                         var excluded = (info.Attributes & (FileAttributes.Encrypted | FileAttributes.ReparsePoint | FileAttributes.SparseFile)) != 0;
                         if (!excluded && info.Length > 0)
-                            result.Add(new FileItem(path, info.Length));
+                            result.Add(new WorkerFile(path, info.Length));
                     }
                     catch (IOException) { }
                     catch (UnauthorizedAccessException) { }
@@ -201,34 +201,7 @@ internal static class Program
         return result;
     }
 
-    private static IReadOnlyList<List<FileItem>> CreateBatches(IReadOnlyList<FileItem> files)
-    {
-        var batches = new List<List<FileItem>>();
-        const long MaximumBatchBytes = 256L * 1024 * 1024;
-        var current = new List<FileItem>();
-        var commandLength = 100;
-        long batchBytes = 0;
-        foreach (var file in files)
-        {
-            var argumentLength = file.Path.Length + 3;
-            if (current.Count > 0 &&
-                (current.Count >= 200 || commandLength + argumentLength > 24_000 || batchBytes + file.Length > MaximumBatchBytes))
-            {
-                batches.Add(current);
-                current = new List<FileItem>();
-                commandLength = 100;
-                batchBytes = 0;
-            }
-            current.Add(file);
-            commandLength += argumentLength;
-            batchBytes += file.Length;
-        }
-        if (current.Count > 0)
-            batches.Add(current);
-        return batches;
-    }
-
-    private static async Task<int> RunCompactAsync(IReadOnlyList<FileItem> files, WorkerJob job, CancellationToken cancellationToken)
+    private static async Task<int> RunCompactAsync(IReadOnlyList<WorkerFile> files, WorkerJob job, CancellationToken cancellationToken)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -260,7 +233,7 @@ internal static class Program
         return process.ExitCode;
     }
 
-    private static long MeasurePhysicalSize(IEnumerable<FileItem> files)
+    private static long MeasurePhysicalSize(IEnumerable<WorkerFile> files)
     {
         long total = 0;
         foreach (var file in files)
@@ -306,5 +279,4 @@ internal static class Program
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern uint GetCompressedFileSizeW(string fileName, out uint fileSizeHigh);
 
-    private sealed record FileItem(string Path, long Length);
 }

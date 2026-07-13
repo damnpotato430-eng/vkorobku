@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vKOROBKU.App", "src\vKOROBKU.App\vKOROBKU.App.csproj", "{BDAC5C8E-A8AC-4ED2-A8BE-371C240D044A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vKOROBKU.Worker", "src\vKOROBKU.Worker\vKOROBKU.Worker.csproj", "{7C78F454-6F72-4C93-A08D-F10F615C1D5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{542B684C-D5CD-4B7D-BC91-BBC22EB85045}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vKOROBKU.Tests", "tests\vKOROBKU.Tests\vKOROBKU.Tests.csproj", "{A75E764A-4F8A-49DA-98FA-DE4E47D1C292}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,5 +25,12 @@ Global
 		{7C78F454-6F72-4C93-A08D-F10F615C1D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C78F454-6F72-4C93-A08D-F10F615C1D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C78F454-6F72-4C93-A08D-F10F615C1D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A75E764A-4F8A-49DA-98FA-DE4E47D1C292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A75E764A-4F8A-49DA-98FA-DE4E47D1C292}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A75E764A-4F8A-49DA-98FA-DE4E47D1C292}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A75E764A-4F8A-49DA-98FA-DE4E47D1C292}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A75E764A-4F8A-49DA-98FA-DE4E47D1C292} = {542B684C-D5CD-4B7D-BC91-BBC22EB85045}
 	EndGlobalSection
 EndGlobal

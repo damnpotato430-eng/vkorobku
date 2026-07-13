@@ -81,9 +81,8 @@ public sealed partial class SteamLibraryScanner
         try
         {
             var content = File.ReadAllText(configuration);
-            foreach (Match match in PathRegex().Matches(content))
+            foreach (var path in ParseLibraryPaths(content))
             {
-                var path = match.Groups[1].Value.Replace(@"\\", @"\");
                 if (Directory.Exists(path))
                     libraries.Add(Path.GetFullPath(path));
             }
@@ -94,11 +93,16 @@ public sealed partial class SteamLibraryScanner
         return libraries;
     }
 
-    private static string? ReadValue(string content, string key)
+    internal static string? ReadValue(string content, string key)
     {
         var match = Regex.Match(content, $"\\\"{Regex.Escape(key)}\\\"\\s*\\\"([^\\\"]*)\\\"", RegexOptions.IgnoreCase);
         return match.Success ? match.Groups[1].Value : null;
     }
+
+    internal static IReadOnlyList<string> ParseLibraryPaths(string content) =>
+        PathRegex().Matches(content)
+            .Select(match => match.Groups[1].Value.Replace(@"\\", @"\"))
+            .ToArray();
 
     [GeneratedRegex("\\\"path\\\"\\s*\\\"([^\\\"]+)\\\"", RegexOptions.IgnoreCase)]
     private static partial Regex PathRegex();
