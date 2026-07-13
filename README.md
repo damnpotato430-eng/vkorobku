@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml"><img src="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml/badge.svg" alt="Статус сборки" /></a>
-  <a href="https://github.com/damnpotato430-eng/vkorobku/releases/tag/v0.1.2"><img src="https://img.shields.io/badge/release-v0.1.2-8BFF4D?style=for-the-badge&logo=github&logoColor=white" alt="Release v0.1.2" /></a>
+  <a href="https://github.com/damnpotato430-eng/vkorobku/releases/latest"><img src="https://img.shields.io/github/v/release/damnpotato430-eng/vkorobku?style=for-the-badge&logo=github&label=release&color=8BFF4D" alt="Последний релиз" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows" alt="Windows 10/11" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-555555?style=for-the-badge" alt="GPL-3.0" /></a>
 </p>
@@ -21,9 +21,9 @@
 
 ## Скачать
 
-### [Скачать vKOROBKU v0.1.2 для Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases/tag/v0.1.2)
+### [Скачать последнюю версию vKOROBKU для Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases/latest)
 
-Рекомендуется скачивать архив `vKOROBKU-v0.1.2-win-x64.zip`, полностью распаковать его и запустить `vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен находиться рядом.
+Рекомендуется скачивать архив `vKOROBKU-v<версия>-win-x64.zip`, полностью распаковать его и запустить `vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен находиться рядом.
 
 Релиз является self-contained: устанавливать .NET Runtime отдельно не требуется.
 

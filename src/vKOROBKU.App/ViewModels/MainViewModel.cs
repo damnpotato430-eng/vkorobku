@@ -15,6 +15,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly ComputerInfoService _computerInfoService = new();
     private readonly FileTreeService _fileTreeService = new();
     private readonly GameAnalysisService _analysisService = new();
+    private readonly AnalysisWorkspaceCleaner _analysisWorkspaceCleaner = new();
     private readonly IgdbCredentialStore _igdbCredentialStore = new();
     private readonly IgdbCoverService _coverService;
     private readonly CompressionWorkerClient _workerClient = new();
@@ -264,6 +265,13 @@ public sealed class MainViewModel : ObservableObject
 
     public async Task InitializeAsync()
     {
+        _ = Task.Run(() =>
+        {
+            try { _analysisWorkspaceCleaner.CleanupOldWorkspaces(); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        });
+
         var interrupted = 0;
         try { interrupted = _operationJournal.MarkInterrupted(); } catch { }
         await RefreshSteamLibraryAsync();
@@ -530,8 +538,7 @@ public sealed class MainViewModel : ObservableObject
             if (coverPath is null)
                 return true;
 
-            var index = Games.ToList().FindIndex(item =>
-                string.Equals(item.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase));
+            var index = FindGameIndex(game.InstallPath);
             if (index < 0)
                 return true;
 
@@ -698,8 +705,7 @@ public sealed class MainViewModel : ObservableObject
         int compressedFiles = 0,
         DateTimeOffset? checkedAt = null)
     {
-        var index = Games.ToList().FindIndex(item =>
-            string.Equals(item.InstallPath, installPath, StringComparison.OrdinalIgnoreCase));
+        var index = FindGameIndex(installPath);
         if (index >= 0)
         {
             Games[index].CompressionState = state;
@@ -931,6 +937,16 @@ public sealed class MainViewModel : ObservableObject
         {
             IsOperating = false;
         }
+    }
+
+    private int FindGameIndex(string installPath)
+    {
+        for (var index = 0; index < Games.Count; index++)
+        {
+            if (string.Equals(Games[index].InstallPath, installPath, StringComparison.OrdinalIgnoreCase))
+                return index;
+        }
+        return -1;
     }
 
     private void CancelAnalysis() => _analysisCancellation?.Cancel();

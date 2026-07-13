@@ -11,8 +11,10 @@ $workerPublish = Join-Path $artifacts "publish-worker"
 $packageName = "vKOROBKU-v$Version-$Runtime"
 $package = Join-Path $artifacts $packageName
 $zip = Join-Path $artifacts "$packageName.zip"
+$checksum = Join-Path $artifacts "$packageName.sha256"
+$checksumNotes = Join-Path $artifacts "$packageName-checksum.md"
 
-Remove-Item $appPublish, $workerPublish, $package, $zip -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item $appPublish, $workerPublish, $package, $zip, $checksum, $checksumNotes -Recurse -Force -ErrorAction SilentlyContinue
 New-Item $appPublish, $workerPublish, $package -ItemType Directory -Force | Out-Null
 
 $properties = @(
@@ -46,7 +48,15 @@ vKOROBKU v$Version ($Runtime)
 
 Compress-Archive -Path (Join-Path $package "*") -DestinationPath $zip -CompressionLevel Optimal
 $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  $packageName.zip" | Set-Content (Join-Path $artifacts "$packageName.sha256") -Encoding ASCII
+"$hash  $packageName.zip" | Set-Content $checksum -Encoding ASCII
+@"
+## SHA-256
 
-Write-Host "Package: $zip"
-Write-Host "SHA256:  $hash"
+``````text
+$hash  $packageName.zip
+``````
+"@ | Set-Content $checksumNotes -Encoding UTF8
+
+Write-Host "Package:  $zip"
+Write-Host "SHA256:   $hash"
+Write-Host "Notes:    $checksumNotes"

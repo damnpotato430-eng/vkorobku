@@ -194,6 +194,9 @@ public sealed class GameAnalysisService
         var workspace = Path.Combine(workspaceRoot, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(workspace);
         File.SetAttributes(workspace, File.GetAttributes(workspace) | FileAttributes.Hidden);
+        var activeMarker = Path.Combine(workspace, AnalysisWorkspaceCleaner.ActiveMarkerName);
+        File.WriteAllText(activeMarker, Environment.ProcessId.ToString());
+        File.SetAttributes(activeMarker, FileAttributes.Hidden | FileAttributes.Temporary);
         return workspace;
     }
 
