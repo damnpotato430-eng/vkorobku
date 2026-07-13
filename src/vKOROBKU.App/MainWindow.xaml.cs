@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using vKOROBKU.App.ViewModels;
 
@@ -30,6 +32,12 @@ public partial class MainWindow : Window
     {
         Loaded -= OnLoaded;
         await _viewModel.InitializeAsync();
+    }
+
+    private void OnGameItemPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is ListBoxItem item)
+            item.IsSelected = true;
     }
 
     [DllImport("dwmapi.dll")]

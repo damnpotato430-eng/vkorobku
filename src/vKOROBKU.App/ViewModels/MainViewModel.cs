@@ -58,6 +58,8 @@ public sealed class MainViewModel : ObservableObject
         ConfigureIgdbCommand = new AsyncRelayCommand(ConfigureIgdbAsync);
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
+        RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
+            () => SelectedGame?.Source == "Добавлено вручную" && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -84,6 +86,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand AddFolderCommand { get; }
     public AsyncRelayCommand ConfigureIgdbCommand { get; }
     public AsyncRelayCommand ReviewIdentityCommand { get; }
+    public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -104,7 +107,9 @@ public sealed class MainViewModel : ObservableObject
                 return;
             NotifyCompressionPanelVisibility();
             OnPropertyChanged(nameof(IdentityReviewVisibility));
+            OnPropertyChanged(nameof(ManualGameVisibility));
             ReviewIdentityCommand.RaiseCanExecuteChanged();
+            RemoveGameCommand.RaiseCanExecuteChanged();
             if (sameGame)
                 return;
             Estimates.Clear();
@@ -185,6 +190,7 @@ public sealed class MainViewModel : ObservableObject
             DecompressCommand.RaiseCanExecuteChanged();
             OptimizeCommand.RaiseCanExecuteChanged();
             CancelCurrentCommand.RaiseCanExecuteChanged();
+            RemoveGameCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -201,6 +207,7 @@ public sealed class MainViewModel : ObservableObject
             CancelOperationCommand.RaiseCanExecuteChanged();
             OptimizeCommand.RaiseCanExecuteChanged();
             CancelCurrentCommand.RaiseCanExecuteChanged();
+            RemoveGameCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -218,6 +225,9 @@ public sealed class MainViewModel : ObservableObject
 
     public Visibility IdentityReviewVisibility =>
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility ManualGameVisibility =>
+        SelectedGame?.Source == "Добавлено вручную" ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility UncompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Collapsed : Visibility.Visible;
@@ -385,6 +395,68 @@ public sealed class MainViewModel : ObservableObject
         RefreshCoversCommand.RaiseCanExecuteChanged();
         _ = await LoadCoverAsync(game, false);
     }
+
+    private void RemoveSelectedGame()
+    {
+        var game = SelectedGame;
+        if (game?.Source != "Добавлено вручную" || IsAnalyzing || IsOperating || IsCheckingCompression)
+            return;
+
+        var message = $"Убрать игру «{game.Name}» из библиотеки?\n\n" +
+                      "Игра будет убрана из библиотеки vKOROBKU. " +
+                      "Файлы на диске не изменяются и не удаляются.";
+        var isCompressed = game.CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
+        if (isCompressed)
+        {
+            message += "\n\nВнимание: игра останется сжатой. Чтобы вернуть файлы в исходное состояние, " +
+                       "сначала выполните распаковку.";
+        }
+
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            message,
+            "Убрать из библиотеки",
+            MessageBoxButton.YesNo,
+            isCompressed ? MessageBoxImage.Warning : MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            _manualGameStore.Remove(game.InstallPath);
+        }
+        catch (IOException exception)
+        {
+            ShowRemoveGameError(exception.Message);
+            return;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            ShowRemoveGameError(exception.Message);
+            return;
+        }
+
+        try { _analysisCache.Remove(game.InstallPath); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+        try { _compressionStatusStore.Remove(game.InstallPath); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        var gameName = game.Name;
+        Games.Remove(game);
+        SelectedGame = null;
+        StatusText = $"Игра «{gameName}» убрана из библиотеки";
+        RefreshCoversCommand.RaiseCanExecuteChanged();
+        RaiseActionCommands();
+    }
+
+    private static void ShowRemoveGameError(string details) => MessageBox.Show(
+        Application.Current.MainWindow,
+        $"Не удалось убрать игру из библиотеки. Проверьте доступ к локальным данным vKOROBKU.\n\n{details}",
+        "Ошибка удаления из библиотеки",
+        MessageBoxButton.OK,
+        MessageBoxImage.Error);
 
     private async Task<ManualGameRecord> RefreshManualGameIdentityAsync(ManualGameRecord record)
     {
@@ -753,6 +825,7 @@ public sealed class MainViewModel : ObservableObject
         OptimizeCommand.RaiseCanExecuteChanged();
         CompressCommand.RaiseCanExecuteChanged();
         DecompressCommand.RaiseCanExecuteChanged();
+        RemoveGameCommand.RaiseCanExecuteChanged();
     }
 
     private void RestoreSavedAnalysis(GameInfo game)

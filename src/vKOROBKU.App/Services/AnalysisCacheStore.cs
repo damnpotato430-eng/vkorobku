@@ -40,6 +40,18 @@ public sealed class AnalysisCacheStore
         }
     }
 
+    public void Remove(string installPath)
+    {
+        lock (_sync)
+        {
+            var cache = ReadCache();
+            var removed = cache.Analyses.RemoveAll(item =>
+                string.Equals(item.InstallPath, installPath, StringComparison.OrdinalIgnoreCase));
+            if (removed > 0)
+                WriteCache(cache);
+        }
+    }
+
     private AnalysisCache ReadCache()
     {
         try

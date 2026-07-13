@@ -36,6 +36,22 @@ public sealed class CompressionStatusStore
         }
     }
 
+    public void Remove(string installPath)
+    {
+        lock (_sync)
+        {
+            var items = Read();
+            var removed = items.RemoveAll(item =>
+                string.Equals(item.InstallPath, installPath, StringComparison.OrdinalIgnoreCase));
+            if (removed == 0)
+                return;
+            Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+            var temporary = _path + ".tmp";
+            File.WriteAllText(temporary, JsonSerializer.Serialize(items, JsonOptions));
+            File.Move(temporary, _path, true);
+        }
+    }
+
     private List<SavedCompressionStatus> Read()
     {
         try

@@ -24,11 +24,28 @@ public sealed class ManualGameStore
             var games = Read();
             games.RemoveAll(item => string.Equals(item.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase));
             games.Add(game);
-            Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-            var temporary = _path + ".tmp";
-            File.WriteAllText(temporary, JsonSerializer.Serialize(games, JsonOptions));
-            File.Move(temporary, _path, true);
+            Write(games);
         }
+    }
+
+    public void Remove(string installPath)
+    {
+        lock (_sync)
+        {
+            var games = Read();
+            var removed = games.RemoveAll(item =>
+                string.Equals(item.InstallPath, installPath, StringComparison.OrdinalIgnoreCase));
+            if (removed > 0)
+                Write(games);
+        }
+    }
+
+    private void Write(List<ManualGameRecord> games)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+        var temporary = _path + ".tmp";
+        File.WriteAllText(temporary, JsonSerializer.Serialize(games, JsonOptions));
+        File.Move(temporary, _path, true);
     }
 
     private List<ManualGameRecord> Read()
