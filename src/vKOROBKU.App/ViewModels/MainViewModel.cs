@@ -447,21 +447,78 @@ public sealed class MainViewModel : ObservableObject
         if (Games.Count == 0)
             return;
 
+        const int maximumConcurrency = 4;
         var snapshot = Games.ToArray();
-        var loaded = 0;
-        foreach (var game in snapshot)
+        using var semaphore = new SemaphoreSlim(maximumConcurrency, maximumConcurrency);
+        using var cancellation = new CancellationTokenSource();
+        var dispatcher = Application.Current.Dispatcher;
+        var failureLock = new object();
+        string? failureMessage = null;
+        var completed = 0;
+
+        void StopRemaining(string message)
         {
-            StatusText = $"Загрузка обложек: {loaded + 1} из {snapshot.Length}";
-            if (!await LoadCoverAsync(game, forceRefresh))
-                break;
-            loaded++;
+            lock (failureLock)
+            {
+                if (failureMessage is not null)
+                    return;
+                failureMessage = message;
+                cancellation.Cancel();
+            }
         }
 
-        if (loaded < snapshot.Length)
+        var tasks = snapshot.Select(async game =>
+        {
+            var entered = false;
+            try
+            {
+                await semaphore.WaitAsync(cancellation.Token);
+                entered = true;
+                var coverPath = await _coverService.GetCoverAsync(game, forceRefresh, cancellation.Token);
+                if (coverPath is not null)
+                {
+                    await dispatcher.InvokeAsync(() =>
+                    {
+                        var current = Games.FirstOrDefault(item =>
+                            string.Equals(item.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase));
+                        if (current is not null)
+                            current.CoverPath = coverPath;
+                    });
+                }
+            }
+            catch (HttpRequestException exception)
+            {
+                StopRemaining(exception.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.BadRequest
+                    ? "IGDB отклонил ключи — проверьте Client ID и Client Secret"
+                    : "Сервис обложек временно недоступен");
+            }
+            catch (TaskCanceledException) when (!cancellation.IsCancellationRequested)
+            {
+                StopRemaining("Сервис обложек не ответил вовремя");
+            }
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
+            finally
+            {
+                if (entered)
+                    semaphore.Release();
+                var currentCompleted = Interlocked.Increment(ref completed);
+                if (failureMessage is null)
+                {
+                    await dispatcher.InvokeAsync(() =>
+                        StatusText = $"Загрузка обложек: {currentCompleted} из {snapshot.Length}");
+                }
+            }
+        }).ToArray();
+
+        await Task.WhenAll(tasks);
+        if (failureMessage is not null)
+        {
+            StatusText = failureMessage;
             return;
+        }
 
         StatusText = _coverService.HasCredentials
-            ? $"Библиотека готова · проверено обложек: {loaded}"
+            ? $"Библиотека готова · проверено обложек: {completed}"
             : "Обложки Steam и локальный кэш загружены · IGDB доступен для остальных игр";
     }
 
