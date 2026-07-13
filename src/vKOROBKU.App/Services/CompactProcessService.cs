@@ -19,8 +19,13 @@ public sealed class CompactProcessService
         await RunAsync(directory, ["/C", "/S", "/I", "/F", $"/EXE:{algorithmName}", "*"], cancellationToken);
     }
 
-    public Task DecompressAsync(string directory, CancellationToken cancellationToken) =>
-        RunAsync(directory, ["/U", "/S", "/I", "/F", "*"], cancellationToken);
+    public async Task DecompressAsync(string directory, CancellationToken cancellationToken)
+    {
+        // compact.exe /U /EXE removes the XPRESS/LZX (WOF) backing applied by CompressAsync;
+        // plain /U removes only NTFS compression and does not touch WOF files.
+        await RunAsync(directory, ["/U", "/EXE", "/S", "/I", "/F", "*"], cancellationToken);
+        await RunAsync(directory, ["/U", "/S", "/I", "/F", "*"], cancellationToken);
+    }
 
     private static async Task RunAsync(string directory, IReadOnlyList<string> arguments, CancellationToken cancellationToken)
     {

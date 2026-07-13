@@ -7,6 +7,11 @@ public sealed class GameCompressionDetector
 {
     private const uint WofProviderFile = 2;
 
+    // Games often ship a few pre-compressed files, so the state is decided by the
+    // share of compressed bytes rather than by the presence of a single compressed file.
+    internal const double CompressedByteShare = 0.85;
+    internal const double PartiallyCompressedByteShare = 0.05;
+
     public Task<GameCompressionDetection> DetectAsync(
         string rootPath,
         CancellationToken cancellationToken = default) =>
@@ -72,18 +77,32 @@ public sealed class GameCompressionDetector
             catch (UnauthorizedAccessException) { }
         }
 
-        if (algorithms.Count == 0)
+        var state = ClassifyState(algorithms.Values.Sum(), logicalBytes);
+        if (state == GameCompressionState.Uncompressed)
             return new GameCompressionDetection(
-                GameCompressionState.Uncompressed, null, 0, physicalBytes, logicalBytes, 0);
+                GameCompressionState.Uncompressed, null, 0, physicalBytes, logicalBytes, compressedFiles);
 
         var dominant = algorithms.MaxBy(pair => pair.Value).Key;
         return new GameCompressionDetection(
-            GameCompressionState.Compressed,
+            state,
             dominant,
             Math.Max(0, logicalBytes - physicalBytes),
             physicalBytes,
             logicalBytes,
             compressedFiles);
+    }
+
+    internal static GameCompressionState ClassifyState(long compressedLogicalBytes, long totalLogicalBytes)
+    {
+        if (totalLogicalBytes <= 0 || compressedLogicalBytes <= 0)
+            return GameCompressionState.Uncompressed;
+
+        var share = compressedLogicalBytes / (double)totalLogicalBytes;
+        return share >= CompressedByteShare
+            ? GameCompressionState.Compressed
+            : share >= PartiallyCompressedByteShare
+                ? GameCompressionState.PartiallyCompressed
+                : GameCompressionState.Uncompressed;
     }
 
     private static bool TryGetWofAlgorithm(string path, out string algorithm)

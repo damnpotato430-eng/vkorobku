@@ -905,7 +905,9 @@ public sealed class MainViewModel : ObservableObject
             StatusText = state switch
             {
                 GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {detected.Algorithm ?? "Windows"}",
-                GameCompressionState.PartiallyCompressed => $"Игра «{game.Name}» обновилась и требует дообработки",
+                GameCompressionState.PartiallyCompressed => buildChanged
+                    ? $"Игра «{game.Name}» обновилась и требует дообработки"
+                    : $"Игра «{game.Name}» сжата частично: {detected.Algorithm ?? "Windows"}",
                 _ => $"Игра «{game.Name}» не сжата"
             };
         }
@@ -1145,18 +1147,25 @@ public sealed class MainViewModel : ObservableObject
             }
 
             OperationProgress = 100;
+            var processedGame = Games.FirstOrDefault(game =>
+                string.Equals(game.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
+            var decompressIncomplete = job.Operation == "decompress" && result.ErrorCount > 0;
             var newState = job.Operation == "compress"
                 ? (result.ErrorCount == 0 ? GameCompressionState.Compressed : GameCompressionState.PartiallyCompressed)
-                : GameCompressionState.Uncompressed;
-            var newAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
+                : decompressIncomplete
+                    ? GameCompressionState.PartiallyCompressed
+                    : GameCompressionState.Uncompressed;
+            var newAlgorithm = job.Operation == "compress"
+                ? job.Algorithm
+                : decompressIncomplete ? processedGame?.CompressionAlgorithm : null;
             var difference = result.PhysicalBefore - result.PhysicalAfter;
             var savedBytes = job.Operation == "compress" ? Math.Max(0, difference) : 0;
-            var compressedFiles = job.Operation == "compress" ? result.ProcessedFiles : 0;
+            var compressedFiles = job.Operation == "compress"
+                ? result.ProcessedFiles
+                : decompressIncomplete ? result.ErrorCount : 0;
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now);
-            var processedGame = Games.FirstOrDefault(game =>
-                string.Equals(game.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
@@ -1164,7 +1173,9 @@ public sealed class MainViewModel : ObservableObject
 
             OperationSummary = job.Operation == "compress"
                 ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}"
-                : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
+                : decompressIncomplete
+                    ? $"Распаковка завершена частично · ошибок: {result.ErrorCount}"
+                    : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
             operation = operation with

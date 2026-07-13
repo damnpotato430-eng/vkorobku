@@ -205,36 +205,53 @@ internal static class Program
         return result;
     }
 
+    // compact.exe /U without /EXE removes only NTFS compression, while /U /EXE removes
+    // only the XPRESS/LZX (WOF) backing, so a full decompress needs both passes.
+    internal static IReadOnlyList<string[]> CreateCompactPasses(WorkerJob job)
+    {
+        if (job.Operation == "compress")
+            return [["/C", "/I", "/F", "/Q", $"/EXE:{job.Algorithm}"]];
+
+        return
+        [
+            ["/U", "/EXE", "/I", "/F", "/Q"],
+            ["/U", "/I", "/F", "/Q"]
+        ];
+    }
+
     private static async Task<int> RunCompactAsync(IReadOnlyList<WorkerFile> files, WorkerJob job, CancellationToken cancellationToken)
     {
-        var startInfo = new ProcessStartInfo
+        var exitCode = 0;
+        foreach (var passSwitches in CreateCompactPasses(job))
         {
-            FileName = Path.Combine(Environment.SystemDirectory, "compact.exe"),
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        };
-        startInfo.ArgumentList.Add(job.Operation == "compress" ? "/C" : "/U");
-        startInfo.ArgumentList.Add("/I");
-        startInfo.ArgumentList.Add("/F");
-        startInfo.ArgumentList.Add("/Q");
-        if (job.Operation == "compress")
-            startInfo.ArgumentList.Add($"/EXE:{job.Algorithm}");
-        foreach (var file in files)
-            startInfo.ArgumentList.Add(file.Path);
+            cancellationToken.ThrowIfCancellationRequested();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = Path.Combine(Environment.SystemDirectory, "compact.exe"),
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            foreach (var switchArgument in passSwitches)
+                startInfo.ArgumentList.Add(switchArgument);
+            foreach (var file in files)
+                startInfo.ArgumentList.Add(file.Path);
 
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не удалось запустить compact.exe.");
-        using var registration = cancellationToken.Register(() =>
-        {
-            try { if (!process.HasExited) process.Kill(true); } catch { }
-        });
-        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-        await process.WaitForExitAsync(cancellationToken);
-        _ = await outputTask;
-        _ = await errorTask;
-        return process.ExitCode;
+            using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не удалось запустить compact.exe.");
+            using var registration = cancellationToken.Register(() =>
+            {
+                try { if (!process.HasExited) process.Kill(true); } catch { }
+            });
+            var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+            await process.WaitForExitAsync(cancellationToken);
+            _ = await outputTask;
+            _ = await errorTask;
+            if (process.ExitCode != 0)
+                exitCode = process.ExitCode;
+        }
+        return exitCode;
     }
 
     private static long MeasurePhysicalSize(IEnumerable<WorkerFile> files)
