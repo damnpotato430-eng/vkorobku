@@ -5,7 +5,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace vKOROBKU.App.Services;
 
-/// <summary>Measures one-pass physical reads while bypassing the Windows file cache.</summary>
+/// <summary>Measures physical reads while bypassing the Windows file cache.</summary>
 public sealed class ReadBenchmarkService
 {
     private const uint GenericRead = 0x80000000;
@@ -16,8 +16,40 @@ public sealed class ReadBenchmarkService
     private const uint FlagNoBuffering = 0x20000000;
     private const uint FlagSequentialScan = 0x08000000;
     private const int BufferSize = 4 * 1024 * 1024;
+    private const long LargeSampleThresholdBytes = 256L * 1024 * 1024;
+
+    // Three passes allow a median that rejects a single noisy background-I/O spike.
+    private const int NormalPassCount = 3;
+
+    // Two passes keep large analyses reasonably short; the faster pass is used because
+    // incidental competing I/O can only increase elapsed time in this uncached benchmark.
+    private const int LargeSamplePassCount = 2;
 
     public double MeasureLogicalMegabytesPerSecond(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    {
+        long sampleBytes = 0;
+        foreach (var path in paths)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            sampleBytes += new FileInfo(path).Length;
+        }
+
+        var passCount = sampleBytes > LargeSampleThresholdBytes ? LargeSamplePassCount : NormalPassCount;
+        var measurements = new double[passCount];
+        for (var pass = 0; pass < passCount; pass++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            measurements[pass] = MeasureSinglePass(paths, cancellationToken);
+        }
+
+        if (passCount == LargeSamplePassCount)
+            return measurements.Max();
+
+        Array.Sort(measurements);
+        return measurements[measurements.Length / 2];
+    }
+
+    private static double MeasureSinglePass(IReadOnlyList<string> paths, CancellationToken cancellationToken)
     {
         long totalRead = 0;
         var timer = Stopwatch.StartNew();
