@@ -9,7 +9,8 @@ public sealed record SavedCompressionStatus(
     long PhysicalBytes = 0,
     long LogicalBytes = 0,
     int CompressedFiles = 0,
-    string? SteamBuildId = null);
+    string? SteamBuildId = null,
+    bool? HasDirectStorage = null);
 
 public sealed record GameCompressionDetection(
     GameCompressionState State,

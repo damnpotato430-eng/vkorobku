@@ -29,6 +29,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly ManualGameStore _manualGameStore = new();
     private readonly WatchedGameStore _watchedGames = new();
     private readonly FolderSizeScanner _folderSizeScanner = new();
+    private readonly DirectStorageDetector _directStorageDetector = new();
     private UserPreferences _userPreferences;
     private bool _isWatcherCheckRunning;
     private string _watcherSummaryText = string.Empty;
@@ -90,7 +91,9 @@ public sealed class MainViewModel : ObservableObject
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OptimizeCommand = new AsyncRelayCommand(OptimizeSelectedGameAsync,
-            () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } &&
+                  !(SelectedGame?.HasDirectStorage == true && !IsExpertMode) &&
+                  !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         CancelAnalysisCommand = new RelayCommand(CancelAnalysis, () => IsAnalyzing);
         CompressCommand = new AsyncRelayCommand(CompressSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed, IsAnalysisStale: false } && SelectedEstimate is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -275,6 +278,7 @@ public sealed class MainViewModel : ObservableObject
             try { _preferences.Save(_userPreferences); }
             catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
             NotifyCompressionPanelVisibility();
+            RaiseActionCommands();
         }
     }
 
@@ -315,6 +319,11 @@ public sealed class MainViewModel : ObservableObject
         SelectedGame is { } selected && IsResumableAlgorithm(selected.CompressionAlgorithm)
             ? $"Дожать · {selected.CompressionAlgorithm}"
             : "Дожать";
+
+    public Visibility DirectStorageWarningVisibility =>
+        SelectedGame?.HasDirectStorage == true && UncompressedPanelVisibility == Visibility.Visible
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
     public Visibility CompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Visible : Visibility.Collapsed;
@@ -482,11 +491,13 @@ public sealed class MainViewModel : ObservableObject
                 {
                     WatcherSummaryText = $"Проверяем «{current.DisplayName}» ({position} из {watched.Count})…";
                     var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath));
+                    var hasDirectStorage = await Task.Run(() => _directStorageDetector.Detect(current.FolderPath));
                     current = current with
                     {
                         LastCheckedSize = sizes.PhysicalBytes,
                         LastCheckedAtUtc = DateTimeOffset.UtcNow,
-                        SteamBuildId = libraryGame?.SteamBuildId ?? current.SteamBuildId
+                        SteamBuildId = libraryGame?.SteamBuildId ?? current.SteamBuildId,
+                        HasDirectStorage = hasDirectStorage
                     };
                     try { _watchedGames.Upsert(current); }
                     catch (Exception exception) { AppLog.Error("Не удалось сохранить watcher.json", exception); }
@@ -550,7 +561,8 @@ public sealed class MainViewModel : ObservableObject
                     saved.PhysicalBytes,
                     saved.LogicalBytes,
                     saved.PhysicalBytes,
-                    saved.CheckedAt));
+                    saved.CheckedAt,
+                    game.HasDirectStorage ?? saved.HasDirectStorage == true));
                 AppLog.Info($"Наблюдение добавлено по сохранённому статусу: {game.InstallPath}");
             }
         }
@@ -696,11 +708,13 @@ public sealed class MainViewModel : ObservableObject
         StatusText = "Определяем игру и рассчитываем размер…";
         var sizeTask = Task.Run(() => _fileTreeService.CalculateLogicalSize(path));
         var identityTask = _gameIdentityService.DetectAsync(path);
-        await Task.WhenAll(sizeTask, identityTask);
+        var directStorageTask = Task.Run(() => _directStorageDetector.Detect(path));
+        await Task.WhenAll(sizeTask, identityTask, directStorageTask);
         var size = await sizeTask;
         var identity = await identityTask;
         var game = ApplySavedCompressionStatus(
             new GameInfo(identity.Name, path, size, "Добавлено вручную", identity.SteamAppId));
+        game.HasDirectStorage = await directStorageTask;
 
         var existing = Games.FirstOrDefault(item =>
             string.Equals(item.InstallPath, path, StringComparison.OrdinalIgnoreCase));
@@ -1191,6 +1205,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (saved.LogicalBytes > 0)
                 game.LogicalSizeBytes = saved.LogicalBytes;
+            game.HasDirectStorage = saved.HasDirectStorage;
             game.CompressionState = saved.State;
             game.CompressionAlgorithm = saved.Algorithm;
             game.CompressionSavedBytes = saved.SavedBytes;
@@ -1250,11 +1265,29 @@ public sealed class MainViewModel : ObservableObject
     internal static bool IsResumableAlgorithm(string? algorithm) =>
         algorithm is "XPRESS4K" or "XPRESS8K" or "XPRESS16K" or "LZX";
 
+    private static bool ConfirmDirectStorageCompression(GameInfo game)
+    {
+        if (game.HasDirectStorage != true)
+            return true;
+
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            $"Игра «{game.Name}» использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения " +
+            "и может замедлить загрузки.\n\nВсё равно сжать?",
+            "DirectStorage",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        return confirmation == MessageBoxResult.Yes;
+    }
+
     private async Task FinishCompressionAsync()
     {
         var game = SelectedGame;
         if (game is not { CompressionState: GameCompressionState.PartiallyCompressed } ||
             !IsResumableAlgorithm(game.CompressionAlgorithm))
+            return;
+
+        if (!ConfirmDirectStorageCompression(game))
             return;
 
         var confirmation = MessageBox.Show(
@@ -1378,6 +1411,8 @@ public sealed class MainViewModel : ObservableObject
         try
         {
             var detected = await _compressionDetector.DetectAsync(game.InstallPath, cancellationToken);
+            var hasDirectStorage = await Task.Run(
+                () => _directStorageDetector.Detect(game.InstallPath, cancellationToken), cancellationToken);
             if (SelectedGame?.InstallPath.Equals(game.InstallPath, StringComparison.OrdinalIgnoreCase) != true)
                 return;
 
@@ -1394,11 +1429,11 @@ public sealed class MainViewModel : ObservableObject
             UpdateGameCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
                 detected.SavedBytes, detected.PhysicalBytes, detected.CompressedFiles, DateTimeOffset.Now,
-                detected.LogicalBytes);
+                detected.LogicalBytes, hasDirectStorage);
             TrySaveCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
                 detected.SavedBytes, detected.PhysicalBytes, detected.LogicalBytes, detected.CompressedFiles,
-                buildChanged ? savedStatus?.SteamBuildId : game.SteamBuildId);
+                buildChanged ? savedStatus?.SteamBuildId : game.SteamBuildId, hasDirectStorage);
             StatusText = state switch
             {
                 GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {detected.Algorithm ?? "Windows"}",
@@ -1428,13 +1463,16 @@ public sealed class MainViewModel : ObservableObject
         long physicalBytes = 0,
         int compressedFiles = 0,
         DateTimeOffset? checkedAt = null,
-        long logicalBytes = 0)
+        long logicalBytes = 0,
+        bool? hasDirectStorage = null)
     {
         var index = FindGameIndex(installPath);
         if (index >= 0)
         {
             if (logicalBytes > 0)
                 Games[index].LogicalSizeBytes = logicalBytes;
+            if (hasDirectStorage is not null)
+                Games[index].HasDirectStorage = hasDirectStorage;
             Games[index].CompressionState = state;
             Games[index].CompressionAlgorithm = algorithm;
             Games[index].CompressionSavedBytes = savedBytes;
@@ -1460,6 +1498,7 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(PartialPanelVisibility));
         OnPropertyChanged(nameof(PartialInfoVisibility));
         OnPropertyChanged(nameof(FinishCompressionButtonText));
+        OnPropertyChanged(nameof(DirectStorageWarningVisibility));
     }
 
     private void TrySaveCompressionStatus(
@@ -1470,13 +1509,14 @@ public sealed class MainViewModel : ObservableObject
         long physicalBytes = 0,
         long logicalBytes = 0,
         int compressedFiles = 0,
-        string? steamBuildId = null)
+        string? steamBuildId = null,
+        bool? hasDirectStorage = null)
     {
         try
         {
             _compressionStatusStore.Save(new SavedCompressionStatus(
                 installPath, state, algorithm, DateTimeOffset.Now,
-                savedBytes, physicalBytes, logicalBytes, compressedFiles, steamBuildId));
+                savedBytes, physicalBytes, logicalBytes, compressedFiles, steamBuildId, hasDirectStorage));
         }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
@@ -1548,6 +1588,9 @@ public sealed class MainViewModel : ObservableObject
         var game = SelectedGame;
         var estimate = SelectedEstimate;
         if (game is null || estimate is null)
+            return;
+
+        if (!ConfirmDirectStorageCompression(game))
             return;
 
         var confirmation = MessageBox.Show(
@@ -1694,7 +1737,7 @@ public sealed class MainViewModel : ObservableObject
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
-                processedGame?.SteamBuildId);
+                processedGame?.SteamBuildId, processedGame?.HasDirectStorage);
             UpdateWatchedGame(job, result, newState, processedGame);
 
             OperationSummary = job.Operation == "compress"
@@ -1778,7 +1821,8 @@ public sealed class MainViewModel : ObservableObject
                     result.PhysicalAfter,
                     result.TotalBytes,
                     result.PhysicalAfter,
-                    DateTimeOffset.UtcNow));
+                    DateTimeOffset.UtcNow,
+                    processedGame?.HasDirectStorage == true));
                 AppLog.Info($"Наблюдение обновлено после сжатия: {job.RootPath} ({job.Algorithm})");
             }
             else if (job.Operation == "decompress" && newState == GameCompressionState.Uncompressed)
