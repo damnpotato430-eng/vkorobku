@@ -10,7 +10,7 @@ internal static class CompressionResultVerifier
     private const int ProbeBytes = 1024 * 1024;
     private const double IncompressibleRatio = 0.98;
 
-    internal static int CountErrors(
+    internal static (int Errors, long ErrorBytes) CountErrors(
         IReadOnlyList<WorkerFile> files,
         WorkerJob job,
         CancellationToken cancellationToken)
@@ -18,6 +18,7 @@ internal static class CompressionResultVerifier
         var expectedAlgorithm = job.Operation == "compress" ? ParseAlgorithm(job.Algorithm) : null;
         var clusterSizes = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         var errors = 0;
+        long errorBytes = 0;
 
         foreach (var file in files)
         {
@@ -25,6 +26,7 @@ internal static class CompressionResultVerifier
             if (!File.Exists(file.Path))
             {
                 errors++;
+                errorBytes += file.Length;
                 continue;
             }
 
@@ -32,7 +34,10 @@ internal static class CompressionResultVerifier
             if (job.Operation == "decompress")
             {
                 if (hasWofBacking)
+                {
                     errors++;
+                    errorBytes += file.Length;
+                }
                 continue;
             }
 
@@ -42,6 +47,7 @@ internal static class CompressionResultVerifier
             if (!TryGetPhysicalSize(file.Path, out var physicalSize) || physicalSize != file.Length)
             {
                 errors++;
+                errorBytes += file.Length;
                 continue;
             }
 
@@ -65,9 +71,10 @@ internal static class CompressionResultVerifier
                 continue;
 
             errors++;
+            errorBytes += file.Length;
         }
 
-        return errors;
+        return (errors, errorBytes);
     }
 
     internal static uint? ParseAlgorithm(string? algorithm) => algorithm switch

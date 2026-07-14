@@ -70,7 +70,7 @@ public sealed class CompressionResultVerifierTests
         CompressionResultVerifier.CountErrors(
             [new WorkerFile(path, length)],
             new WorkerJob(Path.GetDirectoryName(path)!, "compress", algorithm),
-            CancellationToken.None);
+            CancellationToken.None).Errors;
 
     private static string CreateFile(int length)
     {

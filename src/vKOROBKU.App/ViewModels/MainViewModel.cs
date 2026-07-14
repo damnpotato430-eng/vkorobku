@@ -72,6 +72,10 @@ public sealed class MainViewModel : ObservableObject
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
+        FinishCompressionCommand = new AsyncRelayCommand(FinishCompressionAsync,
+            () => SelectedGame is { CompressionState: GameCompressionState.PartiallyCompressed } game &&
+                  IsResumableAlgorithm(game.CompressionAlgorithm) &&
+                  !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -103,6 +107,7 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RecheckCompressionCommand { get; }
     public RelayCommand OpenGameFolderCommand { get; }
+    public AsyncRelayCommand FinishCompressionCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -223,6 +228,7 @@ public sealed class MainViewModel : ObservableObject
             CancelCurrentCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             RecheckCompressionCommand.RaiseCanExecuteChanged();
+            FinishCompressionCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -241,6 +247,7 @@ public sealed class MainViewModel : ObservableObject
             CancelCurrentCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             RecheckCompressionCommand.RaiseCanExecuteChanged();
+            FinishCompressionCommand.RaiseCanExecuteChanged();
             NotifyCompressionPanelVisibility();
         }
     }
@@ -263,18 +270,37 @@ public sealed class MainViewModel : ObservableObject
     public Visibility ManualGameVisibility =>
         SelectedGame?.Source == "Добавлено вручную" ? Visibility.Visible : Visibility.Collapsed;
 
+    // A partially compressed game with a known algorithm gets a dedicated "finish"
+    // panel instead of the mode selection, so algorithms are not mixed within one game.
+    private bool IsPartialResumeAvailable =>
+        SelectedGame is { CompressionState: GameCompressionState.PartiallyCompressed } game &&
+        IsResumableAlgorithm(game.CompressionAlgorithm);
+
     public Visibility UncompressedPanelVisibility =>
-        SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Collapsed : Visibility.Visible;
+        SelectedGame?.CompressionState == GameCompressionState.Compressed || IsPartialResumeAvailable
+            ? Visibility.Collapsed
+            : Visibility.Visible;
 
     public Visibility AutoOptimizationVisibility =>
-        SelectedGame?.CompressionState == GameCompressionState.Compressed || IsExpertMode
+        SelectedGame?.CompressionState == GameCompressionState.Compressed || IsPartialResumeAvailable || IsExpertMode
             ? Visibility.Collapsed
             : Visibility.Visible;
 
     public Visibility ExpertOptimizationVisibility =>
-        SelectedGame?.CompressionState == GameCompressionState.Compressed || !IsExpertMode
+        SelectedGame?.CompressionState == GameCompressionState.Compressed || IsPartialResumeAvailable || !IsExpertMode
             ? Visibility.Collapsed
             : Visibility.Visible;
+
+    public Visibility PartialPanelVisibility =>
+        IsPartialResumeAvailable ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility PartialInfoVisibility =>
+        IsPartialResumeAvailable && !IsOperating ? Visibility.Visible : Visibility.Collapsed;
+
+    public string FinishCompressionButtonText =>
+        SelectedGame is { } selected && IsResumableAlgorithm(selected.CompressionAlgorithm)
+            ? $"Дожать · {selected.CompressionAlgorithm}"
+            : "Дожать";
 
     public Visibility CompressedPanelVisibility =>
         SelectedGame?.CompressionState == GameCompressionState.Compressed ? Visibility.Visible : Visibility.Collapsed;
@@ -1027,6 +1053,30 @@ public sealed class MainViewModel : ObservableObject
         SelectedGame is not null &&
         string.Equals(SelectedGame.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase);
 
+    internal static bool IsResumableAlgorithm(string? algorithm) =>
+        algorithm is "XPRESS4K" or "XPRESS8K" or "XPRESS16K" or "LZX";
+
+    private async Task FinishCompressionAsync()
+    {
+        var game = SelectedGame;
+        if (game is not { CompressionState: GameCompressionState.PartiallyCompressed } ||
+            !IsResumableAlgorithm(game.CompressionAlgorithm))
+            return;
+
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            $"Игра: {game.Name}\nМетод: {game.CompressionAlgorithm} (как при первоначальном сжатии)\n\n" +
+            "Будут сжаты только файлы без сжатия — уже сжатые пропускаются.\n" +
+            "Игра должна быть закрыта. Продолжить?",
+            "Дожать сжатие",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "compress", game.CompressionAlgorithm));
+    }
+
     private void OpenSelectedGameFolder()
     {
         var game = SelectedGame;
@@ -1213,6 +1263,9 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(EstimateListVisibility));
         OnPropertyChanged(nameof(AutoInfoVisibility));
         OnPropertyChanged(nameof(ActiveCompressionInfoVisibility));
+        OnPropertyChanged(nameof(PartialPanelVisibility));
+        OnPropertyChanged(nameof(PartialInfoVisibility));
+        OnPropertyChanged(nameof(FinishCompressionButtonText));
     }
 
     private void TrySaveCompressionStatus(
@@ -1244,6 +1297,7 @@ public sealed class MainViewModel : ObservableObject
         RemoveGameCommand.RaiseCanExecuteChanged();
         RecheckCompressionCommand.RaiseCanExecuteChanged();
         OpenGameFolderCommand.RaiseCanExecuteChanged();
+        FinishCompressionCommand.RaiseCanExecuteChanged();
     }
 
     private void RestoreSavedAnalysis(GameInfo game)
@@ -1420,19 +1474,25 @@ public sealed class MainViewModel : ObservableObject
             var processedGame = Games.FirstOrDefault(game =>
                 string.Equals(game.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
             var decompressIncomplete = job.Operation == "decompress" && result.ErrorCount > 0;
+            // Files that compact.exe legitimately leaves uncompressed (locked, incompressible)
+            // should not pin a game to the partial state forever, so the outcome is graded
+            // by the byte share of problem files, matching the detector thresholds.
             var newState = job.Operation == "compress"
-                ? (result.ErrorCount == 0 ? GameCompressionState.Compressed : GameCompressionState.PartiallyCompressed)
+                ? (result.ErrorCount == 0
+                    ? GameCompressionState.Compressed
+                    : GameCompressionDetector.ClassifyState(
+                        Math.Max(0, result.TotalBytes - result.ErrorBytes), result.TotalBytes))
                 : decompressIncomplete
-                    ? GameCompressionState.PartiallyCompressed
+                    ? GameCompressionDetector.ClassifyState(result.ErrorBytes, result.TotalBytes)
                     : GameCompressionState.Uncompressed;
-            var newAlgorithm = job.Operation == "compress"
-                ? job.Algorithm
-                : decompressIncomplete ? processedGame?.CompressionAlgorithm : null;
+            var newAlgorithm = newState == GameCompressionState.Uncompressed
+                ? null
+                : job.Operation == "compress" ? job.Algorithm : processedGame?.CompressionAlgorithm;
             var difference = result.PhysicalBefore - result.PhysicalAfter;
             var savedBytes = job.Operation == "compress" ? Math.Max(0, difference) : 0;
             var compressedFiles = job.Operation == "compress"
                 ? result.ProcessedFiles
-                : decompressIncomplete ? result.ErrorCount : 0;
+                : newState == GameCompressionState.Uncompressed ? 0 : result.ErrorCount;
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now,

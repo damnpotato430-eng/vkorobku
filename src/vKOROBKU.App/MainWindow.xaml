@@ -351,6 +351,18 @@
                         </Border>
 
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
+                                VerticalAlignment="Top" Visibility="{Binding PartialInfoVisibility}">
+                            <StackPanel>
+                                <TextBlock Text="ИГРА СЖАТА ЧАСТИЧНО" Foreground="#FFB84D" FontSize="11" FontWeight="Bold" />
+                                <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
+                                           FontSize="13" LineHeight="22" TextWrapping="Wrap" />
+                                <TextBlock Text="«Дожать» сожмёт оставшиеся файлы тем же методом — уже сжатые пропускаются. Сменить метод сжатия можно после полной распаковки."
+                                           Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding CompressedPanelVisibility}">
                             <StackPanel>
                                 <TextBlock Text="ИГРА УЖЕ СЖАТА" Foreground="{StaticResource AccentBrush}"
@@ -422,6 +434,34 @@
                                     Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
                                     Visibility="{Binding PartiallyCompressedVisibility}"
                                     ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Visibility="{Binding PartialPanelVisibility}">
+                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
+                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       Foreground="{StaticResource AccentBrush}" />
+                            <Grid Height="22">
+                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
+                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
+                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
+                            </Grid>
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
+                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button Content="{Binding FinishCompressionButtonText}" Command="{Binding FinishCompressionCommand}"
+                                        Style="{StaticResource PrimaryActionButton}"
+                                        ToolTip="Сжать оставшиеся файлы тем же методом — уже сжатые будут пропущены" />
+                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                        Style="{StaticResource StopButton}" />
+                            </Grid>
+                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">

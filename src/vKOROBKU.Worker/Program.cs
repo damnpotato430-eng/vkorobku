@@ -131,7 +131,7 @@ internal static class Program
             ProcessedFiles: processedFiles,
             TotalFiles: files.Count,
             PhysicalBefore: physicalBefore));
-        var errorCount = CompressionResultVerifier.CountErrors(files, job, cancellationToken);
+        var (errorCount, errorBytes) = CompressionResultVerifier.CountErrors(files, job, cancellationToken);
         var physicalAfter = MeasurePhysicalSize(files);
         await SendAsync(writer, new WorkerMessage(
             "completed",
@@ -141,6 +141,7 @@ internal static class Program
             ProcessedFiles: processedFiles,
             TotalFiles: files.Count,
             ErrorCount: errorCount,
+            ErrorBytes: errorBytes,
             PhysicalBefore: physicalBefore,
             PhysicalAfter: physicalAfter));
     }

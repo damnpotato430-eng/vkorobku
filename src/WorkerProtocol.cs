@@ -16,5 +16,6 @@ public sealed record WorkerMessage(
     int ProcessedFiles = 0,
     int TotalFiles = 0,
     int ErrorCount = 0,
+    long ErrorBytes = 0,
     long PhysicalBefore = 0,
     long PhysicalAfter = 0);
