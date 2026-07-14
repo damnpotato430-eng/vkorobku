@@ -467,6 +467,7 @@ public sealed class MainViewModel : ObservableObject
         CheckWatchedGamesCommand.RaiseCanExecuteChanged();
         try
         {
+            var skipSet = CompressionSkipList.BuildEffectiveSet(_userPreferences);
             var degraded = new List<WatchedGame>();
             var position = 0;
             foreach (var entry in watched)
@@ -490,7 +491,7 @@ public sealed class MainViewModel : ObservableObject
                 if (force || !(buildUnchanged && fresh))
                 {
                     WatcherSummaryText = $"Проверяем «{current.DisplayName}» ({position} из {watched.Count})…";
-                    var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath));
+                    var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath, skipSet));
                     var hasDirectStorage = await Task.Run(() => _directStorageDetector.Detect(current.FolderPath));
                     current = current with
                     {
@@ -499,6 +500,18 @@ public sealed class MainViewModel : ObservableObject
                         SteamBuildId = libraryGame?.SteamBuildId ?? current.SteamBuildId,
                         HasDirectStorage = hasDirectStorage
                     };
+                    // A check below the baseline means the baseline was captured with a
+                    // different methodology (before skip-aware measuring) or the game
+                    // shrank — re-baseline so decay starts from the current state.
+                    if (current.LastCheckedSize < current.LastCompressedSize)
+                    {
+                        current = current with
+                        {
+                            LastCompressedSize = sizes.PhysicalBytes,
+                            LastUncompressedSize = sizes.LogicalBytes
+                        };
+                        AppLog.Info($"Базовые размеры наблюдения пересчитаны: {current.FolderPath}");
+                    }
                     try { _watchedGames.Upsert(current); }
                     catch (Exception exception) { AppLog.Error("Не удалось сохранить watcher.json", exception); }
                 }
@@ -623,7 +636,9 @@ public sealed class MainViewModel : ObservableObject
             return;
 
         SelectedGame = game;
-        await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "compress", latest.Algorithm));
+        await ExecuteWorkerOperationAsync(new WorkerJob(
+            game.InstallPath, "compress", latest.Algorithm,
+            CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
     }
 
     private async Task RefreshSteamLibraryAsync()
@@ -1097,7 +1112,8 @@ public sealed class MainViewModel : ObservableObject
                 game,
                 progress,
                 _analysisCancellation.Token,
-                maximumSampleBytes);
+                maximumSampleBytes,
+                CompressionSkipList.BuildEffectiveSet(_userPreferences));
             acceptAnalysisProgress = false;
             var analyzedGameSelected = IsGameSelected(game);
             if (analyzedGameSelected)
@@ -1301,7 +1317,9 @@ public sealed class MainViewModel : ObservableObject
         if (confirmation != MessageBoxResult.Yes)
             return;
 
-        await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "compress", game.CompressionAlgorithm));
+        await ExecuteWorkerOperationAsync(new WorkerJob(
+            game.InstallPath, "compress", game.CompressionAlgorithm,
+            CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
     }
 
     private void OpenSelectedGameFolder()
@@ -1604,7 +1622,9 @@ public sealed class MainViewModel : ObservableObject
         if (confirmation != MessageBoxResult.Yes)
             return;
 
-        await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "compress", estimate.AlgorithmText));
+        await ExecuteWorkerOperationAsync(new WorkerJob(
+            game.InstallPath, "compress", estimate.AlgorithmText,
+            CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
     }
 
     private async Task DecompressSelectedGameAsync()
@@ -1740,8 +1760,11 @@ public sealed class MainViewModel : ObservableObject
                 processedGame?.SteamBuildId, processedGame?.HasDirectStorage);
             UpdateWatchedGame(job, result, newState, processedGame);
 
+            var skipNote = result.SkipListedFiles > 0
+                ? $" · пропущено несжимаемых: {result.SkipListedFiles:N0} ({ByteFormatter.Format(result.SkipListedBytes)})"
+                : string.Empty;
             OperationSummary = job.Operation == "compress"
-                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}"
+                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}{skipNote}"
                 : decompressIncomplete
                     ? $"Распаковка завершена частично · ошибок: {result.ErrorCount}"
                     : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
@@ -1818,9 +1841,9 @@ public sealed class MainViewModel : ObservableObject
                     processedGame?.SteamBuildId,
                     job.Algorithm,
                     DateTimeOffset.UtcNow,
-                    result.PhysicalAfter,
-                    result.TotalBytes,
-                    result.PhysicalAfter,
+                    Math.Max(0, result.PhysicalAfter - result.SkipListedPhysicalBytes),
+                    Math.Max(0, result.TotalBytes - result.SkipListedBytes),
+                    Math.Max(0, result.PhysicalAfter - result.SkipListedPhysicalBytes),
                     DateTimeOffset.UtcNow,
                     processedGame?.HasDirectStorage == true));
                 AppLog.Info($"Наблюдение обновлено после сжатия: {job.RootPath} ({job.Algorithm})");

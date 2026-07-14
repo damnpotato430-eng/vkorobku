@@ -13,7 +13,10 @@ public sealed class SamplePlanner
         IReadOnlyList<FileInventoryEntry> inventory,
         long maximumSampleBytes)
     {
-        var eligible = inventory.Where(file => file.CanSample).OrderBy(file => file.FullPath, StringComparer.OrdinalIgnoreCase).ToArray();
+        var eligible = inventory
+            .Where(file => file.CanSample && !file.IsSkipListed)
+            .OrderBy(file => file.FullPath, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
         var total = eligible.Sum(file => file.LogicalBytes);
         if (total == 0)
             return [];

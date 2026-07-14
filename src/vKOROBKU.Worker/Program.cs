@@ -78,14 +78,41 @@ internal static class Program
         var physicalBefore = MeasurePhysicalSize(files);
 
         await SendAsync(writer, new WorkerMessage("status", "Проверяем, какие файлы уже обработаны…"));
-        var (pendingFiles, skippedBytes, skippedFiles) = PartitionPendingFiles(
-            files, file => IsAlreadyProcessed(file, job), cancellationToken);
-        long processedBytes = skippedBytes;
-        var processedFiles = skippedFiles;
+        var skipExtensions = job.Operation == "compress" && job.SkipExtensions is { Length: > 0 }
+            ? new HashSet<string>(job.SkipExtensions, StringComparer.OrdinalIgnoreCase)
+            : null;
+        var clusterSize = skipExtensions is null
+            ? 0
+            : CompressionResultVerifier.GetClusterSize(Path.GetPathRoot(rootPath) ?? string.Empty);
+        var skipListed = new List<WorkerFile>();
+        IReadOnlyList<WorkerFile> candidates = files;
+        if (skipExtensions is not null)
+        {
+            var compressible = new List<WorkerFile>(files.Count);
+            foreach (var file in files)
+            {
+                if (IsSkipListed(file, skipExtensions, clusterSize))
+                    skipListed.Add(file);
+                else
+                    compressible.Add(file);
+            }
+            candidates = compressible;
+        }
+
+        var (pendingFiles, resumeSkippedBytes, resumeSkippedFiles) = PartitionPendingFiles(
+            candidates, file => IsAlreadyProcessed(file, job), cancellationToken);
+        var skipListedBytes = skipListed.Sum(file => file.Length);
+        long processedBytes = resumeSkippedBytes + skipListedBytes;
+        var processedFiles = resumeSkippedFiles + skipListed.Count;
+        var preparationNotes = new List<string>();
+        if (resumeSkippedFiles > 0)
+            preparationNotes.Add($"уже обработано: {resumeSkippedFiles:N0}");
+        if (skipListed.Count > 0)
+            preparationNotes.Add($"пропущено несжимаемых: {skipListed.Count:N0} ({FormatSize(skipListedBytes)})");
         await SendAsync(writer, new WorkerMessage(
             "progress",
-            skippedFiles > 0
-                ? $"Пропущено уже обработанных файлов: {skippedFiles:N0} — продолжаем с места остановки"
+            preparationNotes.Count > 0
+                ? $"Подготовка завершена — {string.Join(" · ", preparationNotes)}"
                 : "Подготовка завершена",
             ProcessedBytes: processedBytes,
             TotalBytes: totalBytes,
@@ -131,8 +158,11 @@ internal static class Program
             ProcessedFiles: processedFiles,
             TotalFiles: files.Count,
             PhysicalBefore: physicalBefore));
-        var (errorCount, errorBytes) = CompressionResultVerifier.CountErrors(files, job, cancellationToken);
+        // Skip-listed files are uncompressed by design, so they are verified neither
+        // as compressed nor as errors.
+        var (errorCount, errorBytes) = CompressionResultVerifier.CountErrors(candidates, job, cancellationToken);
         var physicalAfter = MeasurePhysicalSize(files);
+        var skipListedPhysical = skipListed.Count == 0 ? 0 : MeasurePhysicalSize(skipListed);
         await SendAsync(writer, new WorkerMessage(
             "completed",
             errorCount == 0 ? "Операция завершена" : "Операция завершена с пропущенными файлами",
@@ -142,9 +172,20 @@ internal static class Program
             TotalFiles: files.Count,
             ErrorCount: errorCount,
             ErrorBytes: errorBytes,
+            SkipListedFiles: skipListed.Count,
+            SkipListedBytes: skipListedBytes,
+            SkipListedPhysicalBytes: skipListedPhysical,
             PhysicalBefore: physicalBefore,
             PhysicalAfter: physicalAfter));
     }
+
+    internal static bool IsSkipListed(WorkerFile file, HashSet<string> skipExtensions, long clusterSize) =>
+        file.Length <= clusterSize || skipExtensions.Contains(Path.GetExtension(file.Path));
+
+    private static string FormatSize(long bytes) =>
+        bytes >= 1024L * 1024 * 1024
+            ? $"{bytes / 1024d / 1024 / 1024:0.#} ГБ"
+            : $"{Math.Max(1, bytes / 1024 / 1024):N0} МБ";
 
     private static string ValidateJob(WorkerJob job)
     {

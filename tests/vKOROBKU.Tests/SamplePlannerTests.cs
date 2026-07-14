@@ -16,6 +16,21 @@ public sealed class SamplePlannerTests
     }
 
     [Fact]
+    public void CreatePlan_SkipListedFilesAreNotSampled()
+    {
+        var inventory = new[]
+        {
+            File("G:\\Game\\data.pak", 200 * MiB),
+            new FileInventoryEntry("G:\\Game\\intro.bik", 800 * MiB, 800 * MiB, true, IsSkipListed: true)
+        };
+
+        var result = new SamplePlanner().CreatePlan(inventory, 512 * MiB);
+
+        Assert.True(result.Count > 0);
+        Assert.All(result, fragment => Assert.Equal("G:\\Game\\data.pak", fragment.SourcePath));
+    }
+
+    [Fact]
     public void CreatePlan_SmallGame_CoversWholeGameUpToSmallGameSample()
     {
         var inventory = Enumerable.Range(0, 4)

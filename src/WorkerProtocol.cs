@@ -3,7 +3,8 @@ namespace vKOROBKU.Protocol;
 public sealed record WorkerJob(
     string RootPath,
     string Operation,
-    string? Algorithm);
+    string? Algorithm,
+    string[]? SkipExtensions = null);
 
 public sealed record WorkerCommand(string Type);
 
@@ -17,5 +18,8 @@ public sealed record WorkerMessage(
     int TotalFiles = 0,
     int ErrorCount = 0,
     long ErrorBytes = 0,
+    int SkipListedFiles = 0,
+    long SkipListedBytes = 0,
+    long SkipListedPhysicalBytes = 0,
     long PhysicalBefore = 0,
     long PhysicalAfter = 0);

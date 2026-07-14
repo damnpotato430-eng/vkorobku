@@ -6,7 +6,9 @@ public sealed record UserPreferences(
     bool ExpertMode = false,
     bool WatcherEnabled = true,
     double DecayThresholdPercent = 5,
-    int MinimumSavingsMb = 500);
+    int MinimumSavingsMb = 500,
+    bool SkipNonCompressable = true,
+    IReadOnlyList<string>? UserSkipExtensions = null);
 
 public sealed class UserPreferencesStore
 {

@@ -163,7 +163,7 @@ internal static class CompressionResultVerifier
         catch (UnauthorizedAccessException) { return false; }
     }
 
-    private static long GetClusterSize(string volumeRoot)
+    internal static long GetClusterSize(string volumeRoot)
     {
         if (GetDiskFreeSpaceW(volumeRoot, out var sectorsPerCluster, out var bytesPerSector, out _, out _))
             return checked((long)sectorsPerCluster * bytesPerSector);

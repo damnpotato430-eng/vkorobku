@@ -5,7 +5,10 @@ public sealed class FolderSizeScanner
 {
     private readonly PhysicalSizeService _physicalSizeService = new();
 
-    public (long LogicalBytes, long PhysicalBytes) Measure(string rootPath, CancellationToken cancellationToken = default)
+    public (long LogicalBytes, long PhysicalBytes) Measure(
+        string rootPath,
+        ISet<string>? skipExtensions = null,
+        CancellationToken cancellationToken = default)
     {
         long logicalBytes = 0;
         long physicalBytes = 0;
@@ -20,6 +23,8 @@ public sealed class FolderSizeScanner
                 foreach (var path in Directory.EnumerateFiles(directory))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    if (skipExtensions?.Contains(Path.GetExtension(path)) == true)
+                        continue;
                     try
                     {
                         var info = new FileInfo(path);

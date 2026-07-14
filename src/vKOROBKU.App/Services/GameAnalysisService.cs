@@ -13,7 +13,8 @@ public sealed class GameAnalysisService
         GameInfo game,
         IProgress<AnalysisProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default,
-        long maximumSampleBytes = 0)
+        long maximumSampleBytes = 0,
+        ISet<string>? skipExtensions = null)
     {
         progress?.Report(new AnalysisProgressUpdate("Проверяем файловую систему…", 0));
 
@@ -21,7 +22,7 @@ public sealed class GameAnalysisService
         var inventoryProgress = new Progress<string>(message =>
             progress?.Report(new AnalysisProgressUpdate(message, 3)));
         var inventory = await Task.Run(
-            () => inventoryService.CreateInventory(game.InstallPath, inventoryProgress, cancellationToken),
+            () => inventoryService.CreateInventory(game.InstallPath, inventoryProgress, cancellationToken, skipExtensions),
             cancellationToken);
 
         progress?.Report(new AnalysisProgressUpdate("Формируем репрезентативную выборку…", 7));
@@ -30,9 +31,17 @@ public sealed class GameAnalysisService
             var logicalBytes = inventory.Sum(file => file.LogicalBytes);
             var physicalBytes = inventory.Sum(file => file.PhysicalBytes);
             var excludedPhysicalBytes = inventory.Where(file => !file.CanSample).Sum(file => file.PhysicalBytes);
-            var eligibleLogicalBytes = inventory.Where(file => file.CanSample).Sum(file => file.LogicalBytes);
+            // Skip-listed files are not sampled: they stay at their current physical
+            // size in the forecast instead of wasting the trial-compression budget.
+            var skipPhysicalBytes = inventory
+                .Where(file => file.CanSample && file.IsSkipListed)
+                .Sum(file => file.PhysicalBytes);
+            var eligibleLogicalBytes = inventory
+                .Where(file => file.CanSample && !file.IsSkipListed)
+                .Sum(file => file.LogicalBytes);
             if (eligibleLogicalBytes == 0)
-                throw new InvalidOperationException("В папке нет доступных файлов для анализа.");
+                throw new InvalidOperationException(
+                    "Все файлы игры относятся к заведомо несжимаемым типам — сжатие не даст экономии.");
 
             var sampleLimit = maximumSampleBytes > 0
                 ? maximumSampleBytes
@@ -41,7 +50,7 @@ public sealed class GameAnalysisService
             if (plan.Count == 0)
                 throw new InvalidOperationException("Не удалось сформировать выборку файлов.");
 
-            return (logicalBytes, physicalBytes, excludedPhysicalBytes, eligibleLogicalBytes, sampleLimit, plan);
+            return (logicalBytes, physicalBytes, excludedPhysicalBytes, skipPhysicalBytes, eligibleLogicalBytes, sampleLimit, plan);
         }, cancellationToken);
 
         progress?.Report(new AnalysisProgressUpdate(
@@ -91,6 +100,7 @@ public sealed class GameAnalysisService
                     sampleBytes,
                     prepared.eligibleLogicalBytes,
                     prepared.excludedPhysicalBytes,
+                    prepared.skipPhysicalBytes,
                     prepared.physicalBytes,
                     prepared.plan.Count,
                     baselineReadSpeed,
@@ -151,6 +161,7 @@ public sealed class GameAnalysisService
         long sampleBytes,
         long eligibleLogicalBytes,
         long excludedPhysicalBytes,
+        long skipPhysicalBytes,
         long currentPhysicalBytes,
         int fragmentCount,
         double baselineReadSpeed,
@@ -163,9 +174,10 @@ public sealed class GameAnalysisService
                 ? ("Средняя", 0.07)
                 : ("Низкая", 0.12);
 
-        var estimated = excludedPhysicalBytes + (long)(eligibleLogicalBytes * ratio);
-        var optimistic = excludedPhysicalBytes + (long)(eligibleLogicalBytes * Math.Max(0, ratio - margin));
-        var pessimistic = excludedPhysicalBytes + (long)(eligibleLogicalBytes * Math.Min(1.25, ratio + margin));
+        var untouchedPhysicalBytes = excludedPhysicalBytes + skipPhysicalBytes;
+        var estimated = untouchedPhysicalBytes + (long)(eligibleLogicalBytes * ratio);
+        var optimistic = untouchedPhysicalBytes + (long)(eligibleLogicalBytes * Math.Max(0, ratio - margin));
+        var pessimistic = untouchedPhysicalBytes + (long)(eligibleLogicalBytes * Math.Min(1.25, ratio + margin));
         var minimumSavings = Math.Max(0, currentPhysicalBytes - pessimistic);
         var maximumSavings = Math.Max(minimumSavings, currentPhysicalBytes - optimistic);
 
