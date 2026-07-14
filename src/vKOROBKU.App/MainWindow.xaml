@@ -139,6 +139,7 @@
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="Проверить состояние сжатия" Command="{Binding RecheckCompressionCommand}" />
                                         <MenuItem Header="Убрать из библиотеки" Command="{Binding RemoveGameCommand}" />
                                     </ContextMenu>
                                 </Setter.Value>

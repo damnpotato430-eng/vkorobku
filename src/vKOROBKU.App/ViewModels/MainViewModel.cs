@@ -62,6 +62,8 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
             () => SelectedGame?.Source == "Добавлено вручную" && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
+            () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -91,6 +93,7 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand ShowOperationsCommand { get; }
     public AsyncRelayCommand ReviewIdentityCommand { get; }
     public RelayCommand RemoveGameCommand { get; }
+    public AsyncRelayCommand RecheckCompressionCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -137,8 +140,16 @@ public sealed class MainViewModel : ObservableObject
             _compressionCheckCancellation = null;
             if (value is not null)
             {
-                _compressionCheckCancellation = new CancellationTokenSource();
-                _ = RefreshCompressionStatusAsync(value, _compressionCheckCancellation.Token);
+                if (HasFreshCompressionStatus(value))
+                {
+                    IsCheckingCompression = false;
+                    StatusText = DescribeCompressionState(value);
+                }
+                else
+                {
+                    _compressionCheckCancellation = new CancellationTokenSource();
+                    _ = RefreshCompressionStatusAsync(value, _compressionCheckCancellation.Token);
+                }
             }
             else
             {
@@ -201,6 +212,7 @@ public sealed class MainViewModel : ObservableObject
             OptimizeCommand.RaiseCanExecuteChanged();
             CancelCurrentCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
+            RecheckCompressionCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -218,6 +230,7 @@ public sealed class MainViewModel : ObservableObject
             OptimizeCommand.RaiseCanExecuteChanged();
             CancelCurrentCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
+            RecheckCompressionCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -905,6 +918,38 @@ public sealed class MainViewModel : ObservableObject
         return game;
     }
 
+    // Full detection walks every file with a WOF query, which is expensive for large
+    // games, so a recently saved status is trusted instead of re-walking on each selection.
+    internal static readonly TimeSpan CompressionStatusTtl = TimeSpan.FromHours(6);
+
+    internal static bool HasFreshCompressionStatus(GameInfo game) =>
+        HasFreshCompressionStatus(game, DateTimeOffset.Now);
+
+    internal static bool HasFreshCompressionStatus(GameInfo game, DateTimeOffset now) =>
+        game.CompressionState != GameCompressionState.Unknown &&
+        game.CompressionCheckedAt is { } checkedAt &&
+        now - checkedAt < CompressionStatusTtl;
+
+    private static string DescribeCompressionState(GameInfo game) => game.CompressionState switch
+    {
+        GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {game.CompressionAlgorithm ?? "Windows"}",
+        GameCompressionState.PartiallyCompressed => $"Игра «{game.Name}» сжата частично: {game.CompressionAlgorithm ?? "Windows"}",
+        GameCompressionState.Uncompressed => $"Игра «{game.Name}» не сжата",
+        _ => $"Состояние сжатия игры «{game.Name}» не проверено"
+    };
+
+    private Task RecheckSelectedGameCompressionAsync()
+    {
+        var game = SelectedGame;
+        if (game is null)
+            return Task.CompletedTask;
+
+        _compressionCheckCancellation?.Cancel();
+        _compressionCheckCancellation?.Dispose();
+        _compressionCheckCancellation = new CancellationTokenSource();
+        return RefreshCompressionStatusAsync(game, _compressionCheckCancellation.Token);
+    }
+
     private async Task RefreshCompressionStatusAsync(GameInfo game, CancellationToken cancellationToken)
     {
         IsCheckingCompression = true;
@@ -1012,6 +1057,7 @@ public sealed class MainViewModel : ObservableObject
         CompressCommand.RaiseCanExecuteChanged();
         DecompressCommand.RaiseCanExecuteChanged();
         RemoveGameCommand.RaiseCanExecuteChanged();
+        RecheckCompressionCommand.RaiseCanExecuteChanged();
     }
 
     private void RestoreSavedAnalysis(GameInfo game)
