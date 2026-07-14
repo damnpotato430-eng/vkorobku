@@ -1746,7 +1746,12 @@ public sealed class MainViewModel : ObservableObject
                 ? null
                 : job.Operation == "compress" ? job.Algorithm : processedGame?.CompressionAlgorithm;
             var difference = result.PhysicalBefore - result.PhysicalAfter;
-            var savedBytes = job.Operation == "compress" ? Math.Max(0, difference) : 0;
+            // The stored saving is the game's CURRENT saving versus its uncompressed
+            // size (detector semantics), not the delta of this run: a resumed or repeat
+            // compression frees ~0 additional bytes but the game still saves gigabytes.
+            var savedBytes = job.Operation == "compress"
+                ? Math.Max(0, result.TotalBytes - result.PhysicalAfter)
+                : 0;
             var compressedFiles = job.Operation == "compress"
                 ? result.ProcessedFiles
                 : newState == GameCompressionState.Uncompressed ? 0 : result.ErrorCount;
@@ -1764,7 +1769,7 @@ public sealed class MainViewModel : ObservableObject
                 ? $" · пропущено несжимаемых: {result.SkipListedFiles:N0} ({ByteFormatter.Format(result.SkipListedBytes)})"
                 : string.Empty;
             OperationSummary = job.Operation == "compress"
-                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}{skipNote}"
+                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · общая экономия {ByteFormatter.Format(savedBytes)} · ошибок: {result.ErrorCount}{skipNote}"
                 : decompressIncomplete
                     ? $"Распаковка завершена частично · ошибок: {result.ErrorCount}"
                     : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
