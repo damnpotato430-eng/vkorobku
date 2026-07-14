@@ -27,6 +27,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly OperationJournalStore _operationJournal = new();
     private readonly UserPreferencesStore _preferences = new();
     private readonly ManualGameStore _manualGameStore = new();
+    private readonly WatchedGameStore _watchedGames = new();
     private readonly GameIdentityService _gameIdentityService = new();
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
@@ -380,6 +381,7 @@ public sealed class MainViewModel : ObservableObject
     {
         _ = Task.Run(() =>
         {
+            AppLog.CleanupOldLogs();
             try { _analysisWorkspaceCleaner.CleanupOldWorkspaces(); }
             catch (IOException) { }
             catch (UnauthorizedAccessException) { }
@@ -1501,6 +1503,7 @@ public sealed class MainViewModel : ObservableObject
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
                 processedGame?.SteamBuildId);
+            UpdateWatchedGame(job, result, newState, processedGame);
 
             OperationSummary = job.Operation == "compress"
                 ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · ошибок: {result.ErrorCount}"
@@ -1562,6 +1565,39 @@ public sealed class MainViewModel : ObservableObject
             acceptWorkerProgress = false;
             IsOperating = false;
             ClearActiveOperation();
+        }
+    }
+
+    private void UpdateWatchedGame(WorkerJob job, WorkerMessage result, GameCompressionState newState, GameInfo? processedGame)
+    {
+        try
+        {
+            if (job.Operation == "compress" && newState != GameCompressionState.Uncompressed &&
+                !string.IsNullOrWhiteSpace(job.Algorithm))
+            {
+                _watchedGames.Upsert(new WatchedGame(
+                    job.RootPath,
+                    processedGame?.Name ?? Path.GetFileName(job.RootPath),
+                    string.Equals(processedGame?.Source, "Steam", StringComparison.OrdinalIgnoreCase),
+                    processedGame?.SteamAppId,
+                    processedGame?.SteamBuildId,
+                    job.Algorithm,
+                    DateTimeOffset.UtcNow,
+                    result.PhysicalAfter,
+                    result.TotalBytes,
+                    result.PhysicalAfter,
+                    DateTimeOffset.UtcNow));
+                AppLog.Info($"Наблюдение обновлено после сжатия: {job.RootPath} ({job.Algorithm})");
+            }
+            else if (job.Operation == "decompress" && newState == GameCompressionState.Uncompressed)
+            {
+                _watchedGames.Remove(job.RootPath);
+                AppLog.Info($"Наблюдение снято после распаковки: {job.RootPath}");
+            }
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("Не удалось обновить watcher.json", exception);
         }
     }
 
