@@ -30,6 +30,9 @@ public sealed class MainViewModel : ObservableObject
     private readonly WatchedGameStore _watchedGames = new();
     private readonly FolderSizeScanner _folderSizeScanner = new();
     private readonly DirectStorageDetector _directStorageDetector = new();
+    private readonly UpdateCheckService _updateCheckService = new();
+    private string _updateNoticeText = string.Empty;
+    private string? _updateUrl;
     private UserPreferences _userPreferences;
     private bool _isWatcherCheckRunning;
     private string _watcherSummaryText = string.Empty;
@@ -81,6 +84,7 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
         ShowSettingsCommand = new RelayCommand(ShowSettings);
+        OpenUpdateCommand = new RelayCommand(OpenUpdatePage, () => _updateUrl is not null);
         CheckWatchedGamesCommand = new AsyncRelayCommand(() => CheckWatchedGamesAsync(true),
             () => !_isWatcherCheckRunning && !IsAnalyzing && !IsOperating);
         FinishCompressionCommand = new AsyncRelayCommand(FinishCompressionAsync,
@@ -123,6 +127,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand FinishCompressionCommand { get; }
     public RelayCommand ShowSettingsCommand { get; }
     public AsyncRelayCommand CheckWatchedGamesCommand { get; }
+    public RelayCommand OpenUpdateCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -384,6 +389,19 @@ public sealed class MainViewModel : ObservableObject
     public Visibility WatcherSummaryVisibility =>
         WatcherSummaryText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
 
+    public string UpdateNoticeText
+    {
+        get => _updateNoticeText;
+        private set
+        {
+            if (SetProperty(ref _updateNoticeText, value))
+                OnPropertyChanged(nameof(UpdateNoticeVisibility));
+        }
+    }
+
+    public Visibility UpdateNoticeVisibility =>
+        UpdateNoticeText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+
     // Shown above the progress bar only while the user is browsing a different card,
     // so the target of the running operation stays visible.
     public string ActiveOperationLabel =>
@@ -436,6 +454,41 @@ public sealed class MainViewModel : ObservableObject
             StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
         await OfferToResumeInterruptedCompressionAsync();
         _ = CheckWatchedGamesAsync(false);
+        _ = CheckForUpdatesAsync();
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var currentVersion = typeof(MainViewModel).Assembly.GetName().Version ?? new Version(0, 0);
+            var newer = await _updateCheckService.CheckForNewerReleaseAsync(currentVersion);
+            if (newer is null)
+                return;
+
+            _updateUrl = newer.Value.Url;
+            UpdateNoticeText = $"Доступна версия {newer.Value.Version.ToString(3)}";
+            OpenUpdateCommand.RaiseCanExecuteChanged();
+            AppLog.Info($"Найдено обновление: {newer.Value.Version}");
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("Проверка обновлений не удалась", exception);
+        }
+    }
+
+    private void OpenUpdatePage()
+    {
+        if (_updateUrl is null)
+            return;
+        try
+        {
+            using var browser = Process.Start(new ProcessStartInfo { FileName = _updateUrl, UseShellExecute = true });
+        }
+        catch (Win32Exception exception)
+        {
+            StatusText = $"Не удалось открыть браузер: {exception.Message}";
+        }
     }
 
     // Startup pass over the watch list: cheap when Steam build ids did not change,
