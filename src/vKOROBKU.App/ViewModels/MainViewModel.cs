@@ -28,6 +28,11 @@ public sealed class MainViewModel : ObservableObject
     private readonly UserPreferencesStore _preferences = new();
     private readonly ManualGameStore _manualGameStore = new();
     private readonly WatchedGameStore _watchedGames = new();
+    private readonly FolderSizeScanner _folderSizeScanner = new();
+    private UserPreferences _userPreferences;
+    private bool _isWatcherCheckRunning;
+    private string _watcherSummaryText = string.Empty;
+    private bool _watcherHasFindings;
     private readonly GameIdentityService _gameIdentityService = new();
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
@@ -55,7 +60,8 @@ public sealed class MainViewModel : ObservableObject
     public MainViewModel()
     {
         _computer = _computerInfoService.GetComputerInfo();
-        _isExpertMode = _preferences.LoadExpertMode();
+        _userPreferences = _preferences.Load();
+        _isExpertMode = _userPreferences.ExpertMode;
         _coverService = new IgdbCoverService(_igdbCredentialStore);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
@@ -73,6 +79,9 @@ public sealed class MainViewModel : ObservableObject
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
+        ShowSettingsCommand = new RelayCommand(ShowSettings);
+        CheckWatchedGamesCommand = new AsyncRelayCommand(() => CheckWatchedGamesAsync(true),
+            () => !_isWatcherCheckRunning && !IsAnalyzing && !IsOperating);
         FinishCompressionCommand = new AsyncRelayCommand(FinishCompressionAsync,
             () => SelectedGame is { CompressionState: GameCompressionState.PartiallyCompressed } game &&
                   IsResumableAlgorithm(game.CompressionAlgorithm) &&
@@ -109,6 +118,8 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand RecheckCompressionCommand { get; }
     public RelayCommand OpenGameFolderCommand { get; }
     public AsyncRelayCommand FinishCompressionCommand { get; }
+    public RelayCommand ShowSettingsCommand { get; }
+    public AsyncRelayCommand CheckWatchedGamesCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -260,7 +271,9 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _isExpertMode, value))
                 return;
-            try { _preferences.SaveExpertMode(value); } catch { }
+            _userPreferences = _userPreferences with { ExpertMode = value };
+            try { _preferences.Save(_userPreferences); }
+            catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
             NotifyCompressionPanelVisibility();
         }
     }
@@ -343,6 +356,25 @@ public sealed class MainViewModel : ObservableObject
         private set => SetProperty(ref _totalSavingsText, value);
     }
 
+    public string WatcherSummaryText
+    {
+        get => _watcherSummaryText;
+        private set
+        {
+            if (SetProperty(ref _watcherSummaryText, value))
+                OnPropertyChanged(nameof(WatcherSummaryVisibility));
+        }
+    }
+
+    public bool WatcherHasFindings
+    {
+        get => _watcherHasFindings;
+        private set => SetProperty(ref _watcherHasFindings, value);
+    }
+
+    public Visibility WatcherSummaryVisibility =>
+        WatcherSummaryText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+
     // Shown above the progress bar only while the user is browsing a different card,
     // so the target of the running operation stays visible.
     public string ActiveOperationLabel =>
@@ -394,6 +426,166 @@ public sealed class MainViewModel : ObservableObject
         if (interrupted > 0)
             StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
         await OfferToResumeInterruptedCompressionAsync();
+        _ = CheckWatchedGamesAsync(false);
+    }
+
+    // Startup pass over the watch list: cheap when Steam build ids did not change,
+    // a background size walk otherwise. Degraded games get the partial badge and
+    // the finish-compression panel via the regular status pipeline.
+    internal static readonly TimeSpan WatchedCheckTtl = TimeSpan.FromDays(7);
+
+    private async Task CheckWatchedGamesAsync(bool force)
+    {
+        if (_isWatcherCheckRunning)
+            return;
+        if (!_userPreferences.WatcherEnabled)
+        {
+            WatcherHasFindings = false;
+            WatcherSummaryText = string.Empty;
+            return;
+        }
+
+        SeedWatchListFromLibrary();
+        var watched = _watchedGames.Load();
+        if (watched.Count == 0)
+        {
+            WatcherHasFindings = false;
+            WatcherSummaryText = string.Empty;
+            return;
+        }
+
+        _isWatcherCheckRunning = true;
+        CheckWatchedGamesCommand.RaiseCanExecuteChanged();
+        try
+        {
+            var degraded = new List<WatchedGame>();
+            var position = 0;
+            foreach (var entry in watched)
+            {
+                position++;
+                var current = entry;
+                if (!Directory.Exists(current.FolderPath))
+                {
+                    try { _watchedGames.Remove(current.FolderPath); } catch { }
+                    AppLog.Info($"Наблюдение снято — папка не найдена: {current.FolderPath}");
+                    continue;
+                }
+
+                var libraryGame = Games.FirstOrDefault(item =>
+                    string.Equals(item.InstallPath, current.FolderPath, StringComparison.OrdinalIgnoreCase));
+                var buildUnchanged = current.IsSteamGame &&
+                                     !string.IsNullOrWhiteSpace(current.SteamBuildId) &&
+                                     !string.IsNullOrWhiteSpace(libraryGame?.SteamBuildId) &&
+                                     string.Equals(current.SteamBuildId, libraryGame!.SteamBuildId, StringComparison.Ordinal);
+                var fresh = DateTimeOffset.UtcNow - current.LastCheckedAtUtc < WatchedCheckTtl;
+                if (force || !(buildUnchanged && fresh))
+                {
+                    WatcherSummaryText = $"Проверяем «{current.DisplayName}» ({position} из {watched.Count})…";
+                    var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath));
+                    current = current with
+                    {
+                        LastCheckedSize = sizes.PhysicalBytes,
+                        LastCheckedAtUtc = DateTimeOffset.UtcNow,
+                        SteamBuildId = libraryGame?.SteamBuildId ?? current.SteamBuildId
+                    };
+                    try { _watchedGames.Upsert(current); }
+                    catch (Exception exception) { AppLog.Error("Не удалось сохранить watcher.json", exception); }
+                }
+
+                if (current.NeedsRecompression(
+                        _userPreferences.DecayThresholdPercent / 100d,
+                        _userPreferences.MinimumSavingsMb * 1024L * 1024))
+                {
+                    degraded.Add(current);
+                    MarkWatchedGameAsDegraded(current, libraryGame);
+                }
+            }
+
+            WatcherHasFindings = degraded.Count > 0;
+            WatcherSummaryText = degraded.Count == 0
+                ? $"Наблюдение: {watched.Count} сжатых игр, деградации сжатия нет"
+                : $"Обновились и требуют дожатия: {degraded.Count} — можно вернуть ~{ByteFormatter.Format(degraded.Sum(item => item.PotentialSavingsBytes))}";
+            if (degraded.Count > 0)
+                AppLog.Info($"Деградация сжатия: {string.Join(", ", degraded.Select(item => item.DisplayName))}");
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("Проверка наблюдаемых игр не удалась", exception);
+            WatcherHasFindings = false;
+            WatcherSummaryText = "Не удалось проверить обновления сжатых игр — подробности в журнале logs";
+        }
+        finally
+        {
+            _isWatcherCheckRunning = false;
+            CheckWatchedGamesCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    // Games compressed before the watch list existed (or by earlier versions) are
+    // adopted from the saved status so monitoring works without recompressing them.
+    private void SeedWatchListFromLibrary()
+    {
+        try
+        {
+            var watched = _watchedGames.Load();
+            foreach (var game in Games)
+            {
+                if (game.CompressionState is not (GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed) ||
+                    !IsResumableAlgorithm(game.CompressionAlgorithm))
+                    continue;
+                if (watched.Any(item => string.Equals(item.FolderPath, game.InstallPath, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+                var saved = _compressionStatusStore.Load(game.InstallPath);
+                if (saved is null || saved.PhysicalBytes <= 0 || saved.LogicalBytes <= 0)
+                    continue;
+
+                _watchedGames.Upsert(new WatchedGame(
+                    game.InstallPath,
+                    game.Name,
+                    string.Equals(game.Source, "Steam", StringComparison.OrdinalIgnoreCase),
+                    game.SteamAppId,
+                    game.SteamBuildId ?? saved.SteamBuildId,
+                    game.CompressionAlgorithm!,
+                    saved.CheckedAt,
+                    saved.PhysicalBytes,
+                    saved.LogicalBytes,
+                    saved.PhysicalBytes,
+                    saved.CheckedAt));
+                AppLog.Info($"Наблюдение добавлено по сохранённому статусу: {game.InstallPath}");
+            }
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("Не удалось пополнить список наблюдения", exception);
+        }
+    }
+
+    private void MarkWatchedGameAsDegraded(WatchedGame entry, GameInfo? libraryGame)
+    {
+        if (libraryGame is null || libraryGame.CompressionState != GameCompressionState.Compressed)
+            return;
+
+        var savedBytes = Math.Max(0, entry.LastUncompressedSize - entry.LastCheckedSize);
+        UpdateGameCompressionStatus(
+            entry.FolderPath, GameCompressionState.PartiallyCompressed, entry.Algorithm,
+            savedBytes, entry.LastCheckedSize, libraryGame.CompressedFileCount, DateTimeOffset.Now);
+        TrySaveCompressionStatus(
+            entry.FolderPath, GameCompressionState.PartiallyCompressed, entry.Algorithm,
+            savedBytes, entry.LastCheckedSize, entry.LastUncompressedSize,
+            libraryGame.CompressedFileCount, libraryGame.SteamBuildId);
+    }
+
+    private void ShowSettings()
+    {
+        var dialog = new SettingsWindow(_userPreferences) { Owner = Application.Current.MainWindow };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        _userPreferences = dialog.Result with { ExpertMode = IsExpertMode };
+        try { _preferences.Save(_userPreferences); }
+        catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
+        StatusText = "Настройки сохранены";
+        _ = CheckWatchedGamesAsync(false);
     }
 
     private async Task OfferToResumeInterruptedCompressionAsync()

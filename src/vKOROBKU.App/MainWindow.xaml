@@ -36,6 +36,8 @@
                     </Border>
                     <Button Content="Операции" Command="{Binding ShowOperationsCommand}"
                             Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
+                    <Button Content="Настройки" Command="{Binding ShowSettingsCommand}"
+                            Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
                     <TextBlock Text="АНАЛИЗ И СЖАТИЕ" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
                                Foreground="{StaticResource MutedTextBrush}" />
                     <TextBlock Text="Оценка XPRESS и LZX доступна после выбора игры" Margin="12,0" TextWrapping="Wrap"
@@ -117,6 +119,29 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    <Grid Margin="0,10,0,0" Visibility="{Binding WatcherSummaryVisibility}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding WatcherSummaryText}" VerticalAlignment="Center"
+                                   FontSize="11" TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding WatcherHasFindings}" Value="True">
+                                            <Setter Property="Foreground" Value="#FFB84D" />
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button Grid.Column="1" Content="Проверить сейчас" Command="{Binding CheckWatchedGamesCommand}"
+                                Style="{StaticResource SecondaryButton}" Padding="10,6" FontSize="11"
+                                Margin="12,0,0,0" VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </Border>
 
