@@ -272,7 +272,7 @@
 
                         <ListBox Grid.Row="2" Margin="0,16,0,12" ItemsSource="{Binding Estimates}"
                                  SelectedItem="{Binding SelectedEstimate}" Background="Transparent" BorderThickness="0"
-                                 Visibility="{Binding ExpertOptimizationVisibility}">
+                                 Visibility="{Binding EstimateListVisibility}">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
@@ -323,7 +323,7 @@
                         </ListBox>
 
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
-                                VerticalAlignment="Top" Visibility="{Binding AutoOptimizationVisibility}">
+                                VerticalAlignment="Top" Visibility="{Binding AutoInfoVisibility}">
                             <StackPanel>
                                 <TextBlock Text="АВТОМАТИЧЕСКАЯ ОПТИМИЗАЦИЯ" Foreground="{StaticResource AccentBrush}"
                                            FontSize="11" FontWeight="Bold" />
@@ -331,6 +331,21 @@
                                            Text="vKOROBKU проанализирует файлы, проверит скорость чтения и самостоятельно выберет подходящий режим XPRESS или LZX." />
                                 <TextBlock Text="Перед изменением файлов программа покажет прогноз и попросит подтверждение."
                                            Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
+                                VerticalAlignment="Top" Visibility="{Binding ActiveCompressionInfoVisibility}">
+                            <StackPanel>
+                                <TextBlock Text="ИДЁТ СЖАТИЕ · ВЫБРАННЫЙ РЕЖИМ" Foreground="{StaticResource AccentBrush}"
+                                           FontSize="11" FontWeight="Bold" />
+                                <TextBlock Text="{Binding ActiveCompressionModeText}" Margin="0,10,0,0"
+                                           FontSize="21" FontWeight="Bold" />
+                                <TextBlock Text="{Binding ActiveCompressionDetailsText}" Margin="0,6,0,0" FontSize="12"
+                                           TextWrapping="Wrap" Foreground="{StaticResource TextBrush}" />
+                                <TextBlock Text="Режим зафиксирован до завершения или остановки операции."
+                                           Margin="0,10,0,0" FontSize="11" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" />
                             </StackPanel>
                         </Border>

@@ -48,6 +48,8 @@ public sealed class MainViewModel : ObservableObject
     private string _totalSavingsText = string.Empty;
     private string? _activeOperationPath;
     private string _activeOperationDescription = string.Empty;
+    private string? _activeCompressionAlgorithm;
+    private string? _activeCompressionSavings;
 
     public MainViewModel()
     {
@@ -239,6 +241,7 @@ public sealed class MainViewModel : ObservableObject
             CancelCurrentCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             RecheckCompressionCommand.RaiseCanExecuteChanged();
+            NotifyCompressionPanelVisibility();
         }
     }
 
@@ -323,6 +326,29 @@ public sealed class MainViewModel : ObservableObject
 
     public Visibility ActiveOperationLabelVisibility =>
         ActiveOperationLabel.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public string ActiveCompressionModeText => _activeCompressionAlgorithm ?? string.Empty;
+
+    public string ActiveCompressionDetailsText =>
+        _activeCompressionSavings is null ? string.Empty : $"Ожидаемая экономия: {_activeCompressionSavings}";
+
+    // While a compression runs, the estimate list is replaced with a read-only card of
+    // the chosen mode, so the selection cannot be toyed with mid-operation.
+    public Visibility ActiveCompressionInfoVisibility =>
+        IsOperating && _activeCompressionAlgorithm is not null &&
+        SelectedGame?.CompressionState != GameCompressionState.Compressed
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+    public Visibility EstimateListVisibility =>
+        !IsOperating && ExpertOptimizationVisibility == Visibility.Visible
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+    public Visibility AutoInfoVisibility =>
+        !IsOperating && AutoOptimizationVisibility == Visibility.Visible
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
     public async Task InitializeAsync()
     {
@@ -1038,13 +1064,23 @@ public sealed class MainViewModel : ObservableObject
     {
         _activeOperationPath = null;
         _activeOperationDescription = string.Empty;
+        _activeCompressionAlgorithm = null;
+        _activeCompressionSavings = null;
         NotifyActiveOperationLabel();
+        NotifyActiveCompressionInfo();
     }
 
     private void NotifyActiveOperationLabel()
     {
         OnPropertyChanged(nameof(ActiveOperationLabel));
         OnPropertyChanged(nameof(ActiveOperationLabelVisibility));
+    }
+
+    private void NotifyActiveCompressionInfo()
+    {
+        OnPropertyChanged(nameof(ActiveCompressionModeText));
+        OnPropertyChanged(nameof(ActiveCompressionDetailsText));
+        OnPropertyChanged(nameof(ActiveCompressionInfoVisibility));
     }
 
     private void RefreshSavingsSummary()
@@ -1174,6 +1210,9 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(ExpertOptimizationVisibility));
         OnPropertyChanged(nameof(CompressedPanelVisibility));
         OnPropertyChanged(nameof(PartiallyCompressedVisibility));
+        OnPropertyChanged(nameof(EstimateListVisibility));
+        OnPropertyChanged(nameof(AutoInfoVisibility));
+        OnPropertyChanged(nameof(ActiveCompressionInfoVisibility));
     }
 
     private void TrySaveCompressionStatus(
@@ -1313,6 +1352,13 @@ public sealed class MainViewModel : ObservableObject
         SetActiveOperation(
             $"{(job.Operation == "compress" ? "Сжимается" : "Распаковывается")}: {targetGame?.Name ?? job.RootPath}",
             job.RootPath);
+        var selectedEstimate = SelectedEstimate;
+        _activeCompressionAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
+        _activeCompressionSavings = job.Operation == "compress" && selectedEstimate is not null &&
+                                    selectedEstimate.AlgorithmText == job.Algorithm
+            ? selectedEstimate.SavingsText
+            : null;
+        NotifyActiveCompressionInfo();
         OperationProgress = 0;
         OperationSummary = "Ожидаем подтверждение прав администратора…";
         StatusText = OperationSummary;
