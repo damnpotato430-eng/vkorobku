@@ -45,7 +45,9 @@
                 <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="12">
                     <StackPanel>
                         <TextBlock Text="СИСТЕМА" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                        <TextBlock Text="{Binding Computer.OperatingSystem}" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
+                        <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
+                                   Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="{Binding Computer.OperatingSystem}" Margin="0,4,0,0" TextWrapping="Wrap" FontSize="11"
                                    Foreground="{StaticResource MutedTextBrush}" />
                         <TextBlock Text="{Binding Computer.MemoryText}" Margin="0,4,0,0" FontSize="11"
                                    Foreground="{StaticResource MutedTextBrush}" />
@@ -90,34 +92,27 @@
             </Grid>
 
             <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="18,15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="ПРОЦЕССОР" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,6,20,0" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <Grid>
-                            <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
-                            <TextBlock Text="{Binding TotalSavingsText}" HorizontalAlignment="Right" FontSize="10"
-                                       FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                        </Grid>
-                        <ItemsControl ItemsSource="{Binding Computer.Drives}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,6,0,0">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="{Binding TotalSavingsText}" HorizontalAlignment="Right" FontSize="10"
+                                   FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Computer.Drives}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,6,0,0" Background="#111318" BorderBrush="#292D35" BorderThickness="1"
+                                        CornerRadius="6" Padding="10,6">
+                                    <Grid>
                                         <TextBlock Text="{Binding DisplayText}" />
                                         <TextBlock Text="{Binding SavingsText}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   FontSize="11" Foreground="{StaticResource AccentBrush}" />
+                                                   FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
                                     </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </Border>
 
             <Grid Grid.Row="4">
@@ -349,6 +344,9 @@
                         </Border>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding AutoOptimizationVisibility}">
+                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
+                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       Foreground="{StaticResource AccentBrush}" />
                             <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
@@ -376,6 +374,9 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding ExpertOptimizationVisibility}">
+                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
+                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       Foreground="{StaticResource AccentBrush}" />
                             <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
@@ -404,6 +405,9 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">
+                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
+                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       Foreground="{StaticResource AccentBrush}" />
                             <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />

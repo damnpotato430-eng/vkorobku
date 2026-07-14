@@ -46,6 +46,8 @@ public sealed class MainViewModel : ObservableObject
     private double _operationProgress;
     private string _operationSummary = "Сжатие изменяет только способ хранения файлов на NTFS.";
     private string _totalSavingsText = string.Empty;
+    private string? _activeOperationPath;
+    private string _activeOperationDescription = string.Empty;
 
     public MainViewModel()
     {
@@ -124,6 +126,7 @@ public sealed class MainViewModel : ObservableObject
             if (!SetProperty(ref _selectedGame, value))
                 return;
             NotifyCompressionPanelVisibility();
+            NotifyActiveOperationLabel();
             OnPropertyChanged(nameof(IdentityReviewVisibility));
             OnPropertyChanged(nameof(ManualGameVisibility));
             ReviewIdentityCommand.RaiseCanExecuteChanged();
@@ -309,6 +312,17 @@ public sealed class MainViewModel : ObservableObject
         get => _totalSavingsText;
         private set => SetProperty(ref _totalSavingsText, value);
     }
+
+    // Shown above the progress bar only while the user is browsing a different card,
+    // so the target of the running operation stays visible.
+    public string ActiveOperationLabel =>
+        _activeOperationPath is not null &&
+        SelectedGame?.InstallPath.Equals(_activeOperationPath, StringComparison.OrdinalIgnoreCase) != true
+            ? _activeOperationDescription
+            : string.Empty;
+
+    public Visibility ActiveOperationLabelVisibility =>
+        ActiveOperationLabel.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public async Task InitializeAsync()
     {
@@ -764,6 +778,7 @@ public sealed class MainViewModel : ObservableObject
         Estimates.Clear();
         _analysisCancellation = new CancellationTokenSource();
         IsAnalyzing = true;
+        SetActiveOperation($"Анализируется: {game.Name}", game.InstallPath);
         OperationProgress = 0;
         AnalysisButtonText = "Анализ выполняется…";
         AnalysisSummary = "Инвентаризация файлов…";
@@ -917,6 +932,7 @@ public sealed class MainViewModel : ObservableObject
             _analysisCancellation.Dispose();
             _analysisCancellation = null;
             IsAnalyzing = false;
+            ClearActiveOperation();
             if (IsGameSelected(game))
                 AnalysisButtonText = "Повторить анализ";
         }
@@ -1009,6 +1025,26 @@ public sealed class MainViewModel : ObservableObject
         {
             StatusText = $"Не удалось открыть проводник: {exception.Message}";
         }
+    }
+
+    private void SetActiveOperation(string description, string installPath)
+    {
+        _activeOperationDescription = description;
+        _activeOperationPath = installPath;
+        NotifyActiveOperationLabel();
+    }
+
+    private void ClearActiveOperation()
+    {
+        _activeOperationPath = null;
+        _activeOperationDescription = string.Empty;
+        NotifyActiveOperationLabel();
+    }
+
+    private void NotifyActiveOperationLabel()
+    {
+        OnPropertyChanged(nameof(ActiveOperationLabel));
+        OnPropertyChanged(nameof(ActiveOperationLabelVisibility));
     }
 
     private void RefreshSavingsSummary()
@@ -1272,6 +1308,11 @@ public sealed class MainViewModel : ObservableObject
         var acceptWorkerProgress = true;
 
         IsOperating = true;
+        var targetGame = Games.FirstOrDefault(item =>
+            string.Equals(item.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
+        SetActiveOperation(
+            $"{(job.Operation == "compress" ? "Сжимается" : "Распаковывается")}: {targetGame?.Name ?? job.RootPath}",
+            job.RootPath);
         OperationProgress = 0;
         OperationSummary = "Ожидаем подтверждение прав администратора…";
         StatusText = OperationSummary;
@@ -1414,6 +1455,7 @@ public sealed class MainViewModel : ObservableObject
         {
             acceptWorkerProgress = false;
             IsOperating = false;
+            ClearActiveOperation();
         }
     }
 
