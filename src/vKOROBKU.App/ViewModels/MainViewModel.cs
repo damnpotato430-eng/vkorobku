@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Windows;
 using Microsoft.Win32;
@@ -43,6 +45,7 @@ public sealed class MainViewModel : ObservableObject
     private bool _isExpertMode;
     private double _operationProgress;
     private string _operationSummary = "Сжатие изменяет только способ хранения файлов на NTFS.";
+    private string _totalSavingsText = string.Empty;
 
     public MainViewModel()
     {
@@ -64,6 +67,7 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame?.Source == "Добавлено вручную" && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
@@ -94,6 +98,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand ReviewIdentityCommand { get; }
     public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RecheckCompressionCommand { get; }
+    public RelayCommand OpenGameFolderCommand { get; }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -299,6 +304,12 @@ public sealed class MainViewModel : ObservableObject
         private set => SetProperty(ref _operationSummary, value);
     }
 
+    public string TotalSavingsText
+    {
+        get => _totalSavingsText;
+        private set => SetProperty(ref _totalSavingsText, value);
+    }
+
     public async Task InitializeAsync()
     {
         _ = Task.Run(() =>
@@ -398,6 +409,7 @@ public sealed class MainViewModel : ObservableObject
                 ? "Игры Steam не найдены — добавьте папку вручную"
                 : $"Найдено игр: {foundGames.Count}";
             RefreshCoversCommand.RaiseCanExecuteChanged();
+            RefreshSavingsSummary();
         }
         catch (Exception exception)
         {
@@ -447,6 +459,7 @@ public sealed class MainViewModel : ObservableObject
         SelectedGame = game;
         StatusText = $"Добавлена игра «{game.Name}»";
         RefreshCoversCommand.RaiseCanExecuteChanged();
+        RefreshSavingsSummary();
         _ = await LoadCoverAsync(game, false);
     }
 
@@ -503,6 +516,7 @@ public sealed class MainViewModel : ObservableObject
         StatusText = $"Игра «{gameName}» убрана из библиотеки";
         RefreshCoversCommand.RaiseCanExecuteChanged();
         RaiseActionCommands();
+        RefreshSavingsSummary();
     }
 
     private static void ShowRemoveGameError(string details) => MessageBox.Show(
@@ -771,7 +785,8 @@ public sealed class MainViewModel : ObservableObject
             if (!acceptAnalysisProgress)
                 return;
             OperationProgress = Math.Clamp(update.Percent, 0, 100);
-            AnalysisSummary = update.Stage;
+            if (IsGameSelected(game))
+                AnalysisSummary = update.Stage;
             OperationSummary = update.Stage;
             StatusText = update.Stage;
             operation = operation with
@@ -809,9 +824,14 @@ public sealed class MainViewModel : ObservableObject
                 _analysisCancellation.Token,
                 maximumSampleBytes);
             acceptAnalysisProgress = false;
-            foreach (var estimate in result.Estimates)
-                Estimates.Add(estimate);
-            SelectedEstimate = Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress16K);
+            var analyzedGameSelected = IsGameSelected(game);
+            if (analyzedGameSelected)
+            {
+                Estimates.Clear();
+                foreach (var estimate in result.Estimates)
+                    Estimates.Add(estimate);
+                SelectedEstimate = ChooseBalancedEstimate(result.Estimates);
+            }
 
             var analyzedAt = DateTimeOffset.Now;
             var cacheSaved = true;
@@ -830,7 +850,8 @@ public sealed class MainViewModel : ObservableObject
             }
 
             OperationProgress = 100;
-            AnalysisSummary = BuildSavedAnalysisSummary(result, analyzedAt);
+            if (analyzedGameSelected)
+                AnalysisSummary = BuildSavedAnalysisSummary(result, analyzedAt);
             StatusText = cacheSaved
                 ? $"Анализ игры «{game.Name}» завершён и сохранён"
                 : $"Анализ игры «{game.Name}» завершён, но кэш записать не удалось";
@@ -861,32 +882,34 @@ public sealed class MainViewModel : ObservableObject
         catch (OperationCanceledException)
         {
             acceptAnalysisProgress = false;
-            AnalysisSummary = "Анализ отменён. Временные файлы удалены.";
+            OperationSummary = "Анализ отменён. Временные файлы удалены.";
+            if (IsGameSelected(game))
+                AnalysisSummary = OperationSummary;
             StatusText = "Анализ отменён";
-            OperationSummary = AnalysisSummary;
             operation = operation with
             {
                 FinishedAt = DateTimeOffset.Now,
                 State = OperationJournalState.Cancelled,
-                Message = AnalysisSummary
+                Message = OperationSummary
             };
             UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, AnalysisSummary); } catch { }
+            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary); } catch { }
         }
         catch (Exception exception)
         {
             acceptAnalysisProgress = false;
-            AnalysisSummary = $"Анализ не выполнен: {exception.Message}";
+            OperationSummary = $"Анализ не выполнен: {exception.Message}";
+            if (IsGameSelected(game))
+                AnalysisSummary = OperationSummary;
             StatusText = "Ошибка анализа";
-            OperationSummary = AnalysisSummary;
             operation = operation with
             {
                 FinishedAt = DateTimeOffset.Now,
                 State = OperationJournalState.Failed,
-                Message = AnalysisSummary
+                Message = OperationSummary
             };
             UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, AnalysisSummary); } catch { }
+            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
         }
         finally
         {
@@ -894,7 +917,8 @@ public sealed class MainViewModel : ObservableObject
             _analysisCancellation.Dispose();
             _analysisCancellation = null;
             IsAnalyzing = false;
-            AnalysisButtonText = "Повторить анализ";
+            if (IsGameSelected(game))
+                AnalysisButtonText = "Повторить анализ";
         }
     }
 
@@ -903,6 +927,8 @@ public sealed class MainViewModel : ObservableObject
         var saved = _compressionStatusStore.Load(game.InstallPath);
         if (saved is not null)
         {
+            if (saved.LogicalBytes > 0)
+                game.LogicalSizeBytes = saved.LogicalBytes;
             game.CompressionState = saved.State;
             game.CompressionAlgorithm = saved.Algorithm;
             game.CompressionSavedBytes = saved.SavedBytes;
@@ -929,6 +955,85 @@ public sealed class MainViewModel : ObservableObject
         game.CompressionState != GameCompressionState.Unknown &&
         game.CompressionCheckedAt is { } checkedAt &&
         now - checkedAt < CompressionStatusTtl;
+
+    // Balance rule: a slightly smaller saving is preferred over a noticeable read slowdown —
+    // a few hundred megabytes do not matter when reads become 15+ percent slower.
+    internal const double MaximumReadSlowdownPercent = -15;
+    internal const long NegligibleSavingsDifferenceBytes = 400L * 1024 * 1024;
+
+    internal static CompressionEstimate? ChooseBalancedEstimate(IReadOnlyList<CompressionEstimate> estimates)
+    {
+        if (estimates.Count == 0)
+            return null;
+
+        var hasBaseline = estimates.Any(estimate => estimate.BaselineReadMegabytesPerSecond > 0);
+        var eligible = hasBaseline
+            ? estimates.Where(estimate => estimate.ReadSpeedChangePercent >= MaximumReadSlowdownPercent).ToArray()
+            : estimates.ToArray();
+        if (eligible.Length == 0)
+            eligible = estimates.ToArray();
+
+        var topSavings = eligible.Max(estimate => estimate.MinimumSavingsBytes);
+        return eligible
+            .Where(estimate => topSavings - estimate.MinimumSavingsBytes <= NegligibleSavingsDifferenceBytes)
+            .OrderByDescending(estimate => estimate.ReadSpeedChangePercent)
+            .ThenByDescending(estimate => estimate.MinimumSavingsBytes)
+            .First();
+    }
+
+    private bool IsGameSelected(GameInfo game) =>
+        SelectedGame is not null &&
+        string.Equals(SelectedGame.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase);
+
+    private void OpenSelectedGameFolder()
+    {
+        var game = SelectedGame;
+        if (game is null)
+            return;
+        if (!Directory.Exists(game.InstallPath))
+        {
+            StatusText = $"Папка игры не найдена: {game.InstallPath}";
+            return;
+        }
+
+        try
+        {
+            using var explorer = Process.Start(new ProcessStartInfo
+            {
+                FileName = game.InstallPath,
+                UseShellExecute = true
+            });
+            StatusText = $"Открываем папку игры «{game.Name}»";
+        }
+        catch (Win32Exception exception)
+        {
+            StatusText = $"Не удалось открыть проводник: {exception.Message}";
+        }
+    }
+
+    private void RefreshSavingsSummary()
+    {
+        long totalSavedBytes = 0;
+        var savedByRoot = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+        foreach (var game in Games)
+        {
+            if (game.CompressionSavedBytes <= 0)
+                continue;
+            totalSavedBytes += game.CompressionSavedBytes;
+            var root = Path.GetPathRoot(game.InstallPath);
+            if (string.IsNullOrEmpty(root))
+                continue;
+            savedByRoot.TryGetValue(root, out var currentBytes);
+            savedByRoot[root] = currentBytes + game.CompressionSavedBytes;
+        }
+
+        foreach (var drive in Computer.Drives)
+            drive.SavedBytes = savedByRoot.TryGetValue(drive.Name, out var savedBytes) ? savedBytes : 0;
+
+        TotalSavingsText = totalSavedBytes > 0
+            ? $"Сэкономлено всего: {ByteFormatter.Format(totalSavedBytes)}"
+            : string.Empty;
+    }
 
     private static string DescribeCompressionState(GameInfo game) => game.CompressionState switch
     {
@@ -972,7 +1077,8 @@ public sealed class MainViewModel : ObservableObject
 
             UpdateGameCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
-                detected.SavedBytes, detected.PhysicalBytes, detected.CompressedFiles, DateTimeOffset.Now);
+                detected.SavedBytes, detected.PhysicalBytes, detected.CompressedFiles, DateTimeOffset.Now,
+                detected.LogicalBytes);
             TrySaveCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
                 detected.SavedBytes, detected.PhysicalBytes, detected.LogicalBytes, detected.CompressedFiles,
@@ -1005,11 +1111,14 @@ public sealed class MainViewModel : ObservableObject
         long savedBytes = 0,
         long physicalBytes = 0,
         int compressedFiles = 0,
-        DateTimeOffset? checkedAt = null)
+        DateTimeOffset? checkedAt = null,
+        long logicalBytes = 0)
     {
         var index = FindGameIndex(installPath);
         if (index >= 0)
         {
+            if (logicalBytes > 0)
+                Games[index].LogicalSizeBytes = logicalBytes;
             Games[index].CompressionState = state;
             Games[index].CompressionAlgorithm = algorithm;
             Games[index].CompressionSavedBytes = savedBytes;
@@ -1019,6 +1128,7 @@ public sealed class MainViewModel : ObservableObject
         }
         NotifyCompressionPanelVisibility();
         RaiseActionCommands();
+        RefreshSavingsSummary();
     }
 
     private void NotifyCompressionPanelVisibility()
@@ -1058,6 +1168,7 @@ public sealed class MainViewModel : ObservableObject
         DecompressCommand.RaiseCanExecuteChanged();
         RemoveGameCommand.RaiseCanExecuteChanged();
         RecheckCompressionCommand.RaiseCanExecuteChanged();
+        OpenGameFolderCommand.RaiseCanExecuteChanged();
     }
 
     private void RestoreSavedAnalysis(GameInfo game)
@@ -1072,8 +1183,7 @@ public sealed class MainViewModel : ObservableObject
 
         foreach (var estimate in saved.Result.Estimates)
             Estimates.Add(estimate);
-        SelectedEstimate = Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress16K)
-                           ?? Estimates.FirstOrDefault();
+        SelectedEstimate = ChooseBalancedEstimate(saved.Result.Estimates) ?? Estimates.FirstOrDefault();
         AnalysisSummary = game.IsAnalysisStale
             ? "Игра обновилась — перед оптимизацией нужен новый быстрый анализ."
             : BuildSavedAnalysisSummary(saved.Result, saved.AnalyzedAt);
@@ -1097,13 +1207,9 @@ public sealed class MainViewModel : ObservableObject
         if (SelectedGame is null || Estimates.Count == 0 || SelectedGame.IsAnalysisStale)
             return;
 
-        var acceptable = Estimates
-            .Where(estimate => estimate.BaselineReadMegabytesPerSecond <= 0 || estimate.ReadSpeedChangePercent >= -5)
-            .OrderByDescending(estimate => estimate.MinimumSavingsBytes)
-            .ToArray();
-        SelectedEstimate = acceptable.FirstOrDefault()
-                           ?? Estimates.FirstOrDefault(estimate => estimate.Algorithm == CompressionAlgorithm.Xpress8K)
-                           ?? Estimates.FirstOrDefault();
+        SelectedEstimate = ChooseBalancedEstimate(Estimates.ToArray()) ?? Estimates.FirstOrDefault();
+        if (SelectedEstimate is null)
+            return;
 
         await CompressSelectedGameAsync();
     }
@@ -1242,7 +1348,8 @@ public sealed class MainViewModel : ObservableObject
                 : decompressIncomplete ? result.ErrorCount : 0;
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
-                savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now);
+                savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now,
+                result.TotalBytes);
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
@@ -1255,6 +1362,7 @@ public sealed class MainViewModel : ObservableObject
                     : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
+            RefreshSavingsSummary();
             operation = operation with
             {
                 FinishedAt = DateTimeOffset.Now,

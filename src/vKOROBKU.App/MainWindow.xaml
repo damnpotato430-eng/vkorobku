@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="vKOROBKU" Icon="Assets/vkorobku.ico"
-        Width="1180" Height="760" MinWidth="1040" MinHeight="660"
+        Width="1180" Height="820" MinWidth="1040" MinHeight="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
         WindowStartupLocation="CenterScreen">
     <Grid Background="{StaticResource BackgroundBrush}">
@@ -100,11 +100,19 @@
                         <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,6,20,0" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                        <Grid>
+                            <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                            <TextBlock Text="{Binding TotalSavingsText}" HorizontalAlignment="Right" FontSize="10"
+                                       FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                        </Grid>
                         <ItemsControl ItemsSource="{Binding Computer.Drives}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding DisplayText}" Margin="0,6,0,0" />
+                                    <Grid Margin="0,6,0,0">
+                                        <TextBlock Text="{Binding DisplayText}" />
+                                        <TextBlock Text="{Binding SavingsText}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                   FontSize="11" Foreground="{StaticResource AccentBrush}" />
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -139,6 +147,7 @@
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="Перейти в каталог" Command="{Binding OpenGameFolderCommand}" />
                                         <MenuItem Header="Проверить состояние сжатия" Command="{Binding RecheckCompressionCommand}" />
                                         <MenuItem Header="Убрать из библиотеки" Command="{Binding RemoveGameCommand}" />
                                     </ContextMenu>
@@ -183,8 +192,39 @@
                                     <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
                                     <TextBlock Text="{Binding SizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
                                 </Grid>
-                                <TextBlock Text="{Binding CompressionStatusText}" Margin="0,7,0,0" FontSize="10"
-                                           Foreground="{StaticResource MutedTextBrush}" />
+                                <Border Margin="0,9,0,0" CornerRadius="5" Padding="8,4" HorizontalAlignment="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#20242C" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CompressionState}" Value="Compressed">
+                                                    <Setter Property="Background" Value="#26331F" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CompressionState}" Value="PartiallyCompressed">
+                                                    <Setter Property="Background" Value="#3A2E14" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding CompressionStatusText}" FontSize="11" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CompressionState}" Value="Compressed">
+                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding CompressionState}" Value="PartiallyCompressed">
+                                                        <Setter Property="Foreground" Value="#FFB84D" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding CompressionState}" Value="Uncompressed">
+                                                        <Setter Property="Foreground" Value="#C7CBD4" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -202,7 +242,7 @@
                             <TextBlock Text="ОПТИМИЗАЦИЯ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
                             <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue=Игра не выбрана}"
                                        Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,4,0,0" FontSize="10"
+                            <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,5,0,0" FontSize="12"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
                             <WrapPanel Orientation="Horizontal" Margin="0,10,0,0">
                                 <ToggleButton Content="Экспертный режим" IsChecked="{Binding IsExpertMode}"
@@ -218,8 +258,8 @@
                                         Style="{StaticResource SecondaryButton}" />
                             </WrapPanel>
                             <StackPanel Visibility="{Binding UncompressedPanelVisibility}">
-                                <TextBlock Text="{Binding AnalysisSummary}" Margin="0,7,0,0" TextWrapping="Wrap"
-                                           Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                <TextBlock Text="{Binding AnalysisSummary}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Foreground="{StaticResource MutedTextBrush}" FontSize="13" />
                                 <StackPanel Visibility="{Binding ExpertOptimizationVisibility}">
                                     <TextBlock Text="ТОЧНОСТЬ АНАЛИЗА" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
                                                Foreground="{StaticResource MutedTextBrush}" />
@@ -309,14 +349,14 @@
                         </Border>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding AutoOptimizationVisibility}">
-                            <Grid Height="18">
+                            <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
                                 <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="White" />
+                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
                             </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,7,0,10" TextWrapping="Wrap"
-                                       FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
+                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -324,61 +364,64 @@
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Оптимизировать игру" Command="{Binding OptimizeCommand}" />
+                                <Button Content="Оптимизировать игру" Command="{Binding OptimizeCommand}"
+                                        Style="{StaticResource PrimaryActionButton}" />
                                 <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
-                                        Background="#A83A3A" Foreground="White" />
+                                        Style="{StaticResource StopButton}" />
                             </Grid>
                             <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
                                     Visibility="{Binding PartiallyCompressedVisibility}"
                                     ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding ExpertOptimizationVisibility}">
-                            <Grid Height="18">
+                            <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
                                 <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="White" />
+                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
                             </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,7,0,10" TextWrapping="Wrap"
-                                       FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
+                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}" />
+                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}"
+                                        Style="{StaticResource PrimaryActionButton}" />
                                 <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
-                                        Background="#A83A3A" Foreground="White" />
+                                        Style="{StaticResource StopButton}" />
                             </Grid>
                             <Button Content="Сжать выбранным режимом" Command="{Binding CompressCommand}"
-                                    Margin="0,8,0,0" />
+                                    Margin="0,8,0,0" Style="{StaticResource PrimaryActionButton}" />
                             <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource SecondaryButton}"
+                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
                                     Visibility="{Binding PartiallyCompressedVisibility}"
                                     ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">
-                            <Grid Height="18">
+                            <Grid Height="22">
                                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
                                              Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
                                 <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="White" />
+                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
                             </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,7,0,10" TextWrapping="Wrap"
-                                       FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
+                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
+                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Распаковать игру" Command="{Binding DecompressCommand}" />
+                                <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                                        Style="{StaticResource PrimaryActionButton}" />
                                 <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
-                                        Background="#A83A3A" Foreground="White" />
+                                        Style="{StaticResource StopButton}" />
                             </Grid>
                         </StackPanel>
                     </Grid>

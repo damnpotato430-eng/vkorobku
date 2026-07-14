@@ -14,6 +14,7 @@ public enum GameCompressionState
 public sealed class GameInfo : INotifyPropertyChanged
 {
     private string _name;
+    private long _logicalSizeBytes;
     private string? _steamAppId;
     private string? _coverPath;
     private GameCompressionState _compressionState;
@@ -59,7 +60,19 @@ public sealed class GameInfo : INotifyPropertyChanged
     }
 
     public string InstallPath { get; }
-    public long LogicalSizeBytes { get; }
+
+    // Steam manifests report the size of a single app, while shared install folders can
+    // hold several apps, so the value is refreshed from real directory walks.
+    public long LogicalSizeBytes
+    {
+        get => _logicalSizeBytes;
+        set
+        {
+            if (SetProperty(ref _logicalSizeBytes, value))
+                OnPropertyChanged(nameof(SizeText));
+        }
+    }
+
     public string Source { get; }
     public string? SteamAppId
     {
