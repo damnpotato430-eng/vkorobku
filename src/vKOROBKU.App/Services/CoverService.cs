@@ -1,5 +1,4 @@
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -7,17 +6,21 @@ using vKOROBKU.App.Models;
 
 namespace vKOROBKU.App.Services;
 
-public sealed class IgdbCoverService
+/// <summary>Resolves game cover art with no user configuration: the Steam cover CDN by
+/// app id, and a Steam store search by name for non-Steam games. A missing cover is
+/// cached negatively for a week so it is not retried on every launch.</summary>
+public sealed class CoverService
 {
     private static readonly HttpClient Http = CreateHttpClient();
-    private readonly IgdbCredentialStore _credentialStore;
-    private readonly SemaphoreSlim _apiGate = new(1, 1);
+    private readonly Func<string, CancellationToken, Task<string?>>? _steamAppIdResolver;
     private readonly string _cacheDirectory = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "vKOROBKU", "Covers");
-    private string? _accessToken;
-    private DateTimeOffset _tokenExpiresAt;
-    private DateTimeOffset _lastRequestAt;
+
+    public CoverService(Func<string, CancellationToken, Task<string?>>? steamAppIdResolver = null)
+    {
+        _steamAppIdResolver = steamAppIdResolver;
+    }
 
     private static HttpClient CreateHttpClient()
     {
@@ -26,13 +29,6 @@ public sealed class IgdbCoverService
         client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.8");
         return client;
     }
-
-    public IgdbCoverService(IgdbCredentialStore credentialStore)
-    {
-        _credentialStore = credentialStore;
-    }
-
-    public bool HasCredentials => _credentialStore.Load()?.IsValid == true;
 
     public async Task<string?> GetCoverAsync(GameInfo game, bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
@@ -43,52 +39,31 @@ public sealed class IgdbCoverService
 
         if (!forceRefresh && File.Exists(imagePath))
             return imagePath;
+        if (!forceRefresh && IsFreshNegativeCache(metadataPath))
+            return null;
 
-        var hasFreshNegativeCache = !forceRefresh && IsFreshNegativeCache(metadataPath);
-        if (!hasFreshNegativeCache && !string.IsNullOrWhiteSpace(game.SteamAppId))
+        if (!string.IsNullOrWhiteSpace(game.SteamAppId))
         {
             var steamCover = await TryDownloadSteamCoverAsync(game.SteamAppId, imagePath, metadataPath, cancellationToken);
             if (steamCover is not null)
                 return steamCover;
         }
-
-        if (hasFreshNegativeCache)
-            return null;
-
-        var credentials = _credentialStore.Load();
-        if (credentials?.IsValid != true)
+        else if (_steamAppIdResolver is not null)
         {
-            await WriteMetadataAsync(metadataPath, null, cancellationToken);
-            return null;
-        }
-
-        await _apiGate.WaitAsync(cancellationToken);
-        try
-        {
-            var elapsed = DateTimeOffset.UtcNow - _lastRequestAt;
-            if (elapsed < TimeSpan.FromMilliseconds(300))
-                await Task.Delay(TimeSpan.FromMilliseconds(300) - elapsed, cancellationToken);
-
-            var token = await GetAccessTokenAsync(credentials, cancellationToken);
-            var imageId = await FindImageIdAsync(game.Name, credentials.ClientId, token, cancellationToken);
-            _lastRequestAt = DateTimeOffset.UtcNow;
-            if (imageId is null)
+            // Non-Steam games (Epic, manual) have no app id: resolve one by name so the
+            // Steam cover CDN can serve them without any account or configuration.
+            var resolvedAppId = await _steamAppIdResolver(game.Name, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(resolvedAppId))
             {
-                await File.WriteAllTextAsync(metadataPath,
-                    JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, null, 2)), cancellationToken);
-                return null;
+                var steamCover = await TryDownloadSteamCoverAsync(resolvedAppId, imagePath, metadataPath, cancellationToken);
+                if (steamCover is not null)
+                    return steamCover;
             }
+        }
 
-            var imageUrl = $"https://images.igdb.com/igdb/image/upload/t_cover_big_2x/{imageId}.jpg";
-            var bytes = await Http.GetByteArrayAsync(imageUrl, cancellationToken);
-            await SaveImageAsync(imagePath, bytes, cancellationToken);
-            await WriteMetadataAsync(metadataPath, imageId, cancellationToken);
-            return imagePath;
-        }
-        finally
-        {
-            _apiGate.Release();
-        }
+        // Remember the miss so it is not retried on every launch for a week.
+        await WriteMetadataAsync(metadataPath, null, cancellationToken);
+        return null;
     }
 
     private static async Task<string?> TryDownloadSteamCoverAsync(
@@ -170,57 +145,6 @@ public sealed class IgdbCoverService
     private static Task WriteMetadataAsync(string metadataPath, string? imageId, CancellationToken cancellationToken) =>
         File.WriteAllTextAsync(metadataPath,
             JsonSerializer.Serialize(new CacheMetadata(DateTimeOffset.UtcNow, imageId, 2)), cancellationToken);
-
-    public void ClearCache()
-    {
-        if (Directory.Exists(_cacheDirectory))
-            Directory.Delete(_cacheDirectory, true);
-    }
-
-    private async Task<string> GetAccessTokenAsync(IgdbCredentials credentials, CancellationToken cancellationToken)
-    {
-        if (_accessToken is not null && _tokenExpiresAt > DateTimeOffset.UtcNow.AddMinutes(5))
-            return _accessToken;
-
-        using var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            ["client_id"] = credentials.ClientId,
-            ["client_secret"] = credentials.ClientSecret,
-            ["grant_type"] = "client_credentials"
-        });
-        using var response = await Http.PostAsync("https://id.twitch.tv/oauth2/token", content, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
-        _accessToken = document.RootElement.GetProperty("access_token").GetString()
-            ?? throw new InvalidOperationException("Twitch не вернул access token.");
-        var expiresIn = document.RootElement.GetProperty("expires_in").GetInt32();
-        _tokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(expiresIn);
-        return _accessToken;
-    }
-
-    private static async Task<string?> FindImageIdAsync(
-        string gameName, string clientId, string token, CancellationToken cancellationToken)
-    {
-        var escapedName = gameName.Replace("\\", "\\\\").Replace("\"", "\\\"");
-        using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.igdb.com/v4/games");
-        request.Headers.Add("Client-ID", clientId);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        request.Content = new StringContent(
-            $"search \"{escapedName}\"; fields name,cover.image_id; limit 5;",
-            Encoding.UTF8,
-            "text/plain");
-
-        using var response = await Http.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        using var document = JsonDocument.Parse(await response.Content.ReadAsStreamAsync(cancellationToken));
-        foreach (var item in document.RootElement.EnumerateArray())
-        {
-            if (item.TryGetProperty("cover", out var cover) &&
-                cover.TryGetProperty("image_id", out var imageId))
-                return imageId.GetString();
-        }
-        return null;
-    }
 
     private static bool IsFreshNegativeCache(string metadataPath)
     {

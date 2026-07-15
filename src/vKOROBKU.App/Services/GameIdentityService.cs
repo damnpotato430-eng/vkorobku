@@ -48,6 +48,16 @@ public sealed partial class GameIdentityService
                ?? new DetectedGameIdentity(cleaned, null, "Указано пользователем");
     }
 
+    /// <summary>Resolves a Steam app id from a game name for cover lookup — lets non-Steam
+    /// games reuse the no-auth Steam cover CDN. Returns null when there is no confident match.</summary>
+    public async Task<string?> FindSteamAppIdAsync(string name, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return null;
+        var match = await TryFindSteamMatchAsync(CleanName(name), cancellationToken);
+        return match?.SteamAppId;
+    }
+
     private static DetectedGameIdentity? TryReadGogIdentity(string installPath)
     {
         try

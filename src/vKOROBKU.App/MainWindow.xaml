@@ -61,7 +61,7 @@
                                    Foreground="{StaticResource MutedTextBrush}" />
                         <TextBlock Text="{Binding Computer.MemoryText}" Margin="0,4,0,0" FontSize="11"
                                    Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="Обложки: Steam / IGDB" Margin="0,8,0,0" FontSize="10"
+                        <TextBlock Text="Обложки: Steam" Margin="0,8,0,0" FontSize="10"
                                    Foreground="{StaticResource MutedTextBrush}" />
                     </StackPanel>
                 </Border>
@@ -84,8 +84,6 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
                     <TextBlock Text="Библиотека игр" FontSize="30" FontWeight="Bold" />
@@ -96,9 +94,6 @@
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
                 <Button Grid.Column="3" Content="+ Добавить папку" Command="{Binding AddFolderCommand}"
                         VerticalAlignment="Center" />
-                <Button Grid.Column="5" Content="IGDB" Command="{Binding ConfigureIgdbCommand}"
-                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
-                        ToolTip="Настроить загрузку и кэширование обложек" />
             </Grid>
 
             <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="18,15">

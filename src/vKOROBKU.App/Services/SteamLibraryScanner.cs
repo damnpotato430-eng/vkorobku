@@ -4,7 +4,7 @@ using vKOROBKU.App.Models;
 
 namespace vKOROBKU.App.Services;
 
-public sealed partial class SteamLibraryScanner
+public sealed partial class SteamLibraryScanner : IGameScanner
 {
     public Task<IReadOnlyList<GameInfo>> ScanAsync(CancellationToken cancellationToken = default) =>
         Task.Run<IReadOnlyList<GameInfo>>(() => Scan(cancellationToken), cancellationToken);
@@ -47,7 +47,7 @@ public sealed partial class SteamLibraryScanner
                     _ = long.TryParse(sizeText, out var size);
                     var path = Path.Combine(steamApps, "common", installDirectory);
                     if (Directory.Exists(path))
-                        games.Add(new GameInfo(name, path, size, "Steam", appId, buildId));
+                        games.Add(new GameInfo(name, GamePath.Normalize(path), size, "Steam", appId, buildId));
                 }
                 catch (IOException) { }
                 catch (UnauthorizedAccessException) { }
