@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Build hygiene: keep the tree warning-clean by failing on any compiler warning. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

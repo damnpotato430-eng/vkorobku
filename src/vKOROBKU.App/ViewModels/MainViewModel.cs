@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Windows;
+using System.Windows.Data;
 using Microsoft.Win32;
 using vKOROBKU.App.Models;
 using vKOROBKU.App.Services;
@@ -33,6 +34,8 @@ public sealed class MainViewModel : ObservableObject
     private readonly UpdateCheckService _updateCheckService = new();
     private string _updateNoticeText = string.Empty;
     private string? _updateUrl;
+    private string _searchText = string.Empty;
+    private string _selectedSortOption = "По имени";
     private UserPreferences _userPreferences;
     private bool _isWatcherCheckRunning;
     private string _watcherSummaryText = string.Empty;
@@ -66,6 +69,9 @@ public sealed class MainViewModel : ObservableObject
         _computer = _computerInfoService.GetComputerInfo();
         _userPreferences = _preferences.Load();
         _isExpertMode = _userPreferences.ExpertMode;
+        GamesView = CollectionViewSource.GetDefaultView(Games);
+        GamesView.Filter = FilterGame;
+        ApplySort();
         _coverService = new IgdbCoverService(_igdbCredentialStore);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
@@ -84,6 +90,7 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
         ShowSettingsCommand = new RelayCommand(ShowSettings);
+        ShowAboutCommand = new RelayCommand(ShowAbout);
         OpenUpdateCommand = new RelayCommand(OpenUpdatePage, () => _updateUrl is not null);
         CheckWatchedGamesCommand = new AsyncRelayCommand(() => CheckWatchedGamesAsync(true),
             () => !_isWatcherCheckRunning && !IsAnalyzing && !IsOperating);
@@ -126,8 +133,24 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand OpenGameFolderCommand { get; }
     public AsyncRelayCommand FinishCompressionCommand { get; }
     public RelayCommand ShowSettingsCommand { get; }
+    public RelayCommand ShowAboutCommand { get; }
     public AsyncRelayCommand CheckWatchedGamesCommand { get; }
     public RelayCommand OpenUpdateCommand { get; }
+
+    public ICollectionView GamesView { get; }
+    public IReadOnlyList<string> SortOptions { get; } = ["По имени", "Сначала крупные", "Сначала несжатые"];
+
+    public string SelectedSortOption
+    {
+        get => _selectedSortOption;
+        set { if (SetProperty(ref _selectedSortOption, value)) ApplySort(); }
+    }
+
+    public string SearchText
+    {
+        get => _searchText;
+        set { if (SetProperty(ref _searchText, value)) GamesView.Refresh(); }
+    }
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -651,6 +674,38 @@ public sealed class MainViewModel : ObservableObject
             entry.FolderPath, GameCompressionState.PartiallyCompressed, entry.Algorithm,
             savedBytes, entry.LastCheckedSize, entry.LastUncompressedSize,
             libraryGame.CompressedFileCount, libraryGame.SteamBuildId);
+    }
+
+    private bool FilterGame(object item) =>
+        string.IsNullOrWhiteSpace(_searchText) ||
+        (item is GameInfo game && game.Name.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    private void ApplySort()
+    {
+        using (GamesView.DeferRefresh())
+        {
+            GamesView.SortDescriptions.Clear();
+            switch (_selectedSortOption)
+            {
+                case "Сначала крупные":
+                    GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.LogicalSizeBytes), ListSortDirection.Descending));
+                    GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.Name), ListSortDirection.Ascending));
+                    break;
+                case "Сначала несжатые":
+                    GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.CompressionState), ListSortDirection.Ascending));
+                    GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.LogicalSizeBytes), ListSortDirection.Descending));
+                    break;
+                default:
+                    GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.Name), ListSortDirection.Ascending));
+                    break;
+            }
+        }
+    }
+
+    private static void ShowAbout()
+    {
+        var dialog = new AboutWindow { Owner = Application.Current.MainWindow };
+        dialog.ShowDialog();
     }
 
     private void ShowSettings()
