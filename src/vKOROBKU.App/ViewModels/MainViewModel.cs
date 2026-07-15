@@ -72,7 +72,7 @@ public sealed class MainViewModel : ObservableObject
         GamesView = CollectionViewSource.GetDefaultView(Games);
         GamesView.Filter = FilterGame;
         ApplySort();
-        _coverService = new IgdbCoverService(_igdbCredentialStore);
+        _coverService = new IgdbCoverService(_igdbCredentialStore, _gameIdentityService.FindSteamAppIdAsync);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
         AnalysisModes.Add(new AnalysisModeOption("Точный", "до 1 ГБ", 1024L * 1024 * 1024));

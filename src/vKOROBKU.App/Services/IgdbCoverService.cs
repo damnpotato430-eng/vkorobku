@@ -27,9 +27,14 @@ public sealed class IgdbCoverService
         return client;
     }
 
-    public IgdbCoverService(IgdbCredentialStore credentialStore)
+    private readonly Func<string, CancellationToken, Task<string?>>? _steamAppIdResolver;
+
+    public IgdbCoverService(
+        IgdbCredentialStore credentialStore,
+        Func<string, CancellationToken, Task<string?>>? steamAppIdResolver = null)
     {
         _credentialStore = credentialStore;
+        _steamAppIdResolver = steamAppIdResolver;
     }
 
     public bool HasCredentials => _credentialStore.Load()?.IsValid == true;
@@ -50,6 +55,19 @@ public sealed class IgdbCoverService
             var steamCover = await TryDownloadSteamCoverAsync(game.SteamAppId, imagePath, metadataPath, cancellationToken);
             if (steamCover is not null)
                 return steamCover;
+        }
+
+        // Non-Steam games (Epic, manual) have no app id: resolve one by name so the
+        // no-auth Steam cover CDN can serve them without any IGDB/Twitch setup.
+        if (!hasFreshNegativeCache && string.IsNullOrWhiteSpace(game.SteamAppId) && _steamAppIdResolver is not null)
+        {
+            var resolvedAppId = await _steamAppIdResolver(game.Name, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(resolvedAppId))
+            {
+                var steamCover = await TryDownloadSteamCoverAsync(resolvedAppId, imagePath, metadataPath, cancellationToken);
+                if (steamCover is not null)
+                    return steamCover;
+            }
         }
 
         if (hasFreshNegativeCache)
