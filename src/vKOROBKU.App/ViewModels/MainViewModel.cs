@@ -14,7 +14,7 @@ namespace vKOROBKU.App.ViewModels;
 public sealed class MainViewModel : ObservableObject
 {
     private const int CurrentIdentityVersion = 4;
-    private readonly SteamLibraryScanner _steamScanner = new();
+    private readonly IReadOnlyList<IGameScanner> _gameScanners = [new SteamLibraryScanner(), new EpicGamesScanner()];
     private readonly ComputerInfoService _computerInfoService = new();
     private readonly FileTreeService _fileTreeService = new();
     private readonly GameAnalysisService _analysisService = new();
@@ -49,7 +49,7 @@ public sealed class MainViewModel : ObservableObject
     private CancellationTokenSource? _analysisCancellation;
     private CancellationTokenSource? _compressionCheckCancellation;
     private string _statusText = "Готово к поиску игр";
-    private string _scanButtonText = "Найти игры Steam";
+    private string _scanButtonText = "Найти игры";
     private string _analysisButtonText = "Рассчитать экономию";
     private string _analysisSummary = "Выберите игру и запустите безопасный анализ выборки.";
     private bool _isAnalyzing;
@@ -758,11 +758,11 @@ public sealed class MainViewModel : ObservableObject
     private async Task ScanSteamAsync()
     {
         ScanButtonText = "Поиск…";
-        StatusText = "Сканируем библиотеки Steam";
+        StatusText = "Сканируем библиотеки игр";
 
         try
         {
-            var foundGames = await _steamScanner.ScanAsync();
+            var foundGames = await ScanAllLibrariesAsync();
             var previousGames = Games.ToDictionary(
                 game => game.InstallPath,
                 StringComparer.OrdinalIgnoreCase);
@@ -792,7 +792,7 @@ public sealed class MainViewModel : ObservableObject
             }
 
             foreach (var manualGame in previousGames.Values.Where(game =>
-                         !string.Equals(game.Source, "Steam", StringComparison.OrdinalIgnoreCase) &&
+                         string.Equals(game.Source, "Добавлено вручную", StringComparison.OrdinalIgnoreCase) &&
                          Games.All(current => !string.Equals(current.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase))))
                 Games.Add(manualGame);
 
@@ -801,19 +801,40 @@ public sealed class MainViewModel : ObservableObject
                     string.Equals(game.InstallPath, selectedPath, StringComparison.OrdinalIgnoreCase));
 
             StatusText = foundGames.Count == 0
-                ? "Игры Steam не найдены — добавьте папку вручную"
+                ? "Игры не найдены — добавьте папку вручную"
                 : $"Найдено игр: {foundGames.Count}";
             RefreshCoversCommand.RaiseCanExecuteChanged();
             RefreshSavingsSummary();
         }
         catch (Exception exception)
         {
-            StatusText = $"Не удалось просканировать Steam: {exception.Message}";
+            StatusText = $"Не удалось просканировать библиотеку: {exception.Message}";
         }
         finally
         {
-            ScanButtonText = "Обновить Steam";
+            ScanButtonText = "Обновить библиотеку";
         }
+    }
+
+    // Each launcher scanner is isolated: a failing or absent source yields an empty
+    // list and never blocks the others.
+    private async Task<IReadOnlyList<GameInfo>> ScanAllLibrariesAsync()
+    {
+        var tasks = _gameScanners.Select(async scanner =>
+        {
+            try { return await scanner.ScanAsync(); }
+            catch (Exception exception)
+            {
+                AppLog.Error($"Сканер {scanner.GetType().Name} не отработал", exception);
+                return (IReadOnlyList<GameInfo>)[];
+            }
+        });
+        var results = await Task.WhenAll(tasks);
+        return results
+            .SelectMany(games => games)
+            .DistinctBy(game => game.InstallPath, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(game => game.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
     }
 
     private async Task AddFolderAsync()

@@ -4,7 +4,7 @@ using vKOROBKU.App.Models;
 
 namespace vKOROBKU.App.Services;
 
-public sealed partial class SteamLibraryScanner
+public sealed partial class SteamLibraryScanner : IGameScanner
 {
     public Task<IReadOnlyList<GameInfo>> ScanAsync(CancellationToken cancellationToken = default) =>
         Task.Run<IReadOnlyList<GameInfo>>(() => Scan(cancellationToken), cancellationToken);
