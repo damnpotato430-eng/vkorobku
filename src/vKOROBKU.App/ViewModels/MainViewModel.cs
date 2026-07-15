@@ -19,8 +19,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly FileTreeService _fileTreeService = new();
     private readonly GameAnalysisService _analysisService = new();
     private readonly AnalysisWorkspaceCleaner _analysisWorkspaceCleaner = new();
-    private readonly IgdbCredentialStore _igdbCredentialStore = new();
-    private readonly IgdbCoverService _coverService;
+    private readonly CoverService _coverService;
     private readonly CompressionWorkerClient _workerClient = new();
     private readonly AnalysisCacheStore _analysisCache = new();
     private readonly CompressionStatusStore _compressionStatusStore = new();
@@ -72,7 +71,7 @@ public sealed class MainViewModel : ObservableObject
         GamesView = CollectionViewSource.GetDefaultView(Games);
         GamesView.Filter = FilterGame;
         ApplySort();
-        _coverService = new IgdbCoverService(_igdbCredentialStore, _gameIdentityService.FindSteamAppIdAsync);
+        _coverService = new CoverService(_gameIdentityService.FindSteamAppIdAsync);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
         AnalysisModes.Add(new AnalysisModeOption("Точный", "до 1 ГБ", 1024L * 1024 * 1024));
@@ -80,7 +79,6 @@ public sealed class MainViewModel : ObservableObject
         SelectedAnalysisMode = AnalysisModes[2];
         ScanSteamCommand = new AsyncRelayCommand(RefreshSteamLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
-        ConfigureIgdbCommand = new AsyncRelayCommand(ConfigureIgdbAsync);
         ShowOperationsCommand = new RelayCommand(ShowOperations);
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
@@ -98,7 +96,7 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame is { CompressionState: GameCompressionState.PartiallyCompressed } game &&
                   IsResumableAlgorithm(game.CompressionAlgorithm) &&
                   !IsAnalyzing && !IsOperating && !IsCheckingCompression);
-        RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0 && _coverService.HasCredentials);
+        RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OptimizeCommand = new AsyncRelayCommand(OptimizeSelectedGameAsync,
@@ -125,7 +123,6 @@ public sealed class MainViewModel : ObservableObject
     }
     public AsyncRelayCommand ScanSteamCommand { get; }
     public AsyncRelayCommand AddFolderCommand { get; }
-    public AsyncRelayCommand ConfigureIgdbCommand { get; }
     public RelayCommand ShowOperationsCommand { get; }
     public AsyncRelayCommand ReviewIdentityCommand { get; }
     public RelayCommand RemoveGameCommand { get; }
@@ -994,18 +991,8 @@ public sealed class MainViewModel : ObservableObject
         ReviewIdentityCommand.RaiseCanExecuteChanged();
         _ = await LoadCoverAsync(game, true);
         StatusText = identity.SteamAppId is null
-            ? $"Название сохранено: «{game.Name}». Для обложки можно настроить IGDB."
+            ? $"Название сохранено: «{game.Name}»"
             : $"Игра определена: «{game.Name}»";
-    }
-
-    private async Task ConfigureIgdbAsync()
-    {
-        var dialog = new IgdbSettingsWindow { Owner = Application.Current.MainWindow };
-        if (dialog.ShowDialog() != true)
-            return;
-
-        RefreshCoversCommand.RaiseCanExecuteChanged();
-        await LoadCoversAsync(true);
     }
 
     private void ShowOperations()
@@ -1105,11 +1092,9 @@ public sealed class MainViewModel : ObservableObject
                     });
                 }
             }
-            catch (HttpRequestException exception)
+            catch (HttpRequestException)
             {
-                StopRemaining(exception.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.BadRequest
-                    ? "IGDB отклонил ключи — проверьте Client ID и Client Secret"
-                    : "Сервис обложек временно недоступен");
+                StopRemaining("Сервис обложек временно недоступен");
             }
             catch (TaskCanceledException) when (!cancellation.IsCancellationRequested)
             {
@@ -1136,9 +1121,7 @@ public sealed class MainViewModel : ObservableObject
             return;
         }
 
-        StatusText = _coverService.HasCredentials
-            ? $"Библиотека готова · проверено обложек: {completed}"
-            : "Обложки Steam и локальный кэш загружены · IGDB доступен для остальных игр";
+        StatusText = $"Библиотека готова · проверено обложек: {completed}";
     }
 
     private async Task<bool> LoadCoverAsync(GameInfo game, bool forceRefresh)
@@ -1158,14 +1141,12 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (HttpRequestException exception)
         {
-            StatusText = exception.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.BadRequest
-                ? "IGDB отклонил ключи — проверьте Client ID и Client Secret"
-                : $"IGDB недоступен: {exception.Message}";
+            StatusText = $"Сервис обложек недоступен: {exception.Message}";
             return false;
         }
         catch (TaskCanceledException)
         {
-            StatusText = "IGDB не ответил вовремя";
+            StatusText = "Сервис обложек не ответил вовремя";
             return false;
         }
     }
