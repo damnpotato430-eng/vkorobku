@@ -778,11 +778,19 @@ public sealed class MainViewModel : ObservableObject
                 _manualGameStore.Load().Select(RefreshManualGameIdentityAsync));
             foreach (var savedManualGame in savedManualGames)
             {
-                if (Games.Any(current => string.Equals(current.InstallPath, savedManualGame.InstallPath, StringComparison.OrdinalIgnoreCase)))
+                var manualPath = GamePath.Normalize(savedManualGame.InstallPath);
+                if (Games.Any(current => string.Equals(current.InstallPath, manualPath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    // The folder is now found by a launcher scanner (Steam/Epic), so the
+                    // manual record is redundant — drop it to keep manual-games.json clean.
+                    try { _manualGameStore.Remove(savedManualGame.InstallPath); }
+                    catch (IOException) { }
+                    catch (UnauthorizedAccessException) { }
                     continue;
+                }
                 Games.Add(ApplySavedCompressionStatus(new GameInfo(
                     savedManualGame.Name,
-                    savedManualGame.InstallPath,
+                    manualPath,
                     savedManualGame.LogicalSizeBytes,
                     "Добавлено вручную",
                     savedManualGame.SteamAppId)));
@@ -845,7 +853,7 @@ public sealed class MainViewModel : ObservableObject
         if (dialog.ShowDialog(Application.Current.MainWindow) != true)
             return;
 
-        var path = dialog.FolderName;
+        var path = GamePath.Normalize(dialog.FolderName);
         StatusText = "Определяем игру и рассчитываем размер…";
         var sizeTask = Task.Run(() => _fileTreeService.CalculateLogicalSize(path));
         var identityTask = _gameIdentityService.DetectAsync(path);

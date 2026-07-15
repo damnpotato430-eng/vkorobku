@@ -47,7 +47,7 @@ public sealed partial class SteamLibraryScanner : IGameScanner
                     _ = long.TryParse(sizeText, out var size);
                     var path = Path.Combine(steamApps, "common", installDirectory);
                     if (Directory.Exists(path))
-                        games.Add(new GameInfo(name, path, size, "Steam", appId, buildId));
+                        games.Add(new GameInfo(name, GamePath.Normalize(path), size, "Steam", appId, buildId));
                 }
                 catch (IOException) { }
                 catch (UnauthorizedAccessException) { }

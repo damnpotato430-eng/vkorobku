@@ -31,7 +31,7 @@ public sealed class EpicGamesScanner : IGameScanner
                 if (manifest is null || !Directory.Exists(manifest.InstallPath))
                     continue;
                 games.Add(new GameInfo(
-                    manifest.Name, manifest.InstallPath, manifest.SizeBytes, "Epic",
+                    manifest.Name, GamePath.Normalize(manifest.InstallPath), manifest.SizeBytes, "Epic",
                     steamAppId: null, steamBuildId: manifest.Version));
             }
             catch (IOException) { }
