@@ -55,7 +55,7 @@ internal static class CompressionResultVerifier
             var volumeRoot = Path.GetPathRoot(file.Path) ?? string.Empty;
             if (!clusterSizes.TryGetValue(volumeRoot, out var clusterSize))
             {
-                clusterSize = GetClusterSize(volumeRoot);
+                clusterSize = VolumeInfo.GetClusterSize(volumeRoot);
                 clusterSizes[volumeRoot] = clusterSize;
             }
 
@@ -154,13 +154,6 @@ internal static class CompressionResultVerifier
         catch (UnauthorizedAccessException) { return false; }
     }
 
-    internal static long GetClusterSize(string volumeRoot)
-    {
-        if (GetDiskFreeSpaceW(volumeRoot, out var sectorsPerCluster, out var bytesPerSector, out _, out _))
-            return checked((long)sectorsPerCluster * bytesPerSector);
-        return 4096;
-    }
-
     [DllImport("WofUtil.dll", CharSet = CharSet.Unicode)]
     private static extern int WofIsExternalFile(
         string filePath,
@@ -168,15 +161,6 @@ internal static class CompressionResultVerifier
         out uint provider,
         ref WofFileCompressionInfo externalFileInfo,
         ref uint bufferLength);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetDiskFreeSpaceW(
-        string rootPathName,
-        out uint sectorsPerCluster,
-        out uint bytesPerSector,
-        out uint numberOfFreeClusters,
-        out uint totalNumberOfClusters);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct WofFileCompressionInfo

@@ -77,3 +77,23 @@ public static class PhysicalFileSize
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern uint GetCompressedFileSizeW(string fileName, out uint fileSizeHigh);
 }
+
+/// <summary>Volume metadata shared by the app and the worker.</summary>
+public static class VolumeInfo
+{
+    public static long GetClusterSize(string volumeRoot)
+    {
+        if (GetDiskFreeSpaceW(volumeRoot, out var sectorsPerCluster, out var bytesPerSector, out _, out _))
+            return checked((long)sectorsPerCluster * bytesPerSector);
+        return 4096;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetDiskFreeSpaceW(
+        string rootPathName,
+        out uint sectorsPerCluster,
+        out uint bytesPerSector,
+        out uint numberOfFreeClusters,
+        out uint totalNumberOfClusters);
+}

@@ -12,10 +12,17 @@ public sealed class FolderSizeScanner
     {
         long logicalBytes = 0;
         long physicalBytes = 0;
+        // The worker also skips files no larger than one cluster during compression,
+        // so watch-list measurements must exclude them too — otherwise games with many
+        // tiny files show phantom "degradation" that recompression can never fix.
+        var clusterSize = skipExtensions is null
+            ? 0
+            : VolumeInfo.GetClusterSize(Path.GetPathRoot(Path.GetFullPath(rootPath)) ?? string.Empty);
 
         FileSystemWalker.Walk(rootPath, info =>
         {
-            if (skipExtensions?.Contains(info.Extension) == true ||
+            if (info.Length <= clusterSize ||
+                skipExtensions?.Contains(info.Extension) == true ||
                 (info.Attributes & FileAttributes.ReparsePoint) != 0)
                 return;
             logicalBytes += info.Length;

@@ -83,7 +83,7 @@ internal static class Program
             : null;
         var clusterSize = skipExtensions is null
             ? 0
-            : CompressionResultVerifier.GetClusterSize(Path.GetPathRoot(rootPath) ?? string.Empty);
+            : VolumeInfo.GetClusterSize(Path.GetPathRoot(rootPath) ?? string.Empty);
         var skipListed = new List<WorkerFile>();
         IReadOnlyList<WorkerFile> candidates = files;
         if (skipExtensions is not null)

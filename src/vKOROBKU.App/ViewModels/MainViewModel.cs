@@ -1813,11 +1813,17 @@ public sealed class MainViewModel : ObservableObject
             var skipNote = result.SkipListedFiles > 0
                 ? $" · пропущено несжимаемых: {result.SkipListedFiles:N0} ({ByteFormatter.Format(result.SkipListedBytes)})"
                 : string.Empty;
+            // ErrorCount are files compact.exe could not convert (locked by another
+            // process, or no WOF benefit outside our exclusions) — the operation itself
+            // succeeded, so the wording avoids the scary word "errors".
+            var leftoverNote = result.ErrorCount > 0
+                ? $" · не сжато файлов: {result.ErrorCount:N0}"
+                : string.Empty;
             OperationSummary = job.Operation == "compress"
-                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · общая экономия {ByteFormatter.Format(savedBytes)} · ошибок: {result.ErrorCount}{skipNote}"
+                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · общая экономия {ByteFormatter.Format(savedBytes)}{leftoverNote}{skipNote}"
                 : decompressIncomplete
-                    ? $"Распаковка завершена частично · ошибок: {result.ErrorCount}"
-                    : $"Готово · распаковано {result.ProcessedFiles:N0} файлов · ошибок: {result.ErrorCount}";
+                    ? $"Распаковка завершена частично · осталось файлов: {result.ErrorCount:N0}"
+                    : $"Готово · распаковано {result.ProcessedFiles:N0} файлов";
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
             RefreshSavingsSummary();
