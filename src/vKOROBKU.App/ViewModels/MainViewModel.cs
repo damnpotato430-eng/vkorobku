@@ -71,6 +71,15 @@ public sealed class MainViewModel : ObservableObject
         GamesView = CollectionViewSource.GetDefaultView(Games);
         GamesView.Filter = FilterGame;
         ApplySort();
+        // Live sorting keeps a card in its correct slot when its state changes in place
+        // (e.g. a game finishes compressing while sorted by "uncompressed first").
+        if (GamesView is ICollectionViewLiveShaping { CanChangeLiveSorting: true } liveView)
+        {
+            liveView.LiveSortingProperties.Add(nameof(GameInfo.Name));
+            liveView.LiveSortingProperties.Add(nameof(GameInfo.LogicalSizeBytes));
+            liveView.LiveSortingProperties.Add(nameof(GameInfo.CompressionState));
+            liveView.IsLiveSorting = true;
+        }
         _coverService = new CoverService(_gameIdentityService.FindSteamAppIdAsync);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
@@ -97,6 +106,7 @@ public sealed class MainViewModel : ObservableObject
                   IsResumableAlgorithm(game.CompressionAlgorithm) &&
                   !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RefreshCoversCommand = new AsyncRelayCommand(() => LoadCoversAsync(true), () => Games.Count > 0);
+        RefreshSelectedCoverCommand = new AsyncRelayCommand(RefreshSelectedCoverAsync, () => SelectedGame is not null);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OptimizeCommand = new AsyncRelayCommand(OptimizeSelectedGameAsync,
@@ -128,6 +138,7 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RecheckCompressionCommand { get; }
     public RelayCommand OpenGameFolderCommand { get; }
+    public AsyncRelayCommand RefreshSelectedCoverCommand { get; }
     public AsyncRelayCommand FinishCompressionCommand { get; }
     public RelayCommand ShowSettingsCommand { get; }
     public RelayCommand ShowAboutCommand { get; }
@@ -516,6 +527,19 @@ public sealed class MainViewModel : ObservableObject
     // the finish-compression panel via the regular status pipeline.
     internal static readonly TimeSpan WatchedCheckTtl = TimeSpan.FromDays(7);
 
+    // A full size walk runs when the stored build/version differs from the library one
+    // (Steam build id and Epic AppVersionString share the same slot) or the last check
+    // is stale; otherwise the recent measurement is trusted regardless of the launcher.
+    internal static bool ShouldRescanWatchedGame(WatchedGame entry, string? libraryBuildId, DateTimeOffset now, bool force)
+    {
+        if (force)
+            return true;
+        var buildChanged = !string.IsNullOrWhiteSpace(entry.SteamBuildId) &&
+                           !string.IsNullOrWhiteSpace(libraryBuildId) &&
+                           !string.Equals(entry.SteamBuildId, libraryBuildId, StringComparison.Ordinal);
+        return buildChanged || now - entry.LastCheckedAtUtc >= WatchedCheckTtl;
+    }
+
     private async Task CheckWatchedGamesAsync(bool force)
     {
         if (_isWatcherCheckRunning)
@@ -556,12 +580,7 @@ public sealed class MainViewModel : ObservableObject
 
                 var libraryGame = Games.FirstOrDefault(item =>
                     string.Equals(item.InstallPath, current.FolderPath, StringComparison.OrdinalIgnoreCase));
-                var buildUnchanged = current.IsSteamGame &&
-                                     !string.IsNullOrWhiteSpace(current.SteamBuildId) &&
-                                     !string.IsNullOrWhiteSpace(libraryGame?.SteamBuildId) &&
-                                     string.Equals(current.SteamBuildId, libraryGame!.SteamBuildId, StringComparison.Ordinal);
-                var fresh = DateTimeOffset.UtcNow - current.LastCheckedAtUtc < WatchedCheckTtl;
-                if (force || !(buildUnchanged && fresh))
+                if (ShouldRescanWatchedGame(current, libraryGame?.SteamBuildId, DateTimeOffset.UtcNow, force))
                 {
                     WatcherSummaryText = $"Проверяем «{current.DisplayName}» ({position} из {watched.Count})…";
                     var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath, skipSet));
@@ -1159,6 +1178,16 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    private async Task RefreshSelectedCoverAsync()
+    {
+        var game = SelectedGame;
+        if (game is null)
+            return;
+        StatusText = $"Обновляем обложку «{game.Name}»…";
+        if (await LoadCoverAsync(game, true))
+            StatusText = $"Обложка «{game.Name}» проверена";
+    }
+
     private Task AnalyzeSelectedGameAsync() =>
         AnalyzeSelectedGameAsync(SelectedAnalysisMode?.MaximumSampleBytes ?? 0);
 
@@ -1667,6 +1696,7 @@ public sealed class MainViewModel : ObservableObject
         RemoveGameCommand.RaiseCanExecuteChanged();
         RecheckCompressionCommand.RaiseCanExecuteChanged();
         OpenGameFolderCommand.RaiseCanExecuteChanged();
+        RefreshSelectedCoverCommand.RaiseCanExecuteChanged();
         FinishCompressionCommand.RaiseCanExecuteChanged();
     }
 

@@ -183,9 +183,9 @@ internal static class Program
         file.Length <= clusterSize || skipExtensions.Contains(Path.GetExtension(file.Path));
 
     private static string FormatSize(long bytes) =>
-        bytes >= 1024L * 1024 * 1024
-            ? $"{bytes / 1024d / 1024 / 1024:0.#} ГБ"
-            : $"{Math.Max(1, bytes / 1024 / 1024):N0} МБ";
+        bytes >= 1024L * 1024 * 1024 ? $"{bytes / 1024d / 1024 / 1024:0.#} ГБ"
+        : bytes >= 1024L * 1024 ? $"{bytes / 1024d / 1024:0.#} МБ"
+        : $"{Math.Max(1, bytes / 1024):N0} КБ";
 
     private static string ValidateJob(WorkerJob job)
     {
