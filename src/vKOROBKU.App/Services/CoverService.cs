@@ -7,8 +7,9 @@ using vKOROBKU.App.Models;
 namespace vKOROBKU.App.Services;
 
 /// <summary>Resolves game cover art with no user configuration: the Steam cover CDN by
-/// app id, and a Steam store search by name for non-Steam games. A missing cover is
-/// cached negatively for a week so it is not retried on every launch.</summary>
+/// app id, the public GOG API by product id, and a Steam store search by name for the
+/// rest. A missing cover is cached negatively for a week so it is not retried on every
+/// launch.</summary>
 public sealed class CoverService
 {
     private static readonly HttpClient Http = CreateHttpClient();
@@ -48,10 +49,18 @@ public sealed class CoverService
             if (steamCover is not null)
                 return steamCover;
         }
-        else if (_steamAppIdResolver is not null)
+        else if (!string.IsNullOrWhiteSpace(game.GogProductId))
         {
-            // Non-Steam games (Epic, manual) have no app id: resolve one by name so the
-            // Steam cover CDN can serve them without any account or configuration.
+            // GOG box art comes from GOG's public catalog API — no account needed.
+            var gogCover = await TryDownloadGogCoverAsync(game.GogProductId, imagePath, metadataPath, cancellationToken);
+            if (gogCover is not null)
+                return gogCover;
+        }
+
+        if (string.IsNullOrWhiteSpace(game.SteamAppId) && _steamAppIdResolver is not null)
+        {
+            // Games without an app id (Epic, manual, GOG titles missing from the GOG
+            // catalog) resolve one by name so the Steam cover CDN can serve them.
             var resolvedAppId = await _steamAppIdResolver(game.Name, cancellationToken);
             if (!string.IsNullOrWhiteSpace(resolvedAppId))
             {
@@ -98,6 +107,35 @@ public sealed class CoverService
         }
 
         return null;
+    }
+
+    private static async Task<string?> TryDownloadGogCoverAsync(
+        string productId,
+        string imagePath,
+        string metadataPath,
+        CancellationToken cancellationToken)
+    {
+        string? boxArtUrl;
+        try
+        {
+            using var response = await Http.GetAsync($"https://api.gog.com/v2/games/{productId}", cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                return null;
+            using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+            if (!document.RootElement.TryGetProperty("_links", out var links) ||
+                !links.TryGetProperty("boxArtImage", out var boxArt) ||
+                !boxArt.TryGetProperty("href", out var href))
+                return null;
+            boxArtUrl = href.GetString();
+        }
+        catch (JsonException) { return null; }
+
+        if (string.IsNullOrWhiteSpace(boxArtUrl))
+            return null;
+        if (!await TryDownloadImageAsync(boxArtUrl, imagePath, cancellationToken))
+            return null;
+        await WriteMetadataAsync(metadataPath, $"gog:{productId}", cancellationToken);
+        return imagePath;
     }
 
     // Transport errors deliberately propagate: a 404 is a miss, but an unreachable
