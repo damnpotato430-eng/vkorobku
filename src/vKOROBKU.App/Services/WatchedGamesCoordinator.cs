@@ -50,6 +50,7 @@ public sealed class WatchedGamesCoordinator
         UserPreferences preferences,
         Func<string, GameInfo?> findLibraryGame,
         Action<WatchedGame, GameInfo?> onDegraded,
+        Action<WatchedGame, GameInfo?> onHealthy,
         Action<string> reportProgress,
         bool force)
     {
@@ -106,6 +107,10 @@ public sealed class WatchedGamesCoordinator
             {
                 degraded.Add(current);
                 onDegraded(current, libraryGame);
+            }
+            else
+            {
+                onHealthy(current, libraryGame);
             }
         }
 

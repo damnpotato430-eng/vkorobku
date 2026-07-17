@@ -550,6 +550,7 @@ public sealed class MainViewModel : ObservableObject
                 _userPreferences,
                 FindGameByPath,
                 MarkWatchedGameAsDegraded,
+                MarkWatchedGameAsCompressed,
                 message => WatcherSummaryText = message,
                 force);
             UpdateWatcherSummary(outcome);
@@ -611,6 +612,28 @@ public sealed class MainViewModel : ObservableObject
             savedBytes, entry.LastCheckedSize, libraryGame.CompressedFileCount, DateTimeOffset.Now);
         TrySaveCompressionStatus(
             entry.FolderPath, GameCompressionState.PartiallyCompressed, entry.Algorithm,
+            savedBytes, entry.LastCheckedSize, entry.LastUncompressedSize,
+            libraryGame.CompressedFileCount, libraryGame.SteamBuildId);
+    }
+
+    // Inverse of MarkWatchedGameAsDegraded: once a check confirms the saving is intact,
+    // a card previously demoted to the partial state returns to "compressed" — the
+    // library must not offer recompression while the banner says there is nothing to
+    // recompress. The algorithm guard keeps a genuinely half-switched game (a new
+    // algorithm applied partway) out of the promotion.
+    private void MarkWatchedGameAsCompressed(WatchedGame entry, GameInfo? libraryGame)
+    {
+        if (libraryGame is null ||
+            libraryGame.CompressionState != GameCompressionState.PartiallyCompressed ||
+            !string.Equals(libraryGame.CompressionAlgorithm, entry.Algorithm, StringComparison.Ordinal))
+            return;
+
+        var savedBytes = Math.Max(0, entry.LastUncompressedSize - entry.LastCheckedSize);
+        UpdateGameCompressionStatus(
+            entry.FolderPath, GameCompressionState.Compressed, entry.Algorithm,
+            savedBytes, entry.LastCheckedSize, libraryGame.CompressedFileCount, DateTimeOffset.Now);
+        TrySaveCompressionStatus(
+            entry.FolderPath, GameCompressionState.Compressed, entry.Algorithm,
             savedBytes, entry.LastCheckedSize, entry.LastUncompressedSize,
             libraryGame.CompressedFileCount, libraryGame.SteamBuildId);
     }
