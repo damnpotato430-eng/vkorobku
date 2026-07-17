@@ -61,7 +61,9 @@ public sealed class CoverService
             }
         }
 
-        // Remember the miss so it is not retried on every launch for a week.
+        // Only a confirmed miss (services reachable, no cover found) is cached for a
+        // week. Network failures throw out of the attempts above and are not cached,
+        // so covers are retried on the next launch instead of going dark for 7 days.
         await WriteMetadataAsync(metadataPath, null, cancellationToken);
         return null;
     }
@@ -98,24 +100,22 @@ public sealed class CoverService
         return null;
     }
 
+    // Transport errors deliberately propagate: a 404 is a miss, but an unreachable
+    // network must not be recorded as "this game has no cover".
     private static async Task<bool> TryDownloadImageAsync(
         string url,
         string imagePath,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            if (!response.IsSuccessStatusCode ||
-                response.Content.Headers.ContentType?.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
-                return false;
-            var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-            if (bytes.Length < 1024)
-                return false;
-            await SaveImageAsync(imagePath, bytes, cancellationToken);
-            return true;
-        }
-        catch (HttpRequestException) { return false; }
+        using var response = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        if (!response.IsSuccessStatusCode ||
+            response.Content.Headers.ContentType?.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
+            return false;
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        if (bytes.Length < 1024)
+            return false;
+        await SaveImageAsync(imagePath, bytes, cancellationToken);
+        return true;
     }
 
     private static async Task<string?> TryGetSteamFallbackImageUrlAsync(string appId, CancellationToken cancellationToken)
@@ -131,7 +131,6 @@ public sealed class CoverService
                 return null;
             return headerImage.GetString();
         }
-        catch (HttpRequestException) { return null; }
         catch (JsonException) { return null; }
     }
 

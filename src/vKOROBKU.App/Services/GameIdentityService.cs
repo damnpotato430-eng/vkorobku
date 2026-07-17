@@ -49,12 +49,13 @@ public sealed partial class GameIdentityService
     }
 
     /// <summary>Resolves a Steam app id from a game name for cover lookup — lets non-Steam
-    /// games reuse the no-auth Steam cover CDN. Returns null when there is no confident match.</summary>
+    /// games reuse the no-auth Steam cover CDN. Returns null when there is no confident match.
+    /// Network failures propagate so callers can tell a miss from an outage.</summary>
     public async Task<string?> FindSteamAppIdAsync(string name, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(name))
             return null;
-        var match = await TryFindSteamMatchAsync(CleanName(name), cancellationToken);
+        var match = await FindSteamMatchAsync(CleanName(name), cancellationToken);
         return match?.SteamAppId;
     }
 
@@ -171,7 +172,19 @@ public sealed partial class GameIdentityService
         catch (JsonException) { return null; }
     }
 
+    // Identity detection treats network problems as "no match"; the cover path uses
+    // the throwing core directly to distinguish an outage from a genuine miss.
     private static async Task<DetectedGameIdentity?> TryFindSteamMatchAsync(string candidate, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await FindSteamMatchAsync(candidate, cancellationToken);
+        }
+        catch (HttpRequestException) { return null; }
+        catch (TaskCanceledException) { return null; }
+    }
+
+    private static async Task<DetectedGameIdentity?> FindSteamMatchAsync(string candidate, CancellationToken cancellationToken)
     {
         if (candidate.Length < 3)
             return null;
@@ -199,8 +212,6 @@ public sealed partial class GameIdentityService
                 ? new DetectedGameIdentity(best.Name, best.Id, "Каталог Steam")
                 : null;
         }
-        catch (HttpRequestException) { return null; }
-        catch (TaskCanceledException) { return null; }
         catch (JsonException) { return null; }
     }
 

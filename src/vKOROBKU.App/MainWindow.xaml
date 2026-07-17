@@ -84,6 +84,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
                     <TextBlock Text="Библиотека игр" FontSize="30" FontWeight="Bold" />
@@ -92,7 +94,10 @@
                 </StackPanel>
                 <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding ScanSteamCommand}"
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
-                <Button Grid.Column="3" Content="+ Добавить папку" Command="{Binding AddFolderCommand}"
+                <Button Grid.Column="3" Content="Обновить обложки" Command="{Binding RefreshCoversCommand}"
+                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
+                        ToolTip="Заново проверить и скачать обложки всех игр" />
+                <Button Grid.Column="5" Content="+ Добавить папку" Command="{Binding AddFolderCommand}"
                         VerticalAlignment="Center" />
             </Grid>
 
@@ -211,6 +216,7 @@
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="Перейти в каталог" Command="{Binding OpenGameFolderCommand}" />
+                                        <MenuItem Header="Обновить обложку" Command="{Binding RefreshSelectedCoverCommand}" />
                                         <MenuItem Header="Проверить состояние сжатия" Command="{Binding RecheckCompressionCommand}" />
                                         <MenuItem Header="Убрать из библиотеки" Command="{Binding RemoveGameCommand}" />
                                     </ContextMenu>
