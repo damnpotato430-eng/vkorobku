@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using vKOROBKU.Protocol;
 using vKOROBKU.Shared;
 
@@ -27,41 +28,84 @@ internal static class Program
             using var writer = new StreamWriter(pipe, new UTF8Encoding(false), 4096, true) { AutoFlush = true };
 
             await SendAsync(writer, new WorkerMessage("hello", Token: expectedToken));
-            var jobLine = await reader.ReadLineAsync();
-            var job = jobLine is null ? null : JsonSerializer.Deserialize<WorkerJob>(jobLine, JsonOptions);
-            if (job is null)
-            {
-                await SendAsync(writer, new WorkerMessage("error", "Не получено задание."));
-                return 3;
-            }
 
-            using var cancellation = new CancellationTokenSource();
-            var monitorTask = MonitorCommandsAsync(reader, cancellation);
-            try
+            // One elevated launch serves a whole queue of jobs: the app sends the next
+            // job only after the previous one reported completed/cancelled/error, and
+            // ends the session with a shutdown command (or by closing the pipe). A
+            // single pump feeds every incoming line into the channel so job reads and
+            // in-flight cancel commands never race for the pipe reader.
+            var inbox = Channel.CreateUnbounded<string>();
+            _ = PumpLinesAsync(reader, inbox.Writer);
+            var processedAnyJob = false;
+
+            while (true)
             {
-                await ExecuteAsync(job, writer, cancellation.Token);
-                return 0;
-            }
-            catch (OperationCanceledException)
-            {
-                await SendAsync(writer, new WorkerMessage("cancelled", "Операция остановлена. Уже обработанные файлы остаются в корректном состоянии."));
-                return 4;
-            }
-            catch (Exception exception)
-            {
-                await SendAsync(writer, new WorkerMessage("error", exception.Message));
-                return 5;
-            }
-            finally
-            {
-                cancellation.Cancel();
-                try { await monitorTask; } catch { }
+                string? line;
+                try { line = await inbox.Reader.ReadAsync(); }
+                catch (ChannelClosedException) { return processedAnyJob ? 0 : 3; }
+
+                var command = TryDeserialize<WorkerCommand>(line);
+                if (command?.Type == "shutdown")
+                    return 0;
+                if (command?.Type is not null)
+                    continue;
+
+                var job = TryDeserialize<WorkerJob>(line);
+                if (job is null)
+                {
+                    await SendAsync(writer, new WorkerMessage("error", "Не получено задание."));
+                    return 3;
+                }
+
+                processedAnyJob = true;
+                using var cancellation = new CancellationTokenSource();
+                var monitorTask = MonitorCommandsAsync(inbox.Reader, cancellation);
+                try
+                {
+                    await ExecuteAsync(job, writer, cancellation.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    await SendAsync(writer, new WorkerMessage("cancelled", "Операция остановлена. Уже обработанные файлы остаются в корректном состоянии."));
+                }
+                catch (Exception exception)
+                {
+                    // A failed job ends only that job — the queue decides whether to
+                    // continue with the next game or shut the session down.
+                    await SendAsync(writer, new WorkerMessage("error", exception.Message));
+                }
+                finally
+                {
+                    cancellation.Cancel();
+                    try { await monitorTask; } catch { }
+                }
             }
         }
         catch
         {
             return 6;
         }
+    }
+
+    private static async Task PumpLinesAsync(StreamReader reader, ChannelWriter<string> inbox)
+    {
+        try
+        {
+            while (await reader.ReadLineAsync() is { } line)
+                await inbox.WriteAsync(line);
+        }
+        catch (IOException) { }
+        catch (ObjectDisposedException) { }
+        finally
+        {
+            inbox.Complete();
+        }
+    }
+
+    private static T? TryDeserialize<T>(string line) where T : class
+    {
+        try { return JsonSerializer.Deserialize<T>(line, JsonOptions); }
+        catch (JsonException) { return null; }
     }
 
     private static async Task ExecuteAsync(WorkerJob job, StreamWriter writer, CancellationToken cancellationToken)
@@ -339,19 +383,29 @@ internal static class Program
         return total;
     }
 
-    private static async Task MonitorCommandsAsync(StreamReader reader, CancellationTokenSource cancellation)
+    // Watches the shared inbox for a cancel while a job runs. Cancelling the pending
+    // ReadAsync does not consume an item, so the next job line stays in the channel
+    // for the main loop. A closed channel means the app side is gone — the current
+    // job is cancelled so the worker never keeps compressing without supervision.
+    private static async Task MonitorCommandsAsync(ChannelReader<string> inbox, CancellationTokenSource cancellation)
     {
-        while (!cancellation.IsCancellationRequested)
+        try
         {
-            var line = await reader.ReadLineAsync(cancellation.Token);
-            if (line is null)
-                break;
-            var command = JsonSerializer.Deserialize<WorkerCommand>(line, JsonOptions);
-            if (command?.Type == "cancel")
+            while (!cancellation.IsCancellationRequested)
             {
-                cancellation.Cancel();
-                break;
+                var line = await inbox.ReadAsync(cancellation.Token);
+                var command = TryDeserialize<WorkerCommand>(line);
+                if (command?.Type is "cancel" or "shutdown")
+                {
+                    cancellation.Cancel();
+                    break;
+                }
             }
+        }
+        catch (OperationCanceledException) { }
+        catch (ChannelClosedException)
+        {
+            cancellation.Cancel();
         }
     }
 

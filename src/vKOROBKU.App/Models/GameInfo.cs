@@ -25,6 +25,7 @@ public sealed class GameInfo : INotifyPropertyChanged
     private DateTimeOffset? _compressionCheckedAt;
     private bool _isAnalysisStale;
     private bool? _hasDirectStorage;
+    private bool _isQueueSelected;
 
     public GameInfo(
         string name,
@@ -172,6 +173,13 @@ public sealed class GameInfo : INotifyPropertyChanged
     {
         get => _isAnalysisStale;
         set => SetProperty(ref _isAnalysisStale, value);
+    }
+
+    // Transient checkbox state of the library's multi-select mode — never persisted.
+    public bool IsQueueSelected
+    {
+        get => _isQueueSelected;
+        set => SetProperty(ref _isQueueSelected, value);
     }
 
     // null — not probed yet; probing happens with the compression status walk.
