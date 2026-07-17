@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Pipes;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using vKOROBKU.Protocol;
+using vKOROBKU.Shared;
 
 namespace vKOROBKU.Worker;
 
@@ -232,41 +232,12 @@ internal static class Program
     private static List<WorkerFile> EnumerateFiles(string rootPath, CancellationToken cancellationToken)
     {
         var result = new List<WorkerFile>();
-        var pending = new Stack<string>();
-        pending.Push(rootPath);
-        while (pending.TryPop(out var directory))
+        FileSystemWalker.Walk(rootPath, info =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                foreach (var path in Directory.EnumerateFiles(directory))
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    try
-                    {
-                        var info = new FileInfo(path);
-                        var excluded = (info.Attributes & (FileAttributes.Encrypted | FileAttributes.ReparsePoint | FileAttributes.SparseFile)) != 0;
-                        if (!excluded && info.Length > 0)
-                            result.Add(new WorkerFile(path, info.Length));
-                    }
-                    catch (IOException) { }
-                    catch (UnauthorizedAccessException) { }
-                }
-
-                foreach (var child in Directory.EnumerateDirectories(directory))
-                {
-                    try
-                    {
-                        if ((File.GetAttributes(child) & FileAttributes.ReparsePoint) == 0)
-                            pending.Push(child);
-                    }
-                    catch (IOException) { }
-                    catch (UnauthorizedAccessException) { }
-                }
-            }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
-        }
+            var excluded = (info.Attributes & (FileAttributes.Encrypted | FileAttributes.ReparsePoint | FileAttributes.SparseFile)) != 0;
+            if (!excluded && info.Length > 0)
+                result.Add(new WorkerFile(info.FullName, info.Length));
+        }, cancellationToken);
         return result;
     }
 
@@ -364,17 +335,7 @@ internal static class Program
     {
         long total = 0;
         foreach (var file in files)
-        {
-            Marshal.SetLastPInvokeError(0);
-            uint high;
-            var low = GetCompressedFileSizeW(file.Path, out high);
-            if (low == uint.MaxValue && Marshal.GetLastWin32Error() != 0)
-            {
-                total += file.Length;
-                continue;
-            }
-            total += checked((long)(((ulong)high << 32) | low));
-        }
+            total += PhysicalFileSize.GetOrDefault(file.Path, file.Length);
         return total;
     }
 
@@ -434,8 +395,5 @@ internal static class Program
         var index = Array.IndexOf(args, name);
         return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
     }
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern uint GetCompressedFileSizeW(string fileName, out uint fileSizeHigh);
 
 }

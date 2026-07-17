@@ -16,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\vKOROBKU.App\vKOROBKU.App.csproj" />
-    <ProjectReference Include="..\..\src\vKOROBKU.Worker\vKOROBKU.Worker.csproj" Aliases="global,worker" />
+    <!-- Worker is referenced only through the "worker" alias: the linked shared files
+         (WorkerProtocol.cs, FileSystemPrimitives.cs) compile into both assemblies, and
+         keeping the worker out of the global alias avoids ambiguous type errors. -->
+    <ProjectReference Include="..\..\src\vKOROBKU.Worker\vKOROBKU.Worker.csproj" Aliases="worker" />
   </ItemGroup>
 </Project>

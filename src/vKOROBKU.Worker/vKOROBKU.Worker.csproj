@@ -17,5 +17,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />
+    <Compile Include="..\FileSystemPrimitives.cs" Link="FileSystemPrimitives.cs" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using vKOROBKU.Protocol;
+using vKOROBKU.Shared;
 
 namespace vKOROBKU.Worker;
 
@@ -120,18 +121,8 @@ internal static class CompressionResultVerifier
         return true;
     }
 
-    private static bool TryGetPhysicalSize(string path, out long physicalSize)
-    {
-        Marshal.SetLastPInvokeError(0);
-        var low = GetCompressedFileSizeW(path, out var high);
-        if (low == uint.MaxValue && Marshal.GetLastWin32Error() != 0)
-        {
-            physicalSize = 0;
-            return false;
-        }
-        physicalSize = checked((long)(((ulong)high << 32) | low));
-        return true;
-    }
+    private static bool TryGetPhysicalSize(string path, out long physicalSize) =>
+        PhysicalFileSize.TryGet(path, out physicalSize, out _);
 
     private static bool IsLikelyIncompressible(string path)
     {
@@ -177,9 +168,6 @@ internal static class CompressionResultVerifier
         out uint provider,
         ref WofFileCompressionInfo externalFileInfo,
         ref uint bufferLength);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern uint GetCompressedFileSizeW(string fileName, out uint fileSizeHigh);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
