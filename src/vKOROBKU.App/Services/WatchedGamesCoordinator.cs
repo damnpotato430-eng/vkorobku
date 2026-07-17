@@ -32,6 +32,20 @@ public sealed class WatchedGamesCoordinator
         return buildChanged || now - entry.LastCheckedAtUtc >= CheckTtl;
     }
 
+    // Reflects operations that already updated the store (a recompression resets the
+    // baseline, a decompression removes the entry) without a folder rescan, so the
+    // summary can refresh right after a job finishes.
+    public CheckOutcome ReadStoredState(UserPreferences preferences)
+    {
+        var watched = _store.Load();
+        var degraded = watched
+            .Where(entry => entry.NeedsRecompression(
+                preferences.DecayThresholdPercent / 100d,
+                preferences.MinimumSavingsMb * 1024L * 1024))
+            .ToList();
+        return new CheckOutcome(watched.Count, degraded);
+    }
+
     public async Task<CheckOutcome> CheckAsync(
         UserPreferences preferences,
         Func<string, GameInfo?> findLibraryGame,

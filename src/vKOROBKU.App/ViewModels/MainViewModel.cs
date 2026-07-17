@@ -38,6 +38,8 @@ public sealed class MainViewModel : ObservableObject
     private bool _isWatcherCheckRunning;
     private string _watcherSummaryText = string.Empty;
     private bool _watcherHasFindings;
+    private bool _showOnlyDegraded;
+    private HashSet<string> _degradedPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly GameIdentityService _gameIdentityService = new();
     private ComputerInfo _computer = null!;
     private GameInfo? _selectedGame;
@@ -158,6 +160,14 @@ public sealed class MainViewModel : ObservableObject
         get => _searchText;
         set { if (SetProperty(ref _searchText, value)) GamesView.Refresh(); }
     }
+
+    public bool ShowOnlyDegraded
+    {
+        get => _showOnlyDegraded;
+        set { if (SetProperty(ref _showOnlyDegraded, value)) GamesView.Refresh(); }
+    }
+
+    public string DegradedFilterLabel => $"Требуют дожатия: {_degradedPaths.Count}";
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -527,8 +537,7 @@ public sealed class MainViewModel : ObservableObject
             return;
         if (!_userPreferences.WatcherEnabled)
         {
-            WatcherHasFindings = false;
-            WatcherSummaryText = string.Empty;
+            UpdateWatcherSummary(new WatchedGamesCoordinator.CheckOutcome(0, []));
             return;
         }
 
@@ -543,17 +552,7 @@ public sealed class MainViewModel : ObservableObject
                 MarkWatchedGameAsDegraded,
                 message => WatcherSummaryText = message,
                 force);
-            if (outcome.WatchedCount == 0)
-            {
-                WatcherHasFindings = false;
-                WatcherSummaryText = string.Empty;
-                return;
-            }
-
-            WatcherHasFindings = outcome.Degraded.Count > 0;
-            WatcherSummaryText = outcome.Degraded.Count == 0
-                ? $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет"
-                : $"Обновились и требуют дожатия: {outcome.Degraded.Count} — можно вернуть ~{ByteFormatter.Format(outcome.Degraded.Sum(item => item.PotentialSavingsBytes))}";
+            UpdateWatcherSummary(outcome);
             if (outcome.Degraded.Count > 0)
                 AppLog.Info($"Деградация сжатия: {string.Join(", ", outcome.Degraded.Select(item => item.DisplayName))}");
         }
@@ -561,6 +560,7 @@ public sealed class MainViewModel : ObservableObject
         {
             AppLog.Error("Проверка наблюдаемых игр не удалась", exception);
             WatcherHasFindings = false;
+            ShowOnlyDegraded = false;
             WatcherSummaryText = "Не удалось проверить обновления сжатых игр — подробности в журнале logs";
         }
         finally
@@ -573,6 +573,32 @@ public sealed class MainViewModel : ObservableObject
     private GameInfo? FindGameByPath(string installPath) =>
         Games.FirstOrDefault(item =>
             string.Equals(item.InstallPath, installPath, StringComparison.OrdinalIgnoreCase));
+
+    private void UpdateWatcherSummary(WatchedGamesCoordinator.CheckOutcome outcome)
+    {
+        _degradedPaths = new HashSet<string>(
+            outcome.Degraded.Select(item => item.FolderPath), StringComparer.OrdinalIgnoreCase);
+        OnPropertyChanged(nameof(DegradedFilterLabel));
+        if (outcome.WatchedCount == 0)
+        {
+            WatcherHasFindings = false;
+            WatcherSummaryText = string.Empty;
+        }
+        else
+        {
+            WatcherHasFindings = outcome.Degraded.Count > 0;
+            WatcherSummaryText = outcome.Degraded.Count == 0
+                ? $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет"
+                : $"Обновились и требуют дожатия: {outcome.Degraded.Count} — можно вернуть ~{ByteFormatter.Format(outcome.Degraded.Sum(item => item.PotentialSavingsBytes))}";
+        }
+
+        // The filter cannot stay on with nothing to show — that would leave an
+        // empty library with the toggle already hidden.
+        if (_degradedPaths.Count == 0)
+            ShowOnlyDegraded = false;
+        else if (_showOnlyDegraded)
+            GamesView.Refresh();
+    }
 
     private void MarkWatchedGameAsDegraded(WatchedGame entry, GameInfo? libraryGame)
     {
@@ -589,9 +615,15 @@ public sealed class MainViewModel : ObservableObject
             libraryGame.CompressedFileCount, libraryGame.SteamBuildId);
     }
 
-    private bool FilterGame(object item) =>
-        string.IsNullOrWhiteSpace(_searchText) ||
-        (item is GameInfo game && game.Name.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+    private bool FilterGame(object item)
+    {
+        if (item is not GameInfo game)
+            return true;
+        if (_showOnlyDegraded && !_degradedPaths.Contains(game.InstallPath))
+            return false;
+        return string.IsNullOrWhiteSpace(_searchText) ||
+               game.Name.Contains(_searchText.Trim(), StringComparison.OrdinalIgnoreCase);
+    }
 
     private void ApplySort()
     {
@@ -1809,6 +1841,11 @@ public sealed class MainViewModel : ObservableObject
                 savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
                 processedGame?.SteamBuildId, processedGame?.HasDirectStorage);
             _watcher.OnOperationCompleted(job, result, newState, processedGame);
+            // The job just updated watcher.json (recompression resets the baseline,
+            // decompression removes the entry), so the degradation banner refreshes
+            // immediately instead of waiting for the next manual check.
+            if (_userPreferences.WatcherEnabled && !_isWatcherCheckRunning)
+                UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
 
             var skipNote = result.SkipListedFiles > 0
                 ? $" · пропущено несжимаемых: {result.SkipListedFiles:N0} ({ByteFormatter.Format(result.SkipListedBytes)})"
