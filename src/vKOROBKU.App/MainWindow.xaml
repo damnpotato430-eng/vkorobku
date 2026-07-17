@@ -92,7 +92,7 @@
                     <TextBlock Text="Найдите установленные игры и оцените возможную экономию места"
                                Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" />
                 </StackPanel>
-                <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding ScanSteamCommand}"
+                <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding RefreshLibraryCommand}"
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
                 <Button Grid.Column="3" Content="Обновить обложки" Command="{Binding RefreshCoversCommand}"
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
