@@ -35,7 +35,8 @@ public sealed class GameInfo : INotifyPropertyChanged
         string? steamBuildId = null,
         string? coverPath = null,
         GameCompressionState compressionState = GameCompressionState.Unknown,
-        string? compressionAlgorithm = null)
+        string? compressionAlgorithm = null,
+        string? gogProductId = null)
     {
         _name = name;
         InstallPath = installPath;
@@ -46,6 +47,7 @@ public sealed class GameInfo : INotifyPropertyChanged
         _coverPath = coverPath;
         _compressionState = compressionState;
         _compressionAlgorithm = compressionAlgorithm;
+        GogProductId = gogProductId;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -86,6 +88,10 @@ public sealed class GameInfo : INotifyPropertyChanged
     }
 
     public string? SteamBuildId { get; }
+
+    // GOG product id from the installer registry entry; drives the native GOG cover API.
+    public string? GogProductId { get; }
+
     public bool NeedsIdentityReview => Source == "Добавлено вручную" && string.IsNullOrWhiteSpace(SteamAppId);
 
     public string? CoverPath
