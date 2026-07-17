@@ -1,6 +1,6 @@
 extern alias worker;
 
-using vKOROBKU.Worker;
+using worker::vKOROBKU.Worker;
 using WorkerJob = worker::vKOROBKU.Protocol.WorkerJob;
 
 namespace vKOROBKU.Tests;

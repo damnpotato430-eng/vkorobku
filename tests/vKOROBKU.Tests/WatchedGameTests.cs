@@ -1,5 +1,5 @@
 using vKOROBKU.App.Models;
-using vKOROBKU.App.ViewModels;
+using vKOROBKU.App.Services;
 
 namespace vKOROBKU.Tests;
 
@@ -99,8 +99,8 @@ public sealed class WatchedGameRescanTests
         var epic = Entry(isSteam: false, storedBuild: "Build_1", checkedAgo: TimeSpan.FromHours(1));
         var steam = Entry(isSteam: true, storedBuild: "456", checkedAgo: TimeSpan.FromHours(1));
 
-        Assert.False(MainViewModel.ShouldRescanWatchedGame(epic, "Build_1", Now, force: false));
-        Assert.False(MainViewModel.ShouldRescanWatchedGame(steam, "456", Now, force: false));
+        Assert.False(WatchedGamesCoordinator.ShouldRescan(epic, "Build_1", Now, force: false));
+        Assert.False(WatchedGamesCoordinator.ShouldRescan(steam, "456", Now, force: false));
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public sealed class WatchedGameRescanTests
     {
         var manual = Entry(isSteam: false, storedBuild: null, checkedAgo: TimeSpan.FromHours(1));
 
-        Assert.False(MainViewModel.ShouldRescanWatchedGame(manual, null, Now, force: false));
+        Assert.False(WatchedGamesCoordinator.ShouldRescan(manual, null, Now, force: false));
     }
 
     [Fact]
@@ -116,15 +116,15 @@ public sealed class WatchedGameRescanTests
     {
         var epic = Entry(isSteam: false, storedBuild: "Build_1", checkedAgo: TimeSpan.FromHours(1));
 
-        Assert.True(MainViewModel.ShouldRescanWatchedGame(epic, "Build_2", Now, force: false));
+        Assert.True(WatchedGamesCoordinator.ShouldRescan(epic, "Build_2", Now, force: false));
     }
 
     [Fact]
     public void StaleEntry_TriggersRescan()
     {
-        var entry = Entry(isSteam: true, storedBuild: "456", checkedAgo: MainViewModel.WatchedCheckTtl);
+        var entry = Entry(isSteam: true, storedBuild: "456", checkedAgo: WatchedGamesCoordinator.CheckTtl);
 
-        Assert.True(MainViewModel.ShouldRescanWatchedGame(entry, "456", Now, force: false));
+        Assert.True(WatchedGamesCoordinator.ShouldRescan(entry, "456", Now, force: false));
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class WatchedGameRescanTests
     {
         var entry = Entry(isSteam: true, storedBuild: "456", checkedAgo: TimeSpan.FromMinutes(5));
 
-        Assert.True(MainViewModel.ShouldRescanWatchedGame(entry, "456", Now, force: true));
+        Assert.True(WatchedGamesCoordinator.ShouldRescan(entry, "456", Now, force: true));
     }
 
     private static WatchedGame Entry(bool isSteam, string? storedBuild, TimeSpan checkedAgo) =>

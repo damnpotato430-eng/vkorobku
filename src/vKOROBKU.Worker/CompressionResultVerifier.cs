@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using vKOROBKU.Protocol;
+using vKOROBKU.Shared;
 
 namespace vKOROBKU.Worker;
 
@@ -54,7 +55,7 @@ internal static class CompressionResultVerifier
             var volumeRoot = Path.GetPathRoot(file.Path) ?? string.Empty;
             if (!clusterSizes.TryGetValue(volumeRoot, out var clusterSize))
             {
-                clusterSize = GetClusterSize(volumeRoot);
+                clusterSize = VolumeInfo.GetClusterSize(volumeRoot);
                 clusterSizes[volumeRoot] = clusterSize;
             }
 
@@ -120,18 +121,8 @@ internal static class CompressionResultVerifier
         return true;
     }
 
-    private static bool TryGetPhysicalSize(string path, out long physicalSize)
-    {
-        Marshal.SetLastPInvokeError(0);
-        var low = GetCompressedFileSizeW(path, out var high);
-        if (low == uint.MaxValue && Marshal.GetLastWin32Error() != 0)
-        {
-            physicalSize = 0;
-            return false;
-        }
-        physicalSize = checked((long)(((ulong)high << 32) | low));
-        return true;
-    }
+    private static bool TryGetPhysicalSize(string path, out long physicalSize) =>
+        PhysicalFileSize.TryGet(path, out physicalSize, out _);
 
     private static bool IsLikelyIncompressible(string path)
     {
@@ -163,13 +154,6 @@ internal static class CompressionResultVerifier
         catch (UnauthorizedAccessException) { return false; }
     }
 
-    internal static long GetClusterSize(string volumeRoot)
-    {
-        if (GetDiskFreeSpaceW(volumeRoot, out var sectorsPerCluster, out var bytesPerSector, out _, out _))
-            return checked((long)sectorsPerCluster * bytesPerSector);
-        return 4096;
-    }
-
     [DllImport("WofUtil.dll", CharSet = CharSet.Unicode)]
     private static extern int WofIsExternalFile(
         string filePath,
@@ -177,18 +161,6 @@ internal static class CompressionResultVerifier
         out uint provider,
         ref WofFileCompressionInfo externalFileInfo,
         ref uint bufferLength);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern uint GetCompressedFileSizeW(string fileName, out uint fileSizeHigh);
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetDiskFreeSpaceW(
-        string rootPathName,
-        out uint sectorsPerCluster,
-        out uint bytesPerSector,
-        out uint numberOfFreeClusters,
-        out uint totalNumberOfClusters);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct WofFileCompressionInfo

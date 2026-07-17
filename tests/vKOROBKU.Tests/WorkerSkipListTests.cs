@@ -1,4 +1,6 @@
-using vKOROBKU.Worker;
+extern alias worker;
+
+using worker::vKOROBKU.Worker;
 
 namespace vKOROBKU.Tests;
 

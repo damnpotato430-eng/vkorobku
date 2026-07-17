@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using vKOROBKU.App.Models;
+using vKOROBKU.Shared;
 
 namespace vKOROBKU.App.Services;
 
@@ -20,62 +21,31 @@ public sealed class GameCompressionDetector
     private static GameCompressionDetection Detect(string rootPath, CancellationToken cancellationToken)
     {
         var algorithms = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
-        var physicalSizeService = new PhysicalSizeService();
         long logicalBytes = 0;
         long physicalBytes = 0;
         var compressedFiles = 0;
-        var pending = new Stack<string>();
-        pending.Push(rootPath);
 
-        while (pending.TryPop(out var directory))
+        FileSystemWalker.Walk(rootPath, info =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
+            if ((info.Attributes & FileAttributes.ReparsePoint) != 0)
+                return;
+
+            logicalBytes += info.Length;
+            physicalBytes += PhysicalFileSize.GetOrDefault(info.FullName, info.Length);
+
+            if ((info.Attributes & FileAttributes.Compressed) != 0)
             {
-                foreach (var path in Directory.EnumerateFiles(directory))
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    try
-                    {
-                        var info = new FileInfo(path);
-                        if ((info.Attributes & FileAttributes.ReparsePoint) != 0)
-                            continue;
-
-                        logicalBytes += info.Length;
-                        try { physicalBytes += physicalSizeService.GetAllocatedSize(path); }
-                        catch { physicalBytes += info.Length; }
-
-                        if ((info.Attributes & FileAttributes.Compressed) != 0)
-                        {
-                            AddBytes(algorithms, "NTFS", info.Length);
-                            compressedFiles++;
-                            continue;
-                        }
-
-                        if (TryGetWofAlgorithm(path, out var algorithm))
-                        {
-                            AddBytes(algorithms, algorithm, info.Length);
-                            compressedFiles++;
-                        }
-                    }
-                    catch (IOException) { }
-                    catch (UnauthorizedAccessException) { }
-                }
-
-                foreach (var child in Directory.EnumerateDirectories(directory))
-                {
-                    try
-                    {
-                        if ((File.GetAttributes(child) & FileAttributes.ReparsePoint) == 0)
-                            pending.Push(child);
-                    }
-                    catch (IOException) { }
-                    catch (UnauthorizedAccessException) { }
-                }
+                AddBytes(algorithms, "NTFS", info.Length);
+                compressedFiles++;
+                return;
             }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
-        }
+
+            if (TryGetWofAlgorithm(info.FullName, out var algorithm))
+            {
+                AddBytes(algorithms, algorithm, info.Length);
+                compressedFiles++;
+            }
+        }, cancellationToken);
 
         var state = ClassifyState(algorithms.Values.Sum(), logicalBytes);
         if (state == GameCompressionState.Uncompressed)
