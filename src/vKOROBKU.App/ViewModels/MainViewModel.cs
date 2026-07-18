@@ -667,20 +667,32 @@ public sealed class MainViewModel : ObservableObject
 
     private void UpdateWatcherSummary(WatchedGamesCoordinator.CheckOutcome outcome)
     {
+        // "Needs finishing" unites two sources: watched games whose saving decayed
+        // and library cards left partially compressed (an interrupted or cancelled
+        // run) — the latter are not watched yet, but they need the same action.
+        var partialPaths = Games
+            .Where(game => game.CompressionState == GameCompressionState.PartiallyCompressed &&
+                           IsResumableAlgorithm(game.CompressionAlgorithm))
+            .Select(game => game.InstallPath);
         _degradedPaths = new HashSet<string>(
-            outcome.Degraded.Select(item => item.FolderPath), StringComparer.OrdinalIgnoreCase);
+            outcome.Degraded.Select(item => item.FolderPath).Concat(partialPaths),
+            StringComparer.OrdinalIgnoreCase);
         OnPropertyChanged(nameof(DegradedFilterLabel));
-        if (outcome.WatchedCount == 0)
+
+        WatcherHasFindings = _degradedPaths.Count > 0;
+        if (_degradedPaths.Count > 0)
         {
-            WatcherHasFindings = false;
-            WatcherSummaryText = string.Empty;
+            var reclaimable = outcome.Degraded.Sum(item => item.PotentialSavingsBytes);
+            var savingsNote = reclaimable > 0
+                ? $" — можно вернуть ~{ByteFormatter.Format(reclaimable)}"
+                : string.Empty;
+            WatcherSummaryText = $"Требуют дожатия: {_degradedPaths.Count}{savingsNote}";
         }
         else
         {
-            WatcherHasFindings = outcome.Degraded.Count > 0;
-            WatcherSummaryText = outcome.Degraded.Count == 0
-                ? $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет"
-                : $"Обновились и требуют дожатия: {outcome.Degraded.Count} — можно вернуть ~{ByteFormatter.Format(outcome.Degraded.Sum(item => item.PotentialSavingsBytes))}";
+            WatcherSummaryText = outcome.WatchedCount == 0
+                ? string.Empty
+                : $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет";
         }
 
         // The filter cannot stay on with nothing to show — that would leave an
@@ -1977,6 +1989,10 @@ public sealed class MainViewModel : ObservableObject
                     TrySaveCompressionStatus(
                         job.RootPath, GameCompressionState.PartiallyCompressed, cancelledAlgorithm,
                         steamBuildId: targetGame?.SteamBuildId, hasDirectStorage: targetGame?.HasDirectStorage);
+                    // The card just turned partial, so the needs-finishing banner and
+                    // filter reflect it immediately, same as after a completed job.
+                    if (_userPreferences.WatcherEnabled && !_isWatcherCheckRunning)
+                        UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
                 }
                 return new QueueJobOutcome(QueueItemStatus.Cancelled, 0, false);
             }
@@ -2182,11 +2198,23 @@ public sealed class MainViewModel : ObservableObject
     {
         var degraded = _watcher.ReadStoredState(_userPreferences).Degraded;
         var items = new List<CompressionQueueItem>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var entry in degraded)
         {
             var game = FindGameByPath(entry.FolderPath);
-            if (game is not null && !(game.HasDirectStorage == true && !IsExpertMode))
+            if (game is not null && seen.Add(game.InstallPath) &&
+                !(game.HasDirectStorage == true && !IsExpertMode))
                 items.Add(new CompressionQueueItem(game, entry.Algorithm));
+        }
+        // Interrupted and cancelled runs leave partially compressed cards that are
+        // not watched yet — "recompress all" must cover them too.
+        foreach (var game in Games)
+        {
+            if (game.CompressionState == GameCompressionState.PartiallyCompressed &&
+                IsResumableAlgorithm(game.CompressionAlgorithm) &&
+                seen.Add(game.InstallPath) &&
+                !(game.HasDirectStorage == true && !IsExpertMode))
+                items.Add(new CompressionQueueItem(game, game.CompressionAlgorithm!));
         }
         if (items.Count == 0)
         {
