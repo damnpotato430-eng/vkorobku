@@ -117,7 +117,8 @@ internal static class Program
         // compact.exe cannot compress sparse files, but it must still decompress
         // WOF-backed ones carrying the sparse flag (an interrupted conversion or a
         // stale Steam download flag) — otherwise they stay compressed forever.
-        var files = EnumerateFiles(rootPath, includeSparse: job.Operation == "decompress", cancellationToken);
+        var (files, excludedPhysicalBytes) = EnumerateFiles(
+            rootPath, includeSparse: job.Operation == "decompress", cancellationToken);
         if (files.Count == 0)
             throw new InvalidOperationException("В каталоге нет доступных файлов для обработки.");
 
@@ -223,7 +224,8 @@ internal static class Program
             SkipListedBytes: skipListedBytes,
             SkipListedPhysicalBytes: skipListedPhysical,
             PhysicalBefore: physicalBefore,
-            PhysicalAfter: physicalAfter));
+            PhysicalAfter: physicalAfter,
+            ExcludedPhysicalBytes: excludedPhysicalBytes));
     }
 
     internal static bool IsSkipListed(WorkerFile file, HashSet<string> skipExtensions, long clusterSize) =>
@@ -276,18 +278,25 @@ internal static class Program
         }
     }
 
-    private static List<WorkerFile> EnumerateFiles(string rootPath, bool includeSparse, CancellationToken cancellationToken)
+    // Excluded files (sparse from a Steam download or an interrupted conversion,
+    // encrypted) are outside the compact universe, but they still occupy disk space —
+    // their physical size is reported so the app can show the true folder weight.
+    private static (List<WorkerFile> Files, long ExcludedPhysicalBytes) EnumerateFiles(
+        string rootPath, bool includeSparse, CancellationToken cancellationToken)
     {
         var excludedAttributes = FileAttributes.Encrypted | FileAttributes.ReparsePoint;
         if (!includeSparse)
             excludedAttributes |= FileAttributes.SparseFile;
         var result = new List<WorkerFile>();
+        long excludedPhysicalBytes = 0;
         FileSystemWalker.Walk(rootPath, info =>
         {
             if ((info.Attributes & excludedAttributes) == 0 && info.Length > 0)
                 result.Add(new WorkerFile(info.FullName, info.Length));
+            else if ((info.Attributes & FileAttributes.ReparsePoint) == 0 && info.Length > 0)
+                excludedPhysicalBytes += PhysicalFileSize.GetOrDefault(info.FullName, info.Length);
         }, cancellationToken);
-        return result;
+        return (result, excludedPhysicalBytes);
     }
 
     // A file is either fully converted or untouched at the NTFS level, so an interrupted
