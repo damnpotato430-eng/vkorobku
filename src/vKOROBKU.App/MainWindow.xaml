@@ -105,8 +105,23 @@
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{Binding TotalSavingsText}" HorizontalAlignment="Right" FontSize="10"
-                                   FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding TotalSavingsText}" FontSize="10"
+                                       FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                            <TextBlock Text="{Binding AllTimeStatsText}" FontSize="10" FontWeight="Bold"
+                                       Margin="10,0,0,0" Foreground="{StaticResource MutedTextBrush}"
+                                       ToolTip="{Binding AllTimeStatsTooltip}" ToolTipService.InitialShowDelay="200">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding AllTimeStatsText}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
                     </Grid>
                     <ItemsControl ItemsSource="{Binding Computer.Drives}">
                         <ItemsControl.ItemsPanel>

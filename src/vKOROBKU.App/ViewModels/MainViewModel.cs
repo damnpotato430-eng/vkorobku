@@ -28,6 +28,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly CompressionStatusStore _compressionStatusStore = new();
     private readonly GameCompressionDetector _compressionDetector = new();
     private readonly OperationJournalStore _operationJournal = new();
+    private readonly CompressionStatsStore _statsStore = new();
     private readonly UserPreferencesStore _preferences = new();
     private readonly ManualGameStore _manualGameStore = new();
     private readonly WatchedGamesCoordinator _watcher = new();
@@ -62,6 +63,8 @@ public sealed class MainViewModel : ObservableObject
     private double _operationProgress;
     private string _operationSummary = "Сжатие изменяет только способ хранения файлов на NTFS.";
     private string _totalSavingsText = string.Empty;
+    private string _allTimeStatsText = string.Empty;
+    private string _allTimeStatsTooltip = string.Empty;
     private string? _activeOperationPath;
     private string _activeOperationDescription = string.Empty;
     private string? _activeCompressionAlgorithm;
@@ -145,6 +148,7 @@ public sealed class MainViewModel : ObservableObject
         AddToQueueCommand = new RelayCommand(AddSelectedGameToQueue, () => SelectedGame is not null && !IsOperating);
         Games.CollectionChanged += OnGamesCollectionChanged;
         QueueItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(QueuePanelVisibility));
+        RefreshAllTimeStats();
     }
 
     public ObservableCollection<GameInfo> Games { get; } = [];
@@ -500,6 +504,18 @@ public sealed class MainViewModel : ObservableObject
     {
         get => _totalSavingsText;
         private set => SetProperty(ref _totalSavingsText, value);
+    }
+
+    public string AllTimeStatsText
+    {
+        get => _allTimeStatsText;
+        private set => SetProperty(ref _allTimeStatsText, value);
+    }
+
+    public string AllTimeStatsTooltip
+    {
+        get => _allTimeStatsTooltip;
+        private set => SetProperty(ref _allTimeStatsTooltip, value);
     }
 
     public string WatcherSummaryText
@@ -1478,6 +1494,27 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(ActiveCompressionInfoVisibility));
     }
 
+    private void RefreshAllTimeStats(CompressionAllTimeStats? stats = null)
+    {
+        var current = stats ?? _statsStore.Load();
+        if (current.Operations == 0)
+        {
+            AllTimeStatsText = string.Empty;
+            AllTimeStatsTooltip = string.Empty;
+            return;
+        }
+
+        AllTimeStatsText = $"за всё время: {ByteFormatter.Format(current.FreedBytes)}";
+        var since = current.FirstOperationAt is { } first ? $" · с {first:dd.MM.yyyy}" : string.Empty;
+        var driveLines = current.Drives
+            .OrderByDescending(pair => pair.Value.FreedBytes)
+            .Select(pair => $"{pair.Key} — {ByteFormatter.Format(pair.Value.FreedBytes)} · операций: {pair.Value.Operations}");
+        AllTimeStatsTooltip =
+            $"Освобождено сжатием за всё время работы{since}\n" +
+            $"Операций сжатия: {current.Operations}\n\n" +
+            string.Join("\n", driveLines);
+    }
+
     private void RefreshSavingsSummary()
     {
         long totalSavedBytes = 0;
@@ -1922,6 +1959,9 @@ public sealed class MainViewModel : ObservableObject
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
             RefreshSavingsSummary();
+            if (job.Operation == "compress")
+                RefreshAllTimeStats(_statsStore.RecordCompression(
+                    Path.GetPathRoot(job.RootPath) ?? string.Empty, Math.Max(0, difference)));
             tracker.Finish(OperationJournalState.Completed, OperationSummary, result);
             return new QueueJobOutcome(QueueItemStatus.Completed, Math.Max(0, difference), false);
         }
