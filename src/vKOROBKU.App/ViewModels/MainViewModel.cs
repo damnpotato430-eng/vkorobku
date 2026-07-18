@@ -16,7 +16,7 @@ public sealed class MainViewModel : ObservableObject
 {
     private const int CurrentIdentityVersion = 4;
     private readonly IReadOnlyList<IGameScanner> _gameScanners =
-        [new SteamLibraryScanner(), new EpicGamesScanner(), new GogScanner()];
+        [new SteamLibraryScanner(), new EpicGamesScanner(), new GogScanner(), new UbisoftScanner(), new EaScanner()];
     private readonly ComputerInfoService _computerInfoService = new();
     private readonly FileTreeService _fileTreeService = new();
     private readonly GameAnalysisService _analysisService = new();
@@ -856,8 +856,8 @@ public sealed class MainViewModel : ObservableObject
                 var manualPath = GamePath.Normalize(savedManualGame.InstallPath);
                 if (Games.Any(current => string.Equals(current.InstallPath, manualPath, StringComparison.OrdinalIgnoreCase)))
                 {
-                    // The folder is now found by a launcher scanner (Steam/Epic/GOG), so
-                    // the manual record is redundant — drop it to keep manual-games.json clean.
+                    // The folder is now found by a launcher scanner, so the manual
+                    // record is redundant — drop it to keep manual-games.json clean.
                     try { _manualGameStore.Remove(savedManualGame.InstallPath); }
                     catch (IOException) { }
                     catch (UnauthorizedAccessException) { }
