@@ -323,7 +323,34 @@
                                            FontSize="11" TextTrimming="CharacterEllipsis" />
                                 <Grid Margin="0,15,0,0">
                                     <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
-                                    <TextBlock Text="{Binding SizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding ActualSizeText}" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource AccentBrush}" Margin="0,0,4,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="{Binding SizeText}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
+                                                            <Setter Property="Text" Value="{Binding OriginalSizeBracketText}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
                                 <Border CornerRadius="5" Padding="8,4" HorizontalAlignment="Left">
