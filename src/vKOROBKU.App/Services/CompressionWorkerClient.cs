@@ -135,6 +135,7 @@ public sealed class WorkerSession : IAsyncDisposable
                     Encoding.ASCII.GetBytes(hello.Token ?? string.Empty), Encoding.ASCII.GetBytes(token)))
                 throw new InvalidOperationException("Не удалось подтвердить подлинность системного модуля.");
 
+            AppLog.Info("Сессия воркера: запущена и подтверждена");
             return new WorkerSession(pipe, reader, writer, worker, tokenFile);
         }
         catch
@@ -155,18 +156,25 @@ public sealed class WorkerSession : IAsyncDisposable
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+        AppLog.Info($"Сессия воркера: задание {job.Operation} — {job.RootPath}");
         await WriteAsync(JsonSerializer.Serialize(job, JsonOptions), cancellationToken);
         while (true)
         {
             var line = await _reader.ReadLineAsync(cancellationToken);
             if (line is null)
+            {
+                AppLog.Error("Сессия воркера: соединение неожиданно закрылось", new IOException(job.RootPath));
                 throw new IOException("Системный модуль неожиданно завершил соединение.");
+            }
             var message = JsonSerializer.Deserialize<WorkerMessage>(line, JsonOptions)
                 ?? throw new InvalidDataException("Получен некорректный ответ системного модуля.");
             progress?.Report(message);
 
             if (message.Type is "completed" or "cancelled" or "error")
+            {
+                AppLog.Info($"Сессия воркера: задание завершилось — {message.Type}");
                 return message;
+            }
         }
     }
 
@@ -176,6 +184,7 @@ public sealed class WorkerSession : IAsyncDisposable
             return;
         try
         {
+            AppLog.Info("Сессия воркера: отправлена команда отмены текущего задания");
             await WriteAsync(JsonSerializer.Serialize(new WorkerCommand("cancel"), JsonOptions), CancellationToken.None);
         }
         catch (IOException) { }
@@ -187,6 +196,7 @@ public sealed class WorkerSession : IAsyncDisposable
         if (_disposed)
             return;
         _disposed = true;
+        AppLog.Info("Сессия воркера: завершение (shutdown)");
         try
         {
             await WriteAsync(JsonSerializer.Serialize(new WorkerCommand("shutdown"), JsonOptions), CancellationToken.None);

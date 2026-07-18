@@ -360,13 +360,22 @@ internal static class Program
                 startInfo.ArgumentList.Add(file.Path);
 
             using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не удалось запустить compact.exe.");
-            using var registration = cancellationToken.Register(() =>
+            var outputTask = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
+            var errorTask = process.StandardError.ReadToEndAsync(CancellationToken.None);
+            try
             {
+                await process.WaitForExitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                // The kill happens here, not in a token registration: registration
+                // callbacks run after the awaiter's own registration in LIFO order,
+                // so the old pattern could dispose the registration before the kill
+                // ran and leave an orphan compact.exe compressing in the background.
                 try { if (!process.HasExited) process.Kill(true); } catch { }
-            });
-            var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-            await process.WaitForExitAsync(cancellationToken);
+                try { await process.WaitForExitAsync(CancellationToken.None); } catch { }
+                throw;
+            }
             _ = await outputTask;
             _ = await errorTask;
             if (process.ExitCode != 0)

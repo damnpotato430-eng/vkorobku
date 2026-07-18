@@ -1962,6 +1962,22 @@ public sealed class MainViewModel : ObservableObject
                     _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary);
                 }
                 catch { }
+                // A cancelled run leaves the game part-converted at the NTFS level, so
+                // the card switches to the partial state and offers "Дожать" instead of
+                // silently keeping the pre-operation badge. Sizes are unknown here —
+                // the next status check refreshes them.
+                var cancelledAlgorithm = job.Operation == "compress"
+                    ? job.Algorithm
+                    : targetGame?.CompressionAlgorithm;
+                if (cancelledAlgorithm is not null)
+                {
+                    UpdateGameCompressionStatus(
+                        job.RootPath, GameCompressionState.PartiallyCompressed, cancelledAlgorithm,
+                        checkedAt: DateTimeOffset.Now);
+                    TrySaveCompressionStatus(
+                        job.RootPath, GameCompressionState.PartiallyCompressed, cancelledAlgorithm,
+                        steamBuildId: targetGame?.SteamBuildId, hasDirectStorage: targetGame?.HasDirectStorage);
+                }
                 return new QueueJobOutcome(QueueItemStatus.Cancelled, 0, false);
             }
 
@@ -2208,6 +2224,7 @@ public sealed class MainViewModel : ObservableObject
         IsOperating = true;
         IsQueueRunning = true;
         QueueTitle = $"Очередь сжатия · подготовка ({items.Count} игр)";
+        AppLog.Info($"Очередь запущена: {items.Count} игр — {string.Join(", ", items.Select(item => item.Title))}");
         try
         {
             await using var session = await _workerClient.StartSessionAsync();
@@ -2223,9 +2240,12 @@ public sealed class MainViewModel : ObservableObject
 
                 QueueTitle = $"Очередь сжатия · {position} из {items.Count}";
                 item.MarkRunning();
+                AppLog.Info($"Очередь: {position}/{items.Count} — запускаем «{item.Game.Name}» ({item.Algorithm})");
                 var outcome = await RunJobInSessionAsync(session, new WorkerJob(
                     item.Game.InstallPath, "compress", item.Algorithm,
                     CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
+                AppLog.Info($"Очередь: «{item.Game.Name}» — итог {outcome.Status}" +
+                            (outcome.SessionLost ? " (сессия воркера потеряна)" : string.Empty));
                 switch (outcome.Status)
                 {
                     case QueueItemStatus.Completed:
@@ -2247,11 +2267,13 @@ public sealed class MainViewModel : ObservableObject
         {
             OperationSummary = exception.Message;
             StatusText = "Операция отменена";
+            AppLog.Info($"Очередь: отменена — {exception.Message}");
         }
         catch (Exception exception)
         {
             OperationSummary = $"Очередь прервана: {exception.Message}";
             StatusText = "Ошибка системной операции";
+            AppLog.Error("Очередь прервана", exception);
         }
         finally
         {
@@ -2268,6 +2290,7 @@ public sealed class MainViewModel : ObservableObject
             QueueTitle = $"Очередь завершена · сжато {completedCount} из {QueueItems.Count} · освобождено {ByteFormatter.Format(freedBytes)}";
             OperationSummary = QueueTitle;
             StatusText = QueueTitle;
+            AppLog.Info(QueueTitle);
         }
     }
 
