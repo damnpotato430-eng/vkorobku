@@ -22,6 +22,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly GameAnalysisService _analysisService = new();
     private readonly AnalysisWorkspaceCleaner _analysisWorkspaceCleaner = new();
     private readonly CoverService _coverService;
+    private readonly CoverBatchLoader _coverBatchLoader;
     private readonly CompressionWorkerClient _workerClient = new();
     private readonly AnalysisCacheStore _analysisCache = new();
     private readonly CompressionStatusStore _compressionStatusStore = new();
@@ -93,6 +94,7 @@ public sealed class MainViewModel : ObservableObject
             liveView.IsLiveSorting = true;
         }
         _coverService = new CoverService(_gameIdentityService.FindSteamAppIdAsync);
+        _coverBatchLoader = new CoverBatchLoader(_coverService);
         AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
         AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
         AnalysisModes.Add(new AnalysisModeOption("Точный", "до 1 ГБ", 1024L * 1024 * 1024));
@@ -1134,75 +1136,22 @@ public sealed class MainViewModel : ObservableObject
         if (Games.Count == 0)
             return;
 
-        const int maximumConcurrency = 4;
         var snapshot = Games.ToArray();
-        using var semaphore = new SemaphoreSlim(maximumConcurrency, maximumConcurrency);
-        using var cancellation = new CancellationTokenSource();
         var dispatcher = Application.Current.Dispatcher;
-        var failureLock = new object();
-        string? failureMessage = null;
-        var completed = 0;
+        var result = await _coverBatchLoader.LoadAsync(
+            snapshot,
+            forceRefresh,
+            async (game, coverPath) => await dispatcher.InvokeAsync(() =>
+            {
+                var current = Games.FirstOrDefault(item =>
+                    string.Equals(item.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase));
+                if (current is not null)
+                    current.CoverPath = coverPath;
+            }),
+            async completed => await dispatcher.InvokeAsync(() =>
+                StatusText = $"Загрузка обложек: {completed} из {snapshot.Length}"));
 
-        void StopRemaining(string message)
-        {
-            lock (failureLock)
-            {
-                if (failureMessage is not null)
-                    return;
-                failureMessage = message;
-                cancellation.Cancel();
-            }
-        }
-
-        var tasks = snapshot.Select(async game =>
-        {
-            var entered = false;
-            try
-            {
-                await semaphore.WaitAsync(cancellation.Token);
-                entered = true;
-                var coverPath = await _coverService.GetCoverAsync(game, forceRefresh, cancellation.Token);
-                if (coverPath is not null)
-                {
-                    await dispatcher.InvokeAsync(() =>
-                    {
-                        var current = Games.FirstOrDefault(item =>
-                            string.Equals(item.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase));
-                        if (current is not null)
-                            current.CoverPath = coverPath;
-                    });
-                }
-            }
-            catch (HttpRequestException)
-            {
-                StopRemaining("Сервис обложек временно недоступен");
-            }
-            catch (TaskCanceledException) when (!cancellation.IsCancellationRequested)
-            {
-                StopRemaining("Сервис обложек не ответил вовремя");
-            }
-            catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
-            finally
-            {
-                if (entered)
-                    semaphore.Release();
-                var currentCompleted = Interlocked.Increment(ref completed);
-                if (failureMessage is null)
-                {
-                    await dispatcher.InvokeAsync(() =>
-                        StatusText = $"Загрузка обложек: {currentCompleted} из {snapshot.Length}");
-                }
-            }
-        }).ToArray();
-
-        await Task.WhenAll(tasks);
-        if (failureMessage is not null)
-        {
-            StatusText = failureMessage;
-            return;
-        }
-
-        StatusText = $"Библиотека готова · проверено обложек: {completed}";
+        StatusText = result.FailureMessage ?? $"Библиотека готова · проверено обложек: {result.Completed}";
     }
 
     private async Task<bool> LoadCoverAsync(GameInfo game, bool forceRefresh)
@@ -1260,14 +1209,8 @@ public sealed class MainViewModel : ObservableObject
         AnalysisSummary = "Инвентаризация файлов…";
         OperationSummary = AnalysisSummary;
 
-        Guid journalId;
-        var startedAt = DateTimeOffset.Now;
-        try { journalId = _operationJournal.Begin(game.InstallPath, "analysis", null, AnalysisSummary); }
-        catch { journalId = Guid.NewGuid(); }
-        var operation = new OperationJournalEntry(
-            journalId, game.InstallPath, "analysis", null, startedAt, null,
-            OperationJournalState.Running, 0, 0, 0, 0, 0, AnalysisSummary);
-        UpsertOperation(operation);
+        var tracker = OperationTracker.BeginAnalysis(
+            _operationJournal, UpsertOperation, game.InstallPath, AnalysisSummary);
         var lastPersistedPercent = -5;
         var acceptAnalysisProgress = true;
 
@@ -1280,31 +1223,17 @@ public sealed class MainViewModel : ObservableObject
                 AnalysisSummary = update.Stage;
             OperationSummary = update.Stage;
             StatusText = update.Stage;
-            operation = operation with
-            {
-                ProcessedBytes = update.ProcessedBytes,
-                TotalBytes = update.TotalBytes,
-                ProcessedFiles = (int)Math.Round(OperationProgress),
-                TotalFiles = 100,
-                Message = update.Stage
-            };
-            UpsertOperation(operation);
 
-            var wholePercent = (int)OperationProgress;
-            if (wholePercent >= lastPersistedPercent + 5)
-            {
+            var wholePercent = (int)Math.Round(OperationProgress);
+            var persist = wholePercent >= lastPersistedPercent + 5;
+            if (persist)
                 lastPersistedPercent = wholePercent;
-                try
-                {
-                    _operationJournal.Update(journalId, new WorkerMessage(
-                        "progress", update.Stage,
-                        ProcessedBytes: update.ProcessedBytes,
-                        TotalBytes: update.TotalBytes,
-                        ProcessedFiles: wholePercent,
-                        TotalFiles: 100));
-                }
-                catch { }
-            }
+            tracker.ReportProgress(new WorkerMessage(
+                "progress", update.Stage,
+                ProcessedBytes: update.ProcessedBytes,
+                TotalBytes: update.TotalBytes,
+                ProcessedFiles: wholePercent,
+                TotalFiles: 100), update.Stage, persist);
         });
 
         try
@@ -1348,28 +1277,12 @@ public sealed class MainViewModel : ObservableObject
                 ? $"Анализ игры «{game.Name}» завершён и сохранён"
                 : $"Анализ игры «{game.Name}» завершён, но кэш записать не удалось";
             OperationSummary = StatusText;
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Completed,
-                ProcessedBytes = result.SampleBytes,
-                TotalBytes = result.SampleBytes,
-                ProcessedFiles = 100,
-                TotalFiles = 100,
-                Message = StatusText
-            };
-            UpsertOperation(operation);
-            try
-            {
-                _operationJournal.Update(journalId, new WorkerMessage(
-                    "completed", StatusText,
-                    ProcessedBytes: result.SampleBytes,
-                    TotalBytes: result.SampleBytes,
-                    ProcessedFiles: 100,
-                    TotalFiles: 100));
-                _operationJournal.Finish(journalId, OperationJournalState.Completed, StatusText);
-            }
-            catch { }
+            tracker.Finish(OperationJournalState.Completed, StatusText, new WorkerMessage(
+                "completed", StatusText,
+                ProcessedBytes: result.SampleBytes,
+                TotalBytes: result.SampleBytes,
+                ProcessedFiles: 100,
+                TotalFiles: 100));
         }
         catch (OperationCanceledException)
         {
@@ -1378,14 +1291,7 @@ public sealed class MainViewModel : ObservableObject
             if (IsGameSelected(game))
                 AnalysisSummary = OperationSummary;
             StatusText = "Анализ отменён";
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Cancelled,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary); } catch { }
+            tracker.Finish(OperationJournalState.Cancelled, OperationSummary);
         }
         catch (Exception exception)
         {
@@ -1394,14 +1300,7 @@ public sealed class MainViewModel : ObservableObject
             if (IsGameSelected(game))
                 AnalysisSummary = OperationSummary;
             StatusText = "Ошибка анализа";
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Failed,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
+            tracker.Finish(OperationJournalState.Failed, OperationSummary);
         }
         finally
         {
@@ -1884,14 +1783,7 @@ public sealed class MainViewModel : ObservableObject
     // a lost session is reported through the outcome so a queue can stop cleanly.
     private async Task<QueueJobOutcome> RunJobInSessionAsync(WorkerSession session, WorkerJob job)
     {
-        Guid journalId;
-        var startedAt = DateTimeOffset.Now;
-        try { journalId = _operationJournal.Begin(job); }
-        catch { journalId = Guid.NewGuid(); }
-        var operation = new OperationJournalEntry(
-            journalId, job.RootPath, job.Operation, job.Algorithm, startedAt, null,
-            OperationJournalState.Running, 0, 0, 0, 0, 0, "Ожидание Worker");
-        UpsertOperation(operation);
+        var tracker = OperationTracker.Begin(_operationJournal, UpsertOperation, job, "Ожидание Worker");
         var acceptWorkerProgress = true;
 
         var targetGame = Games.FirstOrDefault(item =>
@@ -1921,17 +1813,7 @@ public sealed class MainViewModel : ObservableObject
                 : string.Empty;
             OperationSummary = $"{message.Text}{counters}";
             StatusText = OperationSummary;
-            operation = operation with
-            {
-                ProcessedBytes = message.ProcessedBytes,
-                TotalBytes = message.TotalBytes,
-                ProcessedFiles = message.ProcessedFiles,
-                TotalFiles = message.TotalFiles,
-                ErrorCount = message.ErrorCount,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try { _operationJournal.Update(journalId, message); } catch { }
+            tracker.ReportProgress(message, OperationSummary);
         });
 
         try
@@ -1942,38 +1824,14 @@ public sealed class MainViewModel : ObservableObject
             {
                 OperationSummary = $"Операция не выполнена: {result.Text ?? "ошибка системного модуля"}";
                 StatusText = "Ошибка системной операции";
-                operation = operation with
-                {
-                    FinishedAt = DateTimeOffset.Now,
-                    State = OperationJournalState.Failed,
-                    Message = OperationSummary
-                };
-                UpsertOperation(operation);
-                try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
+                tracker.Finish(OperationJournalState.Failed, OperationSummary);
                 return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, result.Text);
             }
             if (result.Type == "cancelled")
             {
                 OperationSummary = result.Text ?? "Операция отменена";
                 StatusText = OperationSummary;
-                operation = operation with
-                {
-                    FinishedAt = DateTimeOffset.Now,
-                    State = OperationJournalState.Cancelled,
-                    ProcessedBytes = result.ProcessedBytes,
-                    TotalBytes = result.TotalBytes,
-                    ProcessedFiles = result.ProcessedFiles,
-                    TotalFiles = result.TotalFiles,
-                    ErrorCount = result.ErrorCount,
-                    Message = OperationSummary
-                };
-                UpsertOperation(operation);
-                try
-                {
-                    _operationJournal.Update(journalId, result);
-                    _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary);
-                }
-                catch { }
+                tracker.Finish(OperationJournalState.Cancelled, OperationSummary, result);
                 // A cancelled run leaves the game part-converted at the NTFS level, so
                 // the card switches to the partial state and offers "Дожать" instead of
                 // silently keeping the pre-operation badge. Sizes are unknown here —
@@ -2061,24 +1919,7 @@ public sealed class MainViewModel : ObservableObject
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
             RefreshSavingsSummary();
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Completed,
-                ProcessedBytes = result.ProcessedBytes,
-                TotalBytes = result.TotalBytes,
-                ProcessedFiles = result.ProcessedFiles,
-                TotalFiles = result.TotalFiles,
-                ErrorCount = result.ErrorCount,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try
-            {
-                _operationJournal.Update(journalId, result);
-                _operationJournal.Finish(journalId, OperationJournalState.Completed, OperationSummary);
-            }
-            catch { }
+            tracker.Finish(OperationJournalState.Completed, OperationSummary, result);
             return new QueueJobOutcome(QueueItemStatus.Completed, Math.Max(0, difference), false);
         }
         catch (Exception exception)
@@ -2089,14 +1930,7 @@ public sealed class MainViewModel : ObservableObject
             acceptWorkerProgress = false;
             OperationSummary = $"Операция не выполнена: {exception.Message}";
             StatusText = "Ошибка системной операции";
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Failed,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
+            tracker.Finish(OperationJournalState.Failed, OperationSummary);
             return new QueueJobOutcome(QueueItemStatus.Failed, 0, true, exception.Message);
         }
         finally
