@@ -146,9 +146,25 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <Button Grid.Column="1" Content="Проверить сейчас" Command="{Binding CheckWatchedGamesCommand}"
-                                Style="{StaticResource SecondaryButton}" Padding="10,6" FontSize="11"
-                                Margin="12,0,0,0" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Дожать все" Command="{Binding RecompressDegradedCommand}"
+                                    Padding="10,6" FontSize="11" Margin="12,0,0,0"
+                                    ToolTip="Дожать все деградировавшие игры одной очередью — права администратора запрашиваются один раз">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WatcherHasFindings}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="Проверить сейчас" Command="{Binding CheckWatchedGamesCommand}"
+                                    Style="{StaticResource SecondaryButton}" Padding="10,6" FontSize="11"
+                                    Margin="12,0,0,0" />
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
             </Border>
@@ -166,10 +182,12 @@
                         <RowDefinition Height="12" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
+                    <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="210" />
                         </Grid.ColumnDefinitions>
@@ -193,6 +211,12 @@
                             </TextBlock>
                         </Grid>
                         <ToggleButton Grid.Column="2" Margin="0,0,12,0" Padding="12,8" FontSize="12"
+                                      VerticalAlignment="Center" Style="{StaticResource ExpertToggle}"
+                                      IsChecked="{Binding IsMultiSelectMode, Mode=OneWay}"
+                                      Command="{Binding ToggleMultiSelectCommand}"
+                                      Content="{Binding MultiSelectToggleText}"
+                                      ToolTip="Отметить несколько игр и сжать их одной очередью" />
+                        <ToggleButton Grid.Column="3" Margin="0,0,12,0" Padding="12,8" FontSize="12"
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding ShowOnlyDegraded}"
                                       Content="{Binding DegradedFilterLabel}"
@@ -208,10 +232,27 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-                        <ComboBox Grid.Column="3" Height="34" VerticalContentAlignment="Center"
+                        <ComboBox Grid.Column="4" Height="34" VerticalContentAlignment="Center"
                                   ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption}"
                                   Style="{StaticResource DarkComboBox}" ToolTip="Сортировка библиотеки" />
                     </Grid>
+                    <Border Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" CornerRadius="8"
+                            Padding="12,8" Visibility="{Binding MultiSelectVisibility}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding QueueSelectionText}" VerticalAlignment="Center" FontSize="12" />
+                            <ComboBox Grid.Column="1" Width="200" Height="30" Margin="12,0,0,0" VerticalContentAlignment="Center"
+                                      ItemsSource="{Binding QueueMethodOptions}" SelectedItem="{Binding SelectedQueueMethod}"
+                                      Style="{StaticResource DarkComboBox}" ToolTip="Метод сжатия для всей очереди" />
+                            <Button Grid.Column="2" Content="Сжать очередь · 1 запрос прав" Command="{Binding StartQueueCommand}"
+                                    Margin="12,0,0,0" Padding="12,6" FontSize="12" />
+                        </Grid>
+                    </Border>
+                    </StackPanel>
                     <ListBox Grid.Row="2" ItemsSource="{Binding GamesView}" SelectedItem="{Binding SelectedGame}"
                          Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListBox.ItemsPanel>
@@ -233,6 +274,7 @@
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="Перейти в каталог" Command="{Binding OpenGameFolderCommand}" />
+                                        <MenuItem Header="Добавить в очередь сжатия" Command="{Binding AddToQueueCommand}" />
                                         <MenuItem Header="Обновить обложку" Command="{Binding RefreshSelectedCoverCommand}" />
                                         <MenuItem Header="Проверить состояние сжатия" Command="{Binding RecheckCompressionCommand}" />
                                         <MenuItem Header="Убрать из библиотеки" Command="{Binding RemoveGameCommand}" />
@@ -268,6 +310,11 @@
                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         <Image Source="{Binding CoverPath, Converter={StaticResource LocalImageConverter}}"
                                                Stretch="UniformToFill" />
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0"
+                                                Background="#CC14171D" CornerRadius="6" Padding="4"
+                                                Visibility="{Binding DataContext.MultiSelectVisibility, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}">
+                                            <CheckBox IsChecked="{Binding IsQueueSelected}" />
+                                        </Border>
                                     </Grid>
                                 </Border>
                                 <TextBlock Text="{Binding Name}" Margin="0,14,0,0" FontSize="17" FontWeight="SemiBold"
@@ -276,7 +323,34 @@
                                            FontSize="11" TextTrimming="CharacterEllipsis" />
                                 <Grid Margin="0,15,0,0">
                                     <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
-                                    <TextBlock Text="{Binding SizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding ActualSizeText}" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource AccentBrush}" Margin="0,0,4,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="{Binding SizeText}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
+                                                            <Setter Property="Text" Value="{Binding OriginalSizeBracketText}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
                                 <Border CornerRadius="5" Padding="8,4" HorizontalAlignment="Left">
@@ -377,6 +451,59 @@
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
+
+                        <Border Grid.Row="1" Margin="0,14,0,0" Background="#101217" CornerRadius="8" Padding="12,10"
+                                Visibility="{Binding QueuePanelVisibility}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding QueueTitle}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
+                                <ItemsControl ItemsSource="{Binding QueueItems}" Margin="0,8,0,0" MaxHeight="180">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2,0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Title}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11" Margin="8,0,0,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                                    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Running">
+                                                                    <Setter Property="Foreground" Value="#7FB2FF" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                                    <Setter Property="Foreground" Value="#FF7A7A" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Cancelled">
+                                                                    <Setter Property="Foreground" Value="#FFB84D" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <WrapPanel Margin="0,8,0,0" Visibility="{Binding QueueControlsVisibility}">
+                                    <Button Content="Пропустить" Command="{Binding SkipQueueItemCommand}"
+                                            Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
+                                            ToolTip="Отменить текущую игру и перейти к следующей" />
+                                    <Button Content="Стоп после текущей" Command="{Binding StopQueueAfterCurrentCommand}"
+                                            Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
+                                            ToolTip="Дать текущей игре досжаться и остановить очередь" />
+                                    <Button Content="Стоп всё" Command="{Binding StopQueueCommand}"
+                                            Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource StopButton}"
+                                            ToolTip="Остановить очередь немедленно — прерванная игра дожмётся позже" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
 
                         <ListBox Grid.Row="2" Margin="0,16,0,12" ItemsSource="{Binding Estimates}"
                                  SelectedItem="{Binding SelectedEstimate}" Background="Transparent" BorderThickness="0"

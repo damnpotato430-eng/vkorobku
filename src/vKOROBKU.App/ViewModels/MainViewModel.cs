@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.Http;
@@ -64,6 +65,15 @@ public sealed class MainViewModel : ObservableObject
     private string _activeOperationDescription = string.Empty;
     private string? _activeCompressionAlgorithm;
     private string? _activeCompressionSavings;
+    private bool _isMultiSelectMode;
+    private string _selectedQueueMethod = AutoQueueMethod;
+    private string _queueSelectionText = string.Empty;
+    private string _queueTitle = string.Empty;
+    private bool _queueStopAfterCurrent;
+    private bool _queueStopAll;
+    private bool _isQueueRunning;
+
+    private const string AutoQueueMethod = "Авто (сбалансированный)";
 
     public MainViewModel()
     {
@@ -122,12 +132,24 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame is { CompressionState: GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         CancelOperationCommand = new AsyncRelayCommand(_workerClient.CancelAsync, () => IsOperating);
         CancelCurrentCommand = new AsyncRelayCommand(CancelCurrentAsync, () => IsAnalyzing || IsOperating);
+        ToggleMultiSelectCommand = new RelayCommand(ToggleMultiSelectMode, () => Games.Count > 0 && !IsOperating);
+        StartQueueCommand = new AsyncRelayCommand(StartQueueAsync,
+            () => Games.Any(game => game.IsQueueSelected) && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        SkipQueueItemCommand = new AsyncRelayCommand(_workerClient.CancelAsync, () => IsQueueRunning);
+        StopQueueAfterCurrentCommand = new RelayCommand(() => _queueStopAfterCurrent = true, () => IsQueueRunning);
+        StopQueueCommand = new AsyncRelayCommand(StopQueueAsync, () => IsQueueRunning);
+        RecompressDegradedCommand = new AsyncRelayCommand(RecompressDegradedAsync,
+            () => WatcherHasFindings && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        AddToQueueCommand = new RelayCommand(AddSelectedGameToQueue, () => SelectedGame is not null && !IsOperating);
+        Games.CollectionChanged += OnGamesCollectionChanged;
+        QueueItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(QueuePanelVisibility));
     }
 
     public ObservableCollection<GameInfo> Games { get; } = [];
     public ObservableCollection<CompressionEstimate> Estimates { get; } = [];
     public ObservableCollection<OperationJournalEntry> Operations { get; } = [];
     public ObservableCollection<AnalysisModeOption> AnalysisModes { get; } = [];
+    public ObservableCollection<CompressionQueueItem> QueueItems { get; } = [];
     public ComputerInfo Computer
     {
         get => _computer;
@@ -146,6 +168,13 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand ShowAboutCommand { get; }
     public AsyncRelayCommand CheckWatchedGamesCommand { get; }
     public RelayCommand OpenUpdateCommand { get; }
+    public RelayCommand ToggleMultiSelectCommand { get; }
+    public AsyncRelayCommand StartQueueCommand { get; }
+    public AsyncRelayCommand SkipQueueItemCommand { get; }
+    public RelayCommand StopQueueAfterCurrentCommand { get; }
+    public AsyncRelayCommand StopQueueCommand { get; }
+    public AsyncRelayCommand RecompressDegradedCommand { get; }
+    public RelayCommand AddToQueueCommand { get; }
 
     public ICollectionView GamesView { get; }
     public IReadOnlyList<string> SortOptions { get; } = ["По имени", "Сначала крупные", "Сначала несжатые"];
@@ -169,6 +198,62 @@ public sealed class MainViewModel : ObservableObject
     }
 
     public string DegradedFilterLabel => $"Требуют дожатия: {_degradedPaths.Count}";
+
+    public bool IsMultiSelectMode
+    {
+        get => _isMultiSelectMode;
+        private set
+        {
+            if (!SetProperty(ref _isMultiSelectMode, value))
+                return;
+            OnPropertyChanged(nameof(MultiSelectVisibility));
+            OnPropertyChanged(nameof(MultiSelectToggleText));
+            if (!value)
+                ClearQueueSelection();
+            UpdateQueueSelectionSummary();
+        }
+    }
+
+    public Visibility MultiSelectVisibility => IsMultiSelectMode ? Visibility.Visible : Visibility.Collapsed;
+    public string MultiSelectToggleText => IsMultiSelectMode ? "Отменить выбор" : "Выбрать несколько";
+
+    public IReadOnlyList<string> QueueMethodOptions { get; } =
+        [AutoQueueMethod, "XPRESS4K", "XPRESS8K", "XPRESS16K", "LZX"];
+
+    public string SelectedQueueMethod
+    {
+        get => _selectedQueueMethod;
+        set => SetProperty(ref _selectedQueueMethod, value);
+    }
+
+    public string QueueSelectionText
+    {
+        get => _queueSelectionText;
+        private set => SetProperty(ref _queueSelectionText, value);
+    }
+
+    public string QueueTitle
+    {
+        get => _queueTitle;
+        private set => SetProperty(ref _queueTitle, value);
+    }
+
+    public bool IsQueueRunning
+    {
+        get => _isQueueRunning;
+        private set
+        {
+            if (!SetProperty(ref _isQueueRunning, value))
+                return;
+            OnPropertyChanged(nameof(QueueControlsVisibility));
+            SkipQueueItemCommand.RaiseCanExecuteChanged();
+            StopQueueAfterCurrentCommand.RaiseCanExecuteChanged();
+            StopQueueCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    public Visibility QueueControlsVisibility => IsQueueRunning ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility QueuePanelVisibility => QueueItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
@@ -309,6 +394,10 @@ public sealed class MainViewModel : ObservableObject
             RemoveGameCommand.RaiseCanExecuteChanged();
             RecheckCompressionCommand.RaiseCanExecuteChanged();
             FinishCompressionCommand.RaiseCanExecuteChanged();
+            ToggleMultiSelectCommand.RaiseCanExecuteChanged();
+            StartQueueCommand.RaiseCanExecuteChanged();
+            RecompressDegradedCommand.RaiseCanExecuteChanged();
+            AddToQueueCommand.RaiseCanExecuteChanged();
             NotifyCompressionPanelVisibility();
         }
     }
@@ -578,20 +667,32 @@ public sealed class MainViewModel : ObservableObject
 
     private void UpdateWatcherSummary(WatchedGamesCoordinator.CheckOutcome outcome)
     {
+        // "Needs finishing" unites two sources: watched games whose saving decayed
+        // and library cards left partially compressed (an interrupted or cancelled
+        // run) — the latter are not watched yet, but they need the same action.
+        var partialPaths = Games
+            .Where(game => game.CompressionState == GameCompressionState.PartiallyCompressed &&
+                           IsResumableAlgorithm(game.CompressionAlgorithm))
+            .Select(game => game.InstallPath);
         _degradedPaths = new HashSet<string>(
-            outcome.Degraded.Select(item => item.FolderPath), StringComparer.OrdinalIgnoreCase);
+            outcome.Degraded.Select(item => item.FolderPath).Concat(partialPaths),
+            StringComparer.OrdinalIgnoreCase);
         OnPropertyChanged(nameof(DegradedFilterLabel));
-        if (outcome.WatchedCount == 0)
+
+        WatcherHasFindings = _degradedPaths.Count > 0;
+        if (_degradedPaths.Count > 0)
         {
-            WatcherHasFindings = false;
-            WatcherSummaryText = string.Empty;
+            var reclaimable = outcome.Degraded.Sum(item => item.PotentialSavingsBytes);
+            var savingsNote = reclaimable > 0
+                ? $" — можно вернуть ~{ByteFormatter.Format(reclaimable)}"
+                : string.Empty;
+            WatcherSummaryText = $"Требуют дожатия: {_degradedPaths.Count}{savingsNote}";
         }
         else
         {
-            WatcherHasFindings = outcome.Degraded.Count > 0;
-            WatcherSummaryText = outcome.Degraded.Count == 0
-                ? $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет"
-                : $"Обновились и требуют дожатия: {outcome.Degraded.Count} — можно вернуть ~{ByteFormatter.Format(outcome.Degraded.Sum(item => item.PotentialSavingsBytes))}";
+            WatcherSummaryText = outcome.WatchedCount == 0
+                ? string.Empty
+                : $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет";
         }
 
         // The filter cannot stay on with nothing to show — that would leave an
@@ -1746,7 +1847,42 @@ public sealed class MainViewModel : ObservableObject
         await ExecuteWorkerOperationAsync(new WorkerJob(game.InstallPath, "decompress", null));
     }
 
+    // A single operation is a queue of one: the same elevated session API serves both.
     private async Task ExecuteWorkerOperationAsync(WorkerJob job)
+    {
+        IsOperating = true;
+        try
+        {
+            await using var session = await _workerClient.StartSessionAsync();
+            await RunJobInSessionAsync(session, job);
+        }
+        catch (OperationCanceledException exception)
+        {
+            OperationSummary = exception.Message;
+            StatusText = "Операция отменена";
+        }
+        catch (Exception exception)
+        {
+            OperationSummary = $"Операция не выполнена: {exception.Message}";
+            StatusText = "Ошибка системной операции";
+        }
+        finally
+        {
+            IsOperating = false;
+            ClearActiveOperation();
+        }
+    }
+
+    private sealed record QueueJobOutcome(
+        QueueItemStatus Status,
+        long FreedBytes,
+        bool SessionLost,
+        string? FailureReason = null);
+
+    // Runs one job inside an already-started session and fully accounts for it:
+    // journal entry, card status, watcher baseline, summary text. Never throws —
+    // a lost session is reported through the outcome so a queue can stop cleanly.
+    private async Task<QueueJobOutcome> RunJobInSessionAsync(WorkerSession session, WorkerJob job)
     {
         Guid journalId;
         var startedAt = DateTimeOffset.Now;
@@ -1758,7 +1894,6 @@ public sealed class MainViewModel : ObservableObject
         UpsertOperation(operation);
         var acceptWorkerProgress = true;
 
-        IsOperating = true;
         var targetGame = Games.FirstOrDefault(item =>
             string.Equals(item.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
         SetActiveOperation(
@@ -1801,8 +1936,22 @@ public sealed class MainViewModel : ObservableObject
 
         try
         {
-            var result = await _workerClient.ExecuteAsync(job, progress);
+            var result = await session.RunJobAsync(job, progress);
             acceptWorkerProgress = false;
+            if (result.Type == "error")
+            {
+                OperationSummary = $"Операция не выполнена: {result.Text ?? "ошибка системного модуля"}";
+                StatusText = "Ошибка системной операции";
+                operation = operation with
+                {
+                    FinishedAt = DateTimeOffset.Now,
+                    State = OperationJournalState.Failed,
+                    Message = OperationSummary
+                };
+                UpsertOperation(operation);
+                try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
+                return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, result.Text);
+            }
             if (result.Type == "cancelled")
             {
                 OperationSummary = result.Text ?? "Операция отменена";
@@ -1825,7 +1974,27 @@ public sealed class MainViewModel : ObservableObject
                     _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary);
                 }
                 catch { }
-                return;
+                // A cancelled run leaves the game part-converted at the NTFS level, so
+                // the card switches to the partial state and offers "Дожать" instead of
+                // silently keeping the pre-operation badge. Sizes are unknown here —
+                // the next status check refreshes them.
+                var cancelledAlgorithm = job.Operation == "compress"
+                    ? job.Algorithm
+                    : targetGame?.CompressionAlgorithm;
+                if (cancelledAlgorithm is not null)
+                {
+                    UpdateGameCompressionStatus(
+                        job.RootPath, GameCompressionState.PartiallyCompressed, cancelledAlgorithm,
+                        checkedAt: DateTimeOffset.Now);
+                    TrySaveCompressionStatus(
+                        job.RootPath, GameCompressionState.PartiallyCompressed, cancelledAlgorithm,
+                        steamBuildId: targetGame?.SteamBuildId, hasDirectStorage: targetGame?.HasDirectStorage);
+                    // The card just turned partial, so the needs-finishing banner and
+                    // filter reflect it immediately, same as after a completed job.
+                    if (_userPreferences.WatcherEnabled && !_isWatcherCheckRunning)
+                        UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
+                }
+                return new QueueJobOutcome(QueueItemStatus.Cancelled, 0, false);
             }
 
             OperationProgress = 100;
@@ -1856,13 +2025,17 @@ public sealed class MainViewModel : ObservableObject
             var compressedFiles = job.Operation == "compress"
                 ? result.ProcessedFiles
                 : newState == GameCompressionState.Uncompressed ? 0 : result.ErrorCount;
+            // The worker's TotalBytes deliberately excludes files it cannot process
+            // (sparse, encrypted), so it may undercount the folder. The card keeps the
+            // larger known measure — the size the user compares with Explorer.
+            var displayLogicalBytes = Math.Max(processedGame?.LogicalSizeBytes ?? 0, result.TotalBytes);
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
                 savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now,
-                result.TotalBytes);
+                displayLogicalBytes);
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
-                savedBytes, result.PhysicalAfter, result.TotalBytes, compressedFiles,
+                savedBytes, result.PhysicalAfter, displayLogicalBytes, compressedFiles,
                 processedGame?.SteamBuildId, processedGame?.HasDirectStorage);
             _watcher.OnOperationCompleted(job, result, newState, processedGame);
             // The job just updated watcher.json (recompression resets the baseline,
@@ -1906,23 +2079,13 @@ public sealed class MainViewModel : ObservableObject
                 _operationJournal.Finish(journalId, OperationJournalState.Completed, OperationSummary);
             }
             catch { }
-        }
-        catch (OperationCanceledException exception)
-        {
-            acceptWorkerProgress = false;
-            OperationSummary = exception.Message;
-            StatusText = "Операция отменена";
-            operation = operation with
-            {
-                FinishedAt = DateTimeOffset.Now,
-                State = OperationJournalState.Cancelled,
-                Message = OperationSummary
-            };
-            UpsertOperation(operation);
-            try { _operationJournal.Finish(journalId, OperationJournalState.Cancelled, OperationSummary); } catch { }
+            return new QueueJobOutcome(QueueItemStatus.Completed, Math.Max(0, difference), false);
         }
         catch (Exception exception)
         {
+            // The pipe died mid-job (worker crashed or was killed) — the session is
+            // unusable, which the outcome reports so a queue stops instead of feeding
+            // jobs into a dead process.
             acceptWorkerProgress = false;
             OperationSummary = $"Операция не выполнена: {exception.Message}";
             StatusText = "Ошибка системной операции";
@@ -1934,12 +2097,232 @@ public sealed class MainViewModel : ObservableObject
             };
             UpsertOperation(operation);
             try { _operationJournal.Finish(journalId, OperationJournalState.Failed, OperationSummary); } catch { }
+            return new QueueJobOutcome(QueueItemStatus.Failed, 0, true, exception.Message);
         }
         finally
         {
             acceptWorkerProgress = false;
+        }
+    }
+
+    private void ToggleMultiSelectMode() => IsMultiSelectMode = !IsMultiSelectMode;
+
+    private void AddSelectedGameToQueue()
+    {
+        if (SelectedGame is null)
+            return;
+        IsMultiSelectMode = true;
+        SelectedGame.IsQueueSelected = true;
+    }
+
+    private void ClearQueueSelection()
+    {
+        foreach (var game in Games)
+            game.IsQueueSelected = false;
+    }
+
+    private void OnGamesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems is not null)
+        {
+            foreach (GameInfo game in e.NewItems)
+                game.PropertyChanged += OnGamePropertyChanged;
+        }
+        UpdateQueueSelectionSummary();
+        ToggleMultiSelectCommand.RaiseCanExecuteChanged();
+    }
+
+    private void OnGamePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(GameInfo.IsQueueSelected))
+            return;
+        UpdateQueueSelectionSummary();
+        StartQueueCommand.RaiseCanExecuteChanged();
+    }
+
+    private void UpdateQueueSelectionSummary()
+    {
+        var selected = Games.Where(game => game.IsQueueSelected).ToList();
+        QueueSelectionText = selected.Count == 0
+            ? "Отметьте игры галочками на карточках"
+            : $"Выбрано: {selected.Count} · {ByteFormatter.Format(selected.Sum(game => game.LogicalSizeBytes))}";
+    }
+
+    private string ResolveQueueAlgorithm(GameInfo game)
+    {
+        if (SelectedQueueMethod != AutoQueueMethod)
+            return SelectedQueueMethod;
+        // A partially compressed game keeps its current algorithm — mixing methods
+        // inside one game is exactly the mess the queue must not create.
+        if (game.CompressionState == GameCompressionState.PartiallyCompressed &&
+            IsResumableAlgorithm(game.CompressionAlgorithm))
+            return game.CompressionAlgorithm!;
+        var saved = _analysisCache.Load(game.InstallPath);
+        var balanced = saved is null ? null : ChooseBalancedEstimate(saved.Result.Estimates);
+        return balanced?.AlgorithmText ?? "XPRESS16K";
+    }
+
+    private async Task StartQueueAsync()
+    {
+        var selected = Games.Where(game => game.IsQueueSelected).ToList();
+        if (selected.Count == 0)
+            return;
+
+        var directStorage = selected.Where(game => game.HasDirectStorage == true && !IsExpertMode).ToList();
+        var items = selected.Except(directStorage)
+            .Select(game => new CompressionQueueItem(game, ResolveQueueAlgorithm(game)))
+            .ToList();
+        if (items.Count == 0)
+        {
+            StatusText = "Все отмеченные игры используют DirectStorage — сжатие им не рекомендуется";
+            return;
+        }
+
+        var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
+        if (items.Count > 12)
+            preview += $"\n…и ещё {items.Count - 12}";
+        var directStorageNote = directStorage.Count > 0
+            ? $"\n\nПропущено из-за DirectStorage: {directStorage.Count}"
+            : string.Empty;
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            $"Сжать игр: {items.Count} — одной очередью?\n\n{preview}{directStorageNote}\n\n" +
+            "Права администратора будут запрошены один раз. Игры должны быть закрыты.",
+            "Подтверждение очереди",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        IsMultiSelectMode = false;
+        await RunQueueAsync(items);
+    }
+
+    private async Task RecompressDegradedAsync()
+    {
+        var degraded = _watcher.ReadStoredState(_userPreferences).Degraded;
+        var items = new List<CompressionQueueItem>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var entry in degraded)
+        {
+            var game = FindGameByPath(entry.FolderPath);
+            if (game is not null && seen.Add(game.InstallPath) &&
+                !(game.HasDirectStorage == true && !IsExpertMode))
+                items.Add(new CompressionQueueItem(game, entry.Algorithm));
+        }
+        // Interrupted and cancelled runs leave partially compressed cards that are
+        // not watched yet — "recompress all" must cover them too.
+        foreach (var game in Games)
+        {
+            if (game.CompressionState == GameCompressionState.PartiallyCompressed &&
+                IsResumableAlgorithm(game.CompressionAlgorithm) &&
+                seen.Add(game.InstallPath) &&
+                !(game.HasDirectStorage == true && !IsExpertMode))
+                items.Add(new CompressionQueueItem(game, game.CompressionAlgorithm!));
+        }
+        if (items.Count == 0)
+        {
+            StatusText = "Игры для дожатия не найдены в библиотеке";
+            return;
+        }
+
+        var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            $"Дожать игр: {items.Count} — одной очередью?\n\n{preview}\n\n" +
+            "Права администратора будут запрошены один раз. Игры должны быть закрыты.",
+            "Дожать все",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        await RunQueueAsync(items);
+    }
+
+    private async Task StopQueueAsync()
+    {
+        _queueStopAll = true;
+        await _workerClient.CancelAsync();
+    }
+
+    private async Task RunQueueAsync(IReadOnlyList<CompressionQueueItem> items)
+    {
+        QueueItems.Clear();
+        foreach (var item in items)
+            QueueItems.Add(item);
+        _queueStopAfterCurrent = false;
+        _queueStopAll = false;
+        IsOperating = true;
+        IsQueueRunning = true;
+        QueueTitle = $"Очередь сжатия · подготовка ({items.Count} игр)";
+        AppLog.Info($"Очередь запущена: {items.Count} игр — {string.Join(", ", items.Select(item => item.Title))}");
+        try
+        {
+            await using var session = await _workerClient.StartSessionAsync();
+            var position = 0;
+            foreach (var item in items)
+            {
+                position++;
+                if (_queueStopAll || _queueStopAfterCurrent)
+                {
+                    item.MarkSkipped("остановлено");
+                    continue;
+                }
+
+                QueueTitle = $"Очередь сжатия · {position} из {items.Count}";
+                item.MarkRunning();
+                AppLog.Info($"Очередь: {position}/{items.Count} — запускаем «{item.Game.Name}» ({item.Algorithm})");
+                var outcome = await RunJobInSessionAsync(session, new WorkerJob(
+                    item.Game.InstallPath, "compress", item.Algorithm,
+                    CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
+                AppLog.Info($"Очередь: «{item.Game.Name}» — итог {outcome.Status}" +
+                            (outcome.SessionLost ? " (сессия воркера потеряна)" : string.Empty));
+                switch (outcome.Status)
+                {
+                    case QueueItemStatus.Completed:
+                        item.MarkCompleted(outcome.FreedBytes, $"готово · освобождено {ByteFormatter.Format(outcome.FreedBytes)}");
+                        break;
+                    case QueueItemStatus.Cancelled:
+                        item.MarkCancelled();
+                        break;
+                    default:
+                        item.MarkFailed(outcome.FailureReason ?? "не выполнено");
+                        break;
+                }
+
+                if (outcome.SessionLost)
+                    _queueStopAll = true;
+            }
+        }
+        catch (OperationCanceledException exception)
+        {
+            OperationSummary = exception.Message;
+            StatusText = "Операция отменена";
+            AppLog.Info($"Очередь: отменена — {exception.Message}");
+        }
+        catch (Exception exception)
+        {
+            OperationSummary = $"Очередь прервана: {exception.Message}";
+            StatusText = "Ошибка системной операции";
+            AppLog.Error("Очередь прервана", exception);
+        }
+        finally
+        {
+            foreach (var item in QueueItems)
+            {
+                if (item.Status is QueueItemStatus.Pending or QueueItemStatus.Running)
+                    item.MarkSkipped("остановлено");
+            }
+            IsQueueRunning = false;
             IsOperating = false;
             ClearActiveOperation();
+            var completedCount = QueueItems.Count(item => item.Status == QueueItemStatus.Completed);
+            var freedBytes = QueueItems.Sum(item => item.FreedBytes);
+            QueueTitle = $"Очередь завершена · сжато {completedCount} из {QueueItems.Count} · освобождено {ByteFormatter.Format(freedBytes)}";
+            OperationSummary = QueueTitle;
+            StatusText = QueueTitle;
+            AppLog.Info(QueueTitle);
         }
     }
 

@@ -25,6 +25,7 @@ public sealed class GameInfo : INotifyPropertyChanged
     private DateTimeOffset? _compressionCheckedAt;
     private bool _isAnalysisStale;
     private bool? _hasDirectStorage;
+    private bool _isQueueSelected;
 
     public GameInfo(
         string name,
@@ -72,7 +73,11 @@ public sealed class GameInfo : INotifyPropertyChanged
         set
         {
             if (SetProperty(ref _logicalSizeBytes, value))
+            {
                 OnPropertyChanged(nameof(SizeText));
+                OnPropertyChanged(nameof(OriginalSizeBracketText));
+                OnPropertyChanged(nameof(HasCompressedSize));
+            }
         }
     }
 
@@ -109,6 +114,7 @@ public sealed class GameInfo : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(CompressionStatusText));
                 OnPropertyChanged(nameof(CompressionInfoText));
+                OnPropertyChanged(nameof(HasCompressedSize));
             }
         }
     }
@@ -128,6 +134,15 @@ public sealed class GameInfo : INotifyPropertyChanged
 
     public string SizeText => LogicalSizeBytes <= 0 ? "Размер не рассчитан" : FormatBytes(LogicalSizeBytes);
 
+    // Card size for compressed games: the actual on-disk weight in accent color with
+    // the original size in brackets; uncompressed cards keep the plain original size.
+    public bool HasCompressedSize =>
+        CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed &&
+        CompressedPhysicalBytes > 0 && LogicalSizeBytes > 0;
+
+    public string ActualSizeText => FormatBytes(CompressedPhysicalBytes);
+    public string OriginalSizeBracketText => $"({FormatBytes(LogicalSizeBytes)})";
+
     public long CompressionSavedBytes
     {
         get => _compressionSavedBytes;
@@ -144,7 +159,11 @@ public sealed class GameInfo : INotifyPropertyChanged
         set
         {
             if (SetProperty(ref _compressedPhysicalBytes, value))
+            {
                 OnPropertyChanged(nameof(CompressionInfoText));
+                OnPropertyChanged(nameof(ActualSizeText));
+                OnPropertyChanged(nameof(HasCompressedSize));
+            }
         }
     }
 
@@ -172,6 +191,13 @@ public sealed class GameInfo : INotifyPropertyChanged
     {
         get => _isAnalysisStale;
         set => SetProperty(ref _isAnalysisStale, value);
+    }
+
+    // Transient checkbox state of the library's multi-select mode — never persisted.
+    public bool IsQueueSelected
+    {
+        get => _isQueueSelected;
+        set => SetProperty(ref _isQueueSelected, value);
     }
 
     // null — not probed yet; probing happens with the compression status walk.
