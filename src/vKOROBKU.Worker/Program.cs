@@ -114,7 +114,10 @@ internal static class Program
         EnsureGameIsNotRunning(rootPath);
 
         await SendAsync(writer, new WorkerMessage("status", "Сканируем файлы игры…"));
-        var files = EnumerateFiles(rootPath, cancellationToken);
+        // compact.exe cannot compress sparse files, but it must still decompress
+        // WOF-backed ones carrying the sparse flag (an interrupted conversion or a
+        // stale Steam download flag) — otherwise they stay compressed forever.
+        var files = EnumerateFiles(rootPath, includeSparse: job.Operation == "decompress", cancellationToken);
         if (files.Count == 0)
             throw new InvalidOperationException("В каталоге нет доступных файлов для обработки.");
 
@@ -273,13 +276,15 @@ internal static class Program
         }
     }
 
-    private static List<WorkerFile> EnumerateFiles(string rootPath, CancellationToken cancellationToken)
+    private static List<WorkerFile> EnumerateFiles(string rootPath, bool includeSparse, CancellationToken cancellationToken)
     {
+        var excludedAttributes = FileAttributes.Encrypted | FileAttributes.ReparsePoint;
+        if (!includeSparse)
+            excludedAttributes |= FileAttributes.SparseFile;
         var result = new List<WorkerFile>();
         FileSystemWalker.Walk(rootPath, info =>
         {
-            var excluded = (info.Attributes & (FileAttributes.Encrypted | FileAttributes.ReparsePoint | FileAttributes.SparseFile)) != 0;
-            if (!excluded && info.Length > 0)
+            if ((info.Attributes & excludedAttributes) == 0 && info.Length > 0)
                 result.Add(new WorkerFile(info.FullName, info.Length));
         }, cancellationToken);
         return result;
