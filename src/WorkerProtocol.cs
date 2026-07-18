@@ -22,4 +22,5 @@ public sealed record WorkerMessage(
     long SkipListedBytes = 0,
     long SkipListedPhysicalBytes = 0,
     long PhysicalBefore = 0,
-    long PhysicalAfter = 0);
+    long PhysicalAfter = 0,
+    long ExcludedPhysicalBytes = 0);

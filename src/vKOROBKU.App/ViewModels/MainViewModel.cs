@@ -1883,17 +1883,20 @@ public sealed class MainViewModel : ObservableObject
             var compressedFiles = job.Operation == "compress"
                 ? result.ProcessedFiles
                 : newState == GameCompressionState.Uncompressed ? 0 : result.ErrorCount;
-            // The worker's TotalBytes deliberately excludes files it cannot process
-            // (sparse, encrypted), so it may undercount the folder. The card keeps the
-            // larger known measure — the size the user compares with Explorer.
+            // The worker's TotalBytes/PhysicalAfter cover only files it can process —
+            // sparse and encrypted ones are outside its universe but still occupy the
+            // disk. The card shows the sizes the user compares with Explorer, so the
+            // excluded physical bytes are added back and the logical size keeps the
+            // larger known measure.
             var displayLogicalBytes = Math.Max(processedGame?.LogicalSizeBytes ?? 0, result.TotalBytes);
+            var displayPhysicalBytes = result.PhysicalAfter + result.ExcludedPhysicalBytes;
             UpdateGameCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
-                savedBytes, result.PhysicalAfter, compressedFiles, DateTimeOffset.Now,
+                savedBytes, displayPhysicalBytes, compressedFiles, DateTimeOffset.Now,
                 displayLogicalBytes);
             TrySaveCompressionStatus(
                 job.RootPath, newState, newAlgorithm,
-                savedBytes, result.PhysicalAfter, displayLogicalBytes, compressedFiles,
+                savedBytes, displayPhysicalBytes, displayLogicalBytes, compressedFiles,
                 processedGame?.SteamBuildId, processedGame?.HasDirectStorage);
             _watcher.OnOperationCompleted(job, result, newState, processedGame);
             // The job just updated watcher.json (recompression resets the baseline,

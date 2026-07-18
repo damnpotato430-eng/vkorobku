@@ -18,5 +18,6 @@
   <ItemGroup>
     <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />
     <Compile Include="..\FileSystemPrimitives.cs" Link="FileSystemPrimitives.cs" />
+    <Compile Include="..\CompressionHeuristics.cs" Link="CompressionHeuristics.cs" />
   </ItemGroup>
 </Project>

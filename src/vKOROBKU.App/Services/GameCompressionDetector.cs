@@ -24,6 +24,7 @@ public sealed class GameCompressionDetector
         long logicalBytes = 0;
         long physicalBytes = 0;
         var compressedFiles = 0;
+        var nonCompressed = new List<(string Path, long Length)>();
 
         FileSystemWalker.Walk(rootPath, info =>
         {
@@ -44,15 +45,37 @@ public sealed class GameCompressionDetector
             {
                 AddBytes(algorithms, algorithm, info.Length);
                 compressedFiles++;
+                return;
             }
+
+            nonCompressed.Add((info.FullName, info.Length));
         }, cancellationToken);
 
-        var state = ClassifyState(algorithms.Values.Sum(), logicalBytes);
+        var compressedLogicalBytes = algorithms.Values.Sum();
+        var state = ClassifyState(compressedLogicalBytes, logicalBytes);
         if (state == GameCompressionState.Uncompressed)
             return new GameCompressionDetection(
                 GameCompressionState.Uncompressed, null, 0, physicalBytes, logicalBytes, compressedFiles);
 
         var dominant = algorithms.MaxBy(pair => pair.Value).Key;
+
+        // The verifier forgives files compact.exe deliberately leaves uncompressed
+        // (incompressible content, chunk-small files), and the detector must apply the
+        // same mercy — otherwise a game full of pre-compressed archives shows
+        // "partially compressed" forever, with a finish button that can free nothing.
+        if (state == GameCompressionState.PartiallyCompressed)
+        {
+            var chunkSize = CompressionHeuristics.ChunkSize(dominant);
+            var smallFileLimit = Math.Max(
+                VolumeInfo.GetClusterSize(Path.GetPathRoot(rootPath) ?? string.Empty),
+                chunkSize);
+            var problemBytes = ResolveProblemBytes(
+                nonCompressed, smallFileLimit, logicalBytes, cancellationToken,
+                CompressionHeuristics.CanRead,
+                path => CompressionHeuristics.IsLikelyIncompressible(path, chunkSize));
+            state = ClassifyState(logicalBytes - problemBytes, logicalBytes);
+        }
+
         return new GameCompressionDetection(
             state,
             dominant,
@@ -60,6 +83,35 @@ public sealed class GameCompressionDetector
             physicalBytes,
             logicalBytes,
             compressedFiles);
+    }
+
+    // Largest files decide the byte share, so they are probed first and the loop stops
+    // as soon as the remaining bytes cannot change the verdict either way.
+    internal static long ResolveProblemBytes(
+        List<(string Path, long Length)> nonCompressedFiles,
+        long smallFileLimit,
+        long totalLogicalBytes,
+        CancellationToken cancellationToken,
+        Func<string, bool> canRead,
+        Func<string, bool> isLikelyIncompressible)
+    {
+        var ordered = nonCompressedFiles.OrderByDescending(file => file.Length).ToList();
+        var problemThreshold = (long)(totalLogicalBytes * (1 - CompressedByteShare));
+        var unresolvedBytes = ordered.Sum(file => file.Length);
+        long problemBytes = 0;
+        foreach (var file in ordered)
+        {
+            if (problemBytes > problemThreshold || problemBytes + unresolvedBytes <= problemThreshold)
+                break;
+            cancellationToken.ThrowIfCancellationRequested();
+            unresolvedBytes -= file.Length;
+            if (file.Length <= smallFileLimit && canRead(file.Path))
+                continue;
+            if (isLikelyIncompressible(file.Path))
+                continue;
+            problemBytes += file.Length;
+        }
+        return problemBytes;
     }
 
     internal static GameCompressionState ClassifyState(long compressedLogicalBytes, long totalLogicalBytes)

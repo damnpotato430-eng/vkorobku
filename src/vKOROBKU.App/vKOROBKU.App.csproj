@@ -20,6 +20,7 @@
     <Resource Include="Assets\vkorobku.ico" />
     <Compile Include="..\WorkerProtocol.cs" Link="WorkerProtocol.cs" />
     <Compile Include="..\FileSystemPrimitives.cs" Link="FileSystemPrimitives.cs" />
+    <Compile Include="..\CompressionHeuristics.cs" Link="CompressionHeuristics.cs" />
     <ProjectReference Include="..\vKOROBKU.Worker\vKOROBKU.Worker.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <Target Name="CopyWorkerOutput" AfterTargets="Build">

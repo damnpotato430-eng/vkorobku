@@ -1,8 +1,10 @@
 extern alias worker;
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Win32.SafeHandles;
 using vKOROBKU.Protocol;
 
 namespace vKOROBKU.Tests;
@@ -28,6 +30,7 @@ public sealed class WorkerQueueSessionTests
 
         var bigFolder = CreateGameFolder(fileCount: 300, fileSize: 512 * 1024, random: true);
         var smallFolder = CreateGameFolder(fileCount: 4, fileSize: 64 * 1024, random: false);
+        CreateSparseFile(Path.Combine(smallFolder, "preallocated.bin"), 128 * 1024);
         var tokenFile = CreateTokenFile(out var token);
         try
         {
@@ -87,6 +90,9 @@ public sealed class WorkerQueueSessionTests
                     message = await ReadMessageAsync(reader, TimeSpan.FromSeconds(60));
                 } while (message.Type is not ("completed" or "cancelled" or "error"));
                 Assert.Equal("completed", message.Type);
+                // The sparse file stays outside the compact universe, but its physical
+                // size must be reported so the app can show the true folder weight.
+                Assert.True(message.ExcludedPhysicalBytes > 0);
 
                 await WriteLineAsync(writer, new WorkerCommand("shutdown"));
                 await process!.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(15));
@@ -131,6 +137,32 @@ public sealed class WorkerQueueSessionTests
         }
         return root;
     }
+
+    private static void CreateSparseFile(string path, int length)
+    {
+        using var stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite);
+        if (!DeviceIoControl(stream.SafeFileHandle, FsctlSetSparse, IntPtr.Zero, 0, IntPtr.Zero, 0, out _, IntPtr.Zero))
+            throw new IOException($"FSCTL_SET_SPARSE failed: {Marshal.GetLastWin32Error()}");
+        // NTFS does not allocate zero clusters in sparse files, so the payload must be
+        // non-zero for the file to have a physical size at all.
+        var payload = new byte[length];
+        new Random(11).NextBytes(payload);
+        stream.Write(payload);
+    }
+
+    private const uint FsctlSetSparse = 0x000900C4;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeviceIoControl(
+        SafeFileHandle device,
+        uint ioControlCode,
+        IntPtr inBuffer,
+        uint inBufferSize,
+        IntPtr outBuffer,
+        uint outBufferSize,
+        out uint bytesReturned,
+        IntPtr overlapped);
 
     private static string CreateTokenFile(out string token)
     {

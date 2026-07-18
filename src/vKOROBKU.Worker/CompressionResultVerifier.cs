@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using System.Runtime.InteropServices;
 using vKOROBKU.Protocol;
 using vKOROBKU.Shared;
@@ -8,8 +7,6 @@ namespace vKOROBKU.Worker;
 internal static class CompressionResultVerifier
 {
     private const uint WofProviderFile = 2;
-    private const int ProbeBytes = 1024 * 1024;
-    private const double IncompressibleRatio = 0.98;
 
     internal static (int Errors, long ErrorBytes) CountErrors(
         IReadOnlyList<WorkerFile> files,
@@ -59,16 +56,14 @@ internal static class CompressionResultVerifier
                 clusterSizes[volumeRoot] = clusterSize;
             }
 
-            // compact.exe deliberately leaves files no larger than one compression
-            // chunk without WOF backing when the metadata would cancel out the saving.
             // The readability check keeps genuinely locked tiny files classified as errors.
-            var smallFileLimit = Math.Max(clusterSize, GetCompressionChunkSize(expectedAlgorithm));
-            if (file.Length <= smallFileLimit && CanRead(file.Path))
+            var smallFileLimit = Math.Max(clusterSize, CompressionHeuristics.ChunkSize(job.Algorithm));
+            if (file.Length <= smallFileLimit && CompressionHeuristics.CanRead(file.Path))
                 continue;
 
             // Already-compressed archives can also remain regular NTFS files when WOF
             // would not reduce their physical size.
-            if (IsLikelyIncompressible(file.Path))
+            if (CompressionHeuristics.IsLikelyIncompressible(file.Path, CompressionHeuristics.ChunkSize(job.Algorithm)))
                 continue;
 
             errors++;
@@ -87,28 +82,6 @@ internal static class CompressionResultVerifier
         _ => null
     };
 
-    private static long GetCompressionChunkSize(uint? algorithm) => algorithm switch
-    {
-        0 => 4 * 1024,
-        1 => 32 * 1024,
-        2 => 8 * 1024,
-        3 => 16 * 1024,
-        _ => 0
-    };
-
-    private static bool CanRead(string path)
-    {
-        try
-        {
-            using var source = new FileStream(
-                path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-            _ = source.ReadByte();
-            return true;
-        }
-        catch (IOException) { return false; }
-        catch (UnauthorizedAccessException) { return false; }
-    }
-
     internal static bool TryGetWofAlgorithm(string path, out uint algorithm)
     {
         algorithm = uint.MaxValue;
@@ -123,36 +96,6 @@ internal static class CompressionResultVerifier
 
     private static bool TryGetPhysicalSize(string path, out long physicalSize) =>
         PhysicalFileSize.TryGet(path, out physicalSize, out _);
-
-    private static bool IsLikelyIncompressible(string path)
-    {
-        try
-        {
-            using var source = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-            var length = (int)Math.Min(source.Length, ProbeBytes);
-            if (length == 0)
-                return true;
-
-            var buffer = new byte[length];
-            var totalRead = 0;
-            while (totalRead < length)
-            {
-                var read = source.Read(buffer, totalRead, length - totalRead);
-                if (read == 0)
-                    break;
-                totalRead += read;
-            }
-            if (totalRead == 0)
-                return false;
-
-            using var output = new MemoryStream(totalRead);
-            using (var compressor = new DeflateStream(output, CompressionLevel.Fastest, true))
-                compressor.Write(buffer, 0, totalRead);
-            return output.Length >= totalRead * IncompressibleRatio;
-        }
-        catch (IOException) { return false; }
-        catch (UnauthorizedAccessException) { return false; }
-    }
 
     [DllImport("WofUtil.dll", CharSet = CharSet.Unicode)]
     private static extern int WofIsExternalFile(
