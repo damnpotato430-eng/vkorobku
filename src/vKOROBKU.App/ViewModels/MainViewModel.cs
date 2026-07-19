@@ -94,6 +94,9 @@ public sealed class MainViewModel : ObservableObject
         _isExpertMode = _userPreferences.ExpertMode;
         GamesView = CollectionViewSource.GetDefaultView(Games);
         GamesView.Filter = FilterGame;
+        // Must precede ApplySort — it reads the selected option's id.
+        _selectedSortOption = SortOptions[0];
+        _selectedQueueMethod = QueueMethodOptions[0];
         ApplySort();
         // Live sorting keeps a card in its correct slot when its state changes in place
         // (e.g. a game finishes compressing while sorted by "uncompressed first").
@@ -111,8 +114,6 @@ public sealed class MainViewModel : ObservableObject
         AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Precise, Strings.AnalysisMode_PreciseHint, 1024L * 1024 * 1024));
         AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Maximum, Strings.AnalysisMode_MaximumHint, 2L * 1024 * 1024 * 1024));
         SelectedAnalysisMode = AnalysisModes[2];
-        _selectedSortOption = SortOptions[0];
-        _selectedQueueMethod = QueueMethodOptions[0];
         RefreshLibraryCommand = new AsyncRelayCommand(RefreshLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
         ShowOperationsCommand = new RelayCommand(ShowOperations);
