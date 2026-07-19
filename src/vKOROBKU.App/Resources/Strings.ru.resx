@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>Ошибки повторяются, приложение будет закрыто. Отчёты сохранены в папке logs.</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>Произошла непредвиденная ошибка, работа продолжается. Отчёт сохранён в папке logs.</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>УПАКУЙ ИГРЫ УМНЕЕ</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>Библиотека</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>Операции</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>О программе</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>АНАЛИЗ И СЖАТИЕ</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>Оценка XPRESS и LZX доступна после выбора игры</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>СИСТЕМА</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>Обложки: Steam</value></data>
+  <data name="Update_OpenPageTooltip" xml:space="preserve"><value>Открыть страницу загрузки новой версии</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>Библиотека игр</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Найдите установленные игры и оцените возможную экономию места</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>Обновить обложки</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>Заново проверить и скачать обложки всех игр</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ Добавить папку</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>НАКОПИТЕЛИ</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>Дожать все</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Дожать все деградировавшие игры одной очередью — права администратора запрашиваются один раз</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>Проверить сейчас</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Поиск игры…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Отметить несколько игр и сжать их одной очередью</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Показать только игры, требующие дожатия</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>Сортировка библиотеки</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Метод сжатия для всей очереди</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>Сжать очередь · 1 запрос прав</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Перейти в каталог</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Добавить в очередь сжатия</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Обновить обложку</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Проверить состояние сжатия</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Убрать из библиотеки</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>Игра использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется.</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>ОПТИМИЗАЦИЯ ИГРЫ</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Игра не выбрана</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Экспертный режим</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Уточнить игру</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>Игра использует DirectStorage: NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется. В экспертном режиме оно доступно после подтверждения.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ТОЧНОСТЬ АНАЛИЗА</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>Пропустить</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>Отменить текущую игру и перейти к следующей</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Стоп после текущей</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Дать текущей игре досжаться и остановить очередь</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>Стоп всё</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Остановить очередь немедленно — прерванная игра дожмётся позже</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Экономия: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Точность: </value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>АВТОМАТИЧЕСКАЯ ОПТИМИЗАЦИЯ</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU проанализирует файлы, проверит скорость чтения и самостоятельно выберет подходящий режим XPRESS или LZX.</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>Перед изменением файлов программа покажет прогноз и попросит подтверждение.</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>ИДЁТ СЖАТИЕ · ВЫБРАННЫЙ РЕЖИМ</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>Режим зафиксирован до завершения или остановки операции.</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>ИГРА СЖАТА ЧАСТИЧНО</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>«Дожать» сожмёт оставшиеся файлы тем же методом — уже сжатые пропускаются. Сменить метод сжатия можно после полной распаковки.</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>ИГРА УЖЕ СЖАТА</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Файлы прозрачно распаковываются Windows во время чтения. Содержимое игры не изменено.</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>Оптимизировать игру</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>Распаковать игру</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>Игра сжата частично — можно полностью вернуть файлы в исходное состояние</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>Сжать выбранным режимом</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>Сжать оставшиеся файлы тем же методом — уже сжатые будут пропущены</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Наблюдение за сжатыми играми выполняется при запуске приложения и по кнопке «Проверить сейчас».</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>ЯЗЫК ИНТЕРФЕЙСА</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Авто (как в системе)</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>Язык изменится после перезапуска приложения.</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Проверять обновления сжатых игр при запуске</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>ПОРОГ ДЕГРАДАЦИИ СЖАТИЯ, %</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>МИНИМАЛЬНАЯ ВЫГОДА ДЛЯ ДОЖАТИЯ, МБ</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>НЕСЖИМАЕМЫЕ ТИПЫ ФАЙЛОВ</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>Пропускать заведомо несжимаемые файлы (медиа, архивы)</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>Например: .pak или pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>Добавить</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>Удалить выбранное</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>Сбросить к стандартному списку</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>Удаляет все добавленные вручную расширения</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>Стандартный список ({0} расширений): {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>Расширение указывается в формате «.ext» — точка и до 15 символов без пробелов.</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>Расширение {0} уже входит в стандартный список.</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>Расширение {0} уже добавлено.</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>Порог деградации — число от 1 до 100 процентов.</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>Минимальная выгода — целое число мегабайт, не меньше 1.</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>Удалить все добавленные вручную расширения и вернуться к стандартному списку?</value></data>
+</root>

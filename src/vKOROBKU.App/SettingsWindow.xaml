@@ -1,13 +1,16 @@
 <Window x:Class="vKOROBKU.App.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Настройки" Width="560" Height="760" ResizeMode="NoResize"
+        xmlns:res="clr-namespace:vKOROBKU.App.Resources"
+        Title="{x:Static res:Strings.Settings_Title}" Width="560" Height="820" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" Background="{StaticResource BackgroundBrush}"
         Foreground="{StaticResource TextBrush}">
     <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="18" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="14" />
             <RowDefinition Height="Auto" />
@@ -20,32 +23,40 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="Настройки" FontSize="25" FontWeight="Bold" />
+            <TextBlock Text="{x:Static res:Strings.Settings_Title}" FontSize="25" FontWeight="Bold" />
             <TextBlock Margin="0,7,0,0" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"
-                       Text="Наблюдение за сжатыми играми выполняется при запуске приложения и по кнопке «Проверить сейчас»." />
+                       Text="{x:Static res:Strings.Settings_Subtitle}" />
         </StackPanel>
 
-        <CheckBox Grid.Row="2" x:Name="WatcherEnabledBox" Content="Проверять обновления сжатых игр при запуске"
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="{x:Static res:Strings.Settings_LanguageSection}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+            <ComboBox x:Name="LanguageBox" Margin="0,7,0,0" Height="36" Padding="8,4"
+                      Style="{StaticResource DarkComboBox}" VerticalContentAlignment="Center" />
+            <TextBlock Text="{x:Static res:Strings.Settings_LanguageRestartHint}" Margin="0,6,0,0" FontSize="11"
+                       Foreground="{StaticResource MutedTextBrush}" />
+        </StackPanel>
+
+        <CheckBox Grid.Row="4" x:Name="WatcherEnabledBox" Content="{x:Static res:Strings.Settings_WatcherEnabled}"
                   Foreground="{StaticResource TextBrush}" FontSize="13" />
 
-        <StackPanel Grid.Row="4">
-            <TextBlock Text="ПОРОГ ДЕГРАДАЦИИ СЖАТИЯ, %" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+        <StackPanel Grid.Row="6">
+            <TextBlock Text="{x:Static res:Strings.Settings_DecayThreshold}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
             <TextBox x:Name="DecayBox" Margin="0,7,0,0" Height="36" Padding="10,7"
                      Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
                      BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="6">
-            <TextBlock Text="МИНИМАЛЬНАЯ ВЫГОДА ДЛЯ ДОЖАТИЯ, МБ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+        <StackPanel Grid.Row="8">
+            <TextBlock Text="{x:Static res:Strings.Settings_MinimumSavings}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
             <TextBox x:Name="SavingsBox" Margin="0,7,0,0" Height="36" Padding="10,7"
                      Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
                      BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
         </StackPanel>
 
-        <StackPanel Grid.Row="8">
-            <TextBlock Text="НЕСЖИМАЕМЫЕ ТИПЫ ФАЙЛОВ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+        <StackPanel Grid.Row="10">
+            <TextBlock Text="{x:Static res:Strings.Settings_SkipSection}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
             <CheckBox x:Name="SkipEnabledBox" Margin="0,9,0,0" Foreground="{StaticResource TextBrush}" FontSize="13"
-                      Content="Пропускать заведомо несжимаемые файлы (медиа, архивы)" />
+                      Content="{x:Static res:Strings.Settings_SkipEnabled}" />
             <TextBlock x:Name="DefaultListText" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
                        Foreground="{StaticResource MutedTextBrush}" />
             <Grid Margin="0,10,0,0">
@@ -57,8 +68,8 @@
                 <TextBox x:Name="NewExtensionBox" Height="34" Padding="10,6"
                          Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
                          BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}"
-                         ToolTip="Например: .pak или pak" />
-                <Button Grid.Column="2" Content="Добавить" Click="AddExtensionClick" Padding="14,7"
+                         ToolTip="{x:Static res:Strings.Settings_ExtensionExample}" />
+                <Button Grid.Column="2" Content="{x:Static res:Strings.Settings_AddExtension}" Click="AddExtensionClick" Padding="14,7"
                         Style="{StaticResource SecondaryButton}" />
             </Grid>
             <ListBox x:Name="UserExtensionsList" Margin="0,8,0,0" Height="96"
@@ -70,22 +81,22 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Content="Удалить выбранное" Click="RemoveExtensionClick" Padding="12,7"
+                <Button Content="{x:Static res:Strings.Settings_RemoveSelected}" Click="RemoveExtensionClick" Padding="12,7"
                         Style="{StaticResource SecondaryButton}" />
-                <Button Grid.Column="3" Content="Сбросить к стандартному списку" Click="ResetExtensionsClick" Padding="12,7"
+                <Button Grid.Column="3" Content="{x:Static res:Strings.Settings_ResetList}" Click="ResetExtensionsClick" Padding="12,7"
                         Style="{StaticResource SecondaryButton}"
-                        ToolTip="Удаляет все добавленные вручную расширения" />
+                        ToolTip="{x:Static res:Strings.Settings_ResetListTooltip}" />
             </Grid>
         </StackPanel>
 
-        <Grid Grid.Row="10">
+        <Grid Grid.Row="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Content="Сохранить" Click="SaveClick" />
-            <Button Grid.Column="2" Content="Отмена" Click="CancelClick" Style="{StaticResource SecondaryButton}" />
+            <Button Content="{x:Static res:Strings.Settings_Save}" Click="SaveClick" />
+            <Button Grid.Column="2" Content="{x:Static res:Strings.Settings_Cancel}" Click="CancelClick" Style="{StaticResource SecondaryButton}" />
         </Grid>
     </Grid>
 </Window>

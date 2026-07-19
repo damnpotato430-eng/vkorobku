@@ -8,7 +8,10 @@ public sealed record UserPreferences(
     double DecayThresholdPercent = 5,
     int MinimumSavingsMb = 500,
     bool SkipNonCompressable = true,
-    IReadOnlyList<string>? UserSkipExtensions = null);
+    IReadOnlyList<string>? UserSkipExtensions = null,
+    // "auto" follows the OS language (English for anything without a translation);
+    // otherwise a culture code of a shipped translation: "ru", "en".
+    string Language = "auto");
 
 public sealed class UserPreferencesStore
 {
