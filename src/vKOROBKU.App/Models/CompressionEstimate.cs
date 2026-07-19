@@ -1,3 +1,5 @@
+using vKOROBKU.App.Resources;
+
 namespace vKOROBKU.App.Models;
 
 public enum CompressionAlgorithm
@@ -30,14 +32,19 @@ public sealed record CompressionEstimate(
 
     public string EstimatedSizeText => ByteFormatter.Format(EstimatedPhysicalBytes);
     public string SavingsText => $"{ByteFormatter.Format(MinimumSavingsBytes)}–{ByteFormatter.Format(MaximumSavingsBytes)}";
-    public string RatioText => $"Сжатие выборки: {(1 - SampleRatio) * 100:0.#}%";
+    public string RatioText => string.Format(Strings.Estimate_SampleRatio, $"{(1 - SampleRatio) * 100:0.#}");
     public double ReadSpeedChangePercent => BaselineReadMegabytesPerSecond <= 0
         ? 0
         : (ReadMegabytesPerSecond / BaselineReadMegabytesPerSecond - 1) * 100;
 
     public string PerformanceText => BaselineReadMegabytesPerSecond <= 0
-        ? "Повторите анализ для сравнения скорости"
-        : $"{PerformanceImpact}: без сжатия {BaselineReadMegabytesPerSecond:0} → {ReadMegabytesPerSecond:0} МБ/с ({ReadSpeedChangePercent:+0;-0;0}%)";
+        ? Strings.Estimate_RepeatForSpeed
+        : string.Format(
+            Strings.Estimate_Performance,
+            PerformanceImpact,
+            $"{BaselineReadMegabytesPerSecond:0}",
+            $"{ReadMegabytesPerSecond:0}",
+            $"{ReadSpeedChangePercent:+0;-0;0}");
 }
 
 public sealed record GameAnalysisResult(
@@ -52,7 +59,10 @@ public static class ByteFormatter
 {
     public static string Format(long bytes)
     {
-        string[] units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
+        string[] units =
+        [
+            Strings.Unit_Bytes, Strings.Unit_KB, Strings.Unit_MB, Strings.Unit_GB, Strings.Unit_TB
+        ];
         var value = Math.Max(0, bytes);
         var display = (double)value;
         var unit = 0;

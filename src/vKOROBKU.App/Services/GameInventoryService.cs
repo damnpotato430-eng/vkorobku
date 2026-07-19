@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using vKOROBKU.App.Models;
 using vKOROBKU.Shared;
 
@@ -25,7 +26,7 @@ public sealed class GameInventoryService(PhysicalSizeService physicalSizeService
                 info.FullName, info.Length, physical, !excluded && info.Length > 0,
                 skipExtensions?.Contains(info.Extension) == true));
             if (files.Count % 2000 == 0)
-                progress?.Report($"Просканировано файлов: {files.Count:N0}");
+                progress?.Report(string.Format(Strings.Inventory_ScannedFiles, $"{files.Count:N0}"));
         }, cancellationToken);
 
         return files;

@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -85,7 +86,7 @@ public sealed class ReadBenchmarkService
                     FlagNoBuffering | FlagSequentialScan,
                     IntPtr.Zero);
                 if (handle.IsInvalid)
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), $"Не удалось прочитать {path}");
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), string.Format(Strings.Benchmark_ReadFailed, path));
 
                 while (true)
                 {

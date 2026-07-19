@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -32,7 +33,7 @@ internal static class WorkerTokenFile
     {
         var directory = Directory.CreateDirectory(path);
         var currentUser = WindowsIdentity.GetCurrent().User
-                          ?? throw new InvalidOperationException("Не удалось определить текущего пользователя Windows.");
+                          ?? throw new InvalidOperationException(Strings.WorkerToken_UserUnknown);
         var security = new DirectorySecurity();
         security.SetAccessRuleProtection(true, false);
         security.SetOwner(currentUser);

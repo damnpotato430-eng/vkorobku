@@ -1,7 +1,8 @@
 <Window x:Class="vKOROBKU.App.ManualGameIdentityWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Уточнить игру" Width="500" Height="300" ResizeMode="NoResize"
+        xmlns:res="clr-namespace:vKOROBKU.App.Resources"
+        Title="{x:Static res:Strings.Panel_ReviewIdentity}" Width="500" Height="300" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" Background="{StaticResource BackgroundBrush}"
         Foreground="{StaticResource TextBrush}">
     <Grid Margin="28">
@@ -13,12 +14,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel>
-            <TextBlock Text="Какая это игра?" FontSize="24" FontWeight="Bold" />
+            <TextBlock Text="{x:Static res:Strings.Identity_Question}" FontSize="24" FontWeight="Bold" />
             <TextBlock Margin="0,7,0,0" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"
-                       Text="Исправьте название — vKOROBKU попробует найти игру в Steam и загрузить подходящую обложку." />
+                       Text="{x:Static res:Strings.Identity_Hint}" />
         </StackPanel>
         <StackPanel Grid.Row="2">
-            <TextBlock Text="НАЗВАНИЕ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+            <TextBlock Text="{x:Static res:Strings.Identity_NameLabel}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
             <TextBox x:Name="GameNameBox" Margin="0,7,0,0" Height="40" Padding="10,8"
                      Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
                      BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
@@ -29,8 +30,8 @@
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Content="Найти и сохранить" Click="SaveClick" />
-            <Button Grid.Column="2" Content="Отмена" Click="CancelClick" Style="{StaticResource SecondaryButton}" />
+            <Button Content="{x:Static res:Strings.Identity_FindAndSave}" Click="SaveClick" />
+            <Button Grid.Column="2" Content="{x:Static res:Strings.Settings_Cancel}" Click="CancelClick" Style="{StaticResource SecondaryButton}" />
         </Grid>
     </Grid>
 </Window>

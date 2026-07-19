@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Models;
 
@@ -97,7 +98,14 @@ public sealed class GameInfo : INotifyPropertyChanged
     // GOG product id from the installer registry entry; drives the native GOG cover API.
     public string? GogProductId { get; }
 
-    public bool NeedsIdentityReview => Source == "Добавлено вручную" && string.IsNullOrWhiteSpace(SteamAppId);
+    // The invariant marker of manually added games — never persisted, but compared all
+    // over the app, so it must not depend on the UI language.
+    public const string ManualSource = "Manual";
+
+    public bool NeedsIdentityReview => Source == ManualSource && string.IsNullOrWhiteSpace(SteamAppId);
+
+    /// <summary>Launcher names are shown as-is; only the manual marker is localized.</summary>
+    public string SourceText => Source == ManualSource ? Strings.Source_Manual : Source;
 
     public string? CoverPath
     {
@@ -132,7 +140,7 @@ public sealed class GameInfo : INotifyPropertyChanged
         }
     }
 
-    public string SizeText => LogicalSizeBytes <= 0 ? "Размер не рассчитан" : FormatBytes(LogicalSizeBytes);
+    public string SizeText => LogicalSizeBytes <= 0 ? Strings.Card_SizeUnknown : ByteFormatter.Format(LogicalSizeBytes);
 
     // Card size for compressed games: the actual on-disk weight in accent color with
     // the original size in brackets; uncompressed cards keep the plain original size.
@@ -140,8 +148,8 @@ public sealed class GameInfo : INotifyPropertyChanged
         CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed &&
         CompressedPhysicalBytes > 0 && LogicalSizeBytes > 0;
 
-    public string ActualSizeText => FormatBytes(CompressedPhysicalBytes);
-    public string OriginalSizeBracketText => $"({FormatBytes(LogicalSizeBytes)})";
+    public string ActualSizeText => ByteFormatter.Format(CompressedPhysicalBytes);
+    public string OriginalSizeBracketText => $"({ByteFormatter.Format(LogicalSizeBytes)})";
 
     public long CompressionSavedBytes
     {
@@ -209,18 +217,22 @@ public sealed class GameInfo : INotifyPropertyChanged
 
     public string CompressionStatusText => CompressionState switch
     {
-        GameCompressionState.Compressed => $"Сжата · {CompressionAlgorithm ?? "Windows"}",
-        GameCompressionState.PartiallyCompressed => $"Сжата частично · {CompressionAlgorithm ?? "Windows"}",
-        GameCompressionState.Uncompressed => "Не сжата",
-        _ => "Статус не проверен"
+        GameCompressionState.Compressed => string.Format(Strings.Card_StateCompressed, CompressionAlgorithm ?? "Windows"),
+        GameCompressionState.PartiallyCompressed => string.Format(Strings.Card_StatePartial, CompressionAlgorithm ?? "Windows"),
+        GameCompressionState.Uncompressed => Strings.Card_StateUncompressed,
+        _ => Strings.Card_StateUnknown
     };
 
     public string CompressionInfoText =>
-        $"Алгоритм: {CompressionAlgorithm ?? "Windows"}\n" +
-        $"Физический размер: {(CompressedPhysicalBytes > 0 ? FormatBytes(CompressedPhysicalBytes) : "уточняется")}\n" +
-        $"Освобождено: {(CompressionSavedBytes > 0 ? FormatBytes(CompressionSavedBytes) : "не определено")}\n" +
-        $"Сжатых файлов: {CompressedFileCount:N0}" +
-        (CompressionCheckedAt is null ? string.Empty : $"\nПроверено: {CompressionCheckedAt:dd.MM.yyyy HH:mm}");
+        string.Format(Strings.Card_InfoAlgorithm, CompressionAlgorithm ?? "Windows") + "\n" +
+        string.Format(Strings.Card_InfoPhysical,
+            CompressedPhysicalBytes > 0 ? ByteFormatter.Format(CompressedPhysicalBytes) : Strings.Card_InfoPhysicalPending) + "\n" +
+        string.Format(Strings.Card_InfoFreed,
+            CompressionSavedBytes > 0 ? ByteFormatter.Format(CompressionSavedBytes) : Strings.Card_InfoFreedUnknown) + "\n" +
+        string.Format(Strings.Card_InfoFiles, $"{CompressedFileCount:N0}") +
+        (CompressionCheckedAt is null
+            ? string.Empty
+            : "\n" + string.Format(Strings.Card_InfoChecked, $"{CompressionCheckedAt:dd.MM.yyyy HH:mm}"));
 
     private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
@@ -233,17 +245,4 @@ public sealed class GameInfo : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private static string FormatBytes(long bytes)
-    {
-        string[] units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
-        var value = (double)bytes;
-        var unit = 0;
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
-        return $"{value:0.#} {units[unit]}";
-    }
 }

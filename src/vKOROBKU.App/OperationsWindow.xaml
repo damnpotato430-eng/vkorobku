@@ -1,7 +1,8 @@
 <Window x:Class="vKOROBKU.App.OperationsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Операции — vKOROBKU" Icon="Assets/vkorobku.ico"
+        xmlns:res="clr-namespace:vKOROBKU.App.Resources"
+        Title="{x:Static res:Strings.Operations_WindowTitle}" Icon="Assets/vkorobku.ico"
         Width="760" Height="620" MinWidth="620" MinHeight="480"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}">
@@ -37,7 +38,7 @@
         </DataTemplate>
         <DataTemplate x:Key="NoCurrentOperationTemplate">
             <Border Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="18">
-                <TextBlock Text="Сейчас активных операций нет" Foreground="{StaticResource MutedTextBrush}" />
+                <TextBlock Text="{x:Static res:Strings.Operations_NoActive}" Foreground="{StaticResource MutedTextBrush}" />
             </Border>
         </DataTemplate>
     </Window.Resources>
@@ -52,8 +53,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="Операции" FontSize="28" FontWeight="Bold" />
-            <TextBlock Text="Одновременно выполняется одна безопасная операция. Здесь отображаются её ход и история."
+            <TextBlock Text="{x:Static res:Strings.Nav_Operations}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{x:Static res:Strings.Operations_Subtitle}"
                        Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" />
         </StackPanel>
 
@@ -75,11 +76,11 @@
                     </Style>
                 </ContentControl.Style>
             </ContentControl>
-            <Button Grid.Column="2" Content="Остановить" Command="{Binding CancelCurrentCommand}"
+            <Button Grid.Column="2" Content="{x:Static res:Strings.Operations_Stop}" Command="{Binding CancelCurrentCommand}"
                     VerticalAlignment="Center" Background="#A83A3A" Foreground="White" />
         </Grid>
 
-        <TextBlock Grid.Row="3" Text="ИСТОРИЯ" FontSize="10" FontWeight="Bold"
+        <TextBlock Grid.Row="3" Text="{x:Static res:Strings.Operations_History}" FontSize="10" FontWeight="Bold"
                    Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,8" />
         <ListBox Grid.Row="4" ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource OperationCardTemplate}"
                  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">

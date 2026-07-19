@@ -16,6 +16,7 @@
   <data name="Sidebar_SystemSection" xml:space="preserve"><value>СИСТЕМА</value></data>
   <data name="Sidebar_CoversSource" xml:space="preserve"><value>Обложки: Steam</value></data>
   <data name="Update_OpenPageTooltip" xml:space="preserve"><value>Открыть страницу загрузки новой версии</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Доступна версия {0}</value></data>
   <data name="Header_Title" xml:space="preserve"><value>Библиотека игр</value></data>
   <data name="Header_Subtitle" xml:space="preserve"><value>Найдите установленные игры и оцените возможную экономию места</value></data>
   <data name="Header_RefreshCovers" xml:space="preserve"><value>Обновить обложки</value></data>
@@ -25,32 +26,86 @@
   <data name="Watcher_RecompressAll" xml:space="preserve"><value>Дожать все</value></data>
   <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Дожать все деградировавшие игры одной очередью — права администратора запрашиваются один раз</value></data>
   <data name="Watcher_CheckNow" xml:space="preserve"><value>Проверить сейчас</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>Проверяем «{0}» ({1} из {2})…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>Требуют дожатия: {0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — можно вернуть ~{0}</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>Наблюдение: {0} сжатых игр, деградации сжатия нет</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>Не удалось проверить обновления сжатых игр — подробности в журнале logs</value></data>
   <data name="Search_Placeholder" xml:space="preserve"><value>Поиск игры…</value></data>
   <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Отметить несколько игр и сжать их одной очередью</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>Выбрать несколько</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>Отменить выбор</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>Отметьте игры галочками на карточках</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>Выбрано: {0} · {1}</value></data>
   <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Показать только игры, требующие дожатия</value></data>
   <data name="Sort_Tooltip" xml:space="preserve"><value>Сортировка библиотеки</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>По имени</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>Сначала крупные</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Сначала несжатые</value></data>
   <data name="Queue_MethodTooltip" xml:space="preserve"><value>Метод сжатия для всей очереди</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Авто (сбалансированный)</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Сжать очередь · 1 запрос прав</value></data>
-  <data name="Card_OpenFolder" xml:space="preserve"><value>Перейти в каталог</value></data>
-  <data name="Card_AddToQueue" xml:space="preserve"><value>Добавить в очередь сжатия</value></data>
-  <data name="Card_RefreshCover" xml:space="preserve"><value>Обновить обложку</value></data>
-  <data name="Card_RecheckState" xml:space="preserve"><value>Проверить состояние сжатия</value></data>
-  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Убрать из библиотеки</value></data>
-  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>Игра использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется.</value></data>
-  <data name="Panel_Section" xml:space="preserve"><value>ОПТИМИЗАЦИЯ ИГРЫ</value></data>
-  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Игра не выбрана</value></data>
-  <data name="Panel_ExpertMode" xml:space="preserve"><value>Экспертный режим</value></data>
-  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Уточнить игру</value></data>
-  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>Игра использует DirectStorage: NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется. В экспертном режиме оно доступно после подтверждения.</value></data>
-  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ТОЧНОСТЬ АНАЛИЗА</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>Сжать игр: {0} — одной очередью?
+
+{1}
+
+Права администратора будут запрошены один раз. Игры должны быть закрыты.</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>Подтверждение очереди</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>Дожать игр: {0} — одной очередью?
+
+{1}
+
+Права администратора будут запрошены один раз. Игры должны быть закрыты.</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>Все отмеченные игры используют DirectStorage — сжатие им не рекомендуется</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…и ещё {0}</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>Пропущено из-за DirectStorage: {0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>Игры для дожатия не найдены в библиотеке</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>Очередь сжатия · подготовка ({0} игр)</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>Очередь сжатия · {0} из {1}</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>Очередь завершена · сжато {0} из {1} · освобождено {2}</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>Очередь прервана: {0}</value></data>
   <data name="Queue_Skip" xml:space="preserve"><value>Пропустить</value></data>
   <data name="Queue_SkipTooltip" xml:space="preserve"><value>Отменить текущую игру и перейти к следующей</value></data>
   <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Стоп после текущей</value></data>
   <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Дать текущей игре досжаться и остановить очередь</value></data>
   <data name="Queue_StopAll" xml:space="preserve"><value>Стоп всё</value></data>
   <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Остановить очередь немедленно — прерванная игра дожмётся позже</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>в очереди</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>сжимается…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>отменено</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>остановлено</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>готово · освобождено {0}</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>не выполнено</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Перейти в каталог</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Добавить в очередь сжатия</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Обновить обложку</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Проверить состояние сжатия</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Убрать из библиотеки</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>Игра использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется.</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>Сжата · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>Сжата частично · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>Не сжата</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>Статус не проверен</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>Размер не рассчитан</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>Алгоритм: {0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>Физический размер: {0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>уточняется</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>Освобождено: {0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>не определено</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>Сжатых файлов: {0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>Проверено: {0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>Добавлено вручную</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>ОПТИМИЗАЦИЯ ИГРЫ</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Игра не выбрана</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Экспертный режим</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Уточнить игру</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>Игра использует DirectStorage: NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется. В экспертном режиме оно доступно после подтверждения.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ТОЧНОСТЬ АНАЛИЗА</value></data>
   <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Экономия: </value></data>
   <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Точность: </value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>Сжатие выборки: {0}%</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>Повторите анализ для сравнения скорости</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}: без сжатия {1} → {2} МБ/с ({3}%)</value></data>
   <data name="Info_AutoTitle" xml:space="preserve"><value>АВТОМАТИЧЕСКАЯ ОПТИМИЗАЦИЯ</value></data>
   <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU проанализирует файлы, проверит скорость чтения и самостоятельно выберет подходящий режим XPRESS или LZX.</value></data>
   <data name="Info_AutoConfirm" xml:space="preserve"><value>Перед изменением файлов программа покажет прогноз и попросит подтверждение.</value></data>
@@ -66,6 +121,7 @@
   <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>Игра сжата частично — можно полностью вернуть файлы в исходное состояние</value></data>
   <data name="Action_CompressSelected" xml:space="preserve"><value>Сжать выбранным режимом</value></data>
   <data name="Action_FinishTooltip" xml:space="preserve"><value>Сжать оставшиеся файлы тем же методом — уже сжатые будут пропущены</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>Дожать</value></data>
   <data name="Settings_Title" xml:space="preserve"><value>Настройки</value></data>
   <data name="Settings_Subtitle" xml:space="preserve"><value>Наблюдение за сжатыми играми выполняется при запуске приложения и по кнопке «Проверить сейчас».</value></data>
   <data name="Settings_LanguageSection" xml:space="preserve"><value>ЯЗЫК ИНТЕРФЕЙСА</value></data>
@@ -90,4 +146,197 @@
   <data name="Settings_DecayError" xml:space="preserve"><value>Порог деградации — число от 1 до 100 процентов.</value></data>
   <data name="Settings_SavingsError" xml:space="preserve"><value>Минимальная выгода — целое число мегабайт, не меньше 1.</value></data>
   <data name="Settings_ResetConfirm" xml:space="preserve"><value>Удалить все добавленные вручную расширения и вернуться к стандартному списку?</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>Б</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>КБ</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>МБ</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>ГБ</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>ТБ</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>Анализ</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>Сжатие</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>Распаковка</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>Выполняется</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>Завершено</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>Отменено</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>Прервано</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>{0}% · {1} из {2} на текущем этапе</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>{0}% · {1} из {2}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>{0}% · {1} из {2} файлов</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>Ожидание Worker</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>Приложение было закрыто до завершения операции</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} потоков</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>Оперативная память: {0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>Неизвестный процессор</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · свободно {2}</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>сэкономлено {0}</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>Сервис обложек временно недоступен</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>Сервис обложек не ответил вовремя</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>Не удалось запустить compact.exe.</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe завершился с кодом {0}: {1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>Ошибка системного модуля.</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>Не найден системный модуль vKOROBKU.Worker.exe.</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>Запрос прав администратора отменён.</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>Не удалось запустить системный модуль.</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>Системный модуль не подключился за 30 секунд.</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>Не удалось подтвердить подлинность системного модуля.</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>Системный модуль неожиданно завершил соединение.</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>Получен некорректный ответ системного модуля.</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>Системный модуль не смог прочитать одноразовый файл авторизации. Обычно это происходит, когда права администратора подтверждает другая учётная запись Windows. Подтвердите запрос UAC той же учётной записью, под которой запущено приложение, или запустите vKOROBKU от имени администратора.</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>Системный модуль завершился до подключения (код {0}).</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>Имя папки или EXE</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>Указано пользователем</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Каталог Steam</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>Какая это игра?</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>Исправьте название — vKOROBKU попробует найти игру в Steam и загрузить подходящую обложку.</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>НАЗВАНИЕ ИГРЫ</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>Найти и сохранить</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>Введите название игры.</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>Не удалось прочитать {0}</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>Просканировано файлов: {0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>Не удалось определить текущего пользователя Windows.</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>Проверяем файловую систему…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>Формируем репрезентативную выборку…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>Все файлы игры относятся к заведомо несжимаемым типам — сжатие не даст экономии.</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>Не удалось сформировать выборку файлов.</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>Формируем выборку до {0}…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>Измеряем скорость чтения без сжатия…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>Сжимаем тестовую выборку: {0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>Подсчитываем результат {0}…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>Измеряем чтение {0}…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>Готовим следующий режим после {0}…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>Анализ завершён</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} Проход {1} из {2}</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>Подготовка выборки: {0} из {1}</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>Не удалось определить диск игры.</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>Анализ XPRESS/LZX поддерживается только для игр на NTFS.</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>Недостаточно свободного места для временной выборки.</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>Высокая</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>Средняя</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>Низкая</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>Вероятно быстрее</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>Возможно медленнее</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>Изменение незаметно</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Сжатие установленных игр штатными средствами Windows (XPRESS/LZX) для экономии места на диске. Игры продолжают работать как раньше — меняется только способ хранения файлов на NTFS.</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>Репозиторий на GitHub</value></data>
+  <data name="About_ReleasesLink" xml:space="preserve"><value>Последние версии и загрузка</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>Лицензия GPL-3.0</value></data>
+  <data name="About_CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>Папка логов</value></data>
+  <data name="About_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="About_Version" xml:space="preserve"><value>Версия {0}</value></data>
+  <data name="About_UpToDate" xml:space="preserve"><value>У вас установлена последняя версия.</value></data>
+  <data name="About_UpdatesTitle" xml:space="preserve"><value>Обновления</value></data>
+  <data name="About_UpdateAvailable" xml:space="preserve"><value>Доступна версия {0}. Открыть страницу загрузки?</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>Операции — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>Сейчас активных операций нет</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>Одновременно выполняется одна безопасная операция. Здесь отображаются её ход и история.</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>Остановить</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>ИСТОРИЯ</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>Готово к поиску игр</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>Предыдущая операция была прервана. Состояние игры будет проверено при выборе.</value></data>
+  <data name="Status_BrowserFailed" xml:space="preserve"><value>Не удалось открыть браузер: {0}</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>Настройки сохранены</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>Сканируем библиотеки игр</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>Игры не найдены — добавьте папку вручную</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>Найдено игр: {0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>Не удалось просканировать библиотеку: {0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>Определяем игру и рассчитываем размер…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>Добавлена игра «{0}»</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>Игра «{0}» убрана из библиотеки</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>Ищем игру и подходящую обложку…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>Название сохранено: «{0}»</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>Игра определена: «{0}»</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>Загрузка обложек: {0} из {1}</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>Библиотека готова · проверено обложек: {0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>Сервис обложек недоступен: {0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>Обновляем обложку «{0}»…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>Обложка «{0}» проверена</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>Папка игры не найдена: {0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>Открываем папку игры «{0}»</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>Не удалось открыть проводник: {0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>Проверяем состояние сжатия игры «{0}»…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>Не удалось определить состояние сжатия: {0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>Загружен сохранённый анализ игры «{0}»</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>Найти игры</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>Поиск…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>Обновить библиотеку</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>Выберите папку с игрой</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>Убрать игру «{0}» из библиотеки?
+
+Игра будет убрана из библиотеки vKOROBKU. Файлы на диске не изменяются и не удаляются.</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Внимание: игра останется сжатой. Чтобы вернуть файлы в исходное состояние, сначала выполните распаковку.</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>Не удалось убрать игру из библиотеки. Проверьте доступ к локальным данным vKOROBKU.</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>Ошибка удаления из библиотеки</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>Авто</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>512 МБ–2 ГБ по размеру игры</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>Быстрый</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>до 512 МБ</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>Точный</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>до 1 ГБ</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>Максимальный</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>до 2 ГБ</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>Рассчитать экономию</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Анализ выполняется…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Повторить анализ</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Выберите игру и запустите безопасный анализ выборки.</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>Автоматический режим оценит игру и подберёт оптимальный способ экономии места.</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>Инвентаризация файлов…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>Анализ игры «{0}» завершён и сохранён</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>Анализ игры «{0}» завершён, но кэш записать не удалось</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>Анализ отменён. Временные файлы удалены.</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>Анализ отменён</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>Анализ не выполнен: {0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>Ошибка анализа</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>Игра обновилась — перед оптимизацией нужен новый быстрый анализ.</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>Анализ от {0} · {1} файлов · выборка {2} · физически занято {3}</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>Игра «{0}» использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки.
+
+Всё равно сжать?</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>Игра: {0}
+Метод: {1} (как при первоначальном сжатии)
+
+Будут сжаты только файлы без сжатия — уже сжатые пропускаются.
+Игра должна быть закрыта. Продолжить?</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>Дожать сжатие</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>Игра: {0}
+Алгоритм: {1}
+Прогноз размера: {2}
+Экономия: {3}
+
+Игра должна быть закрыта. Продолжить?</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>Подтверждение сжатия</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>Полностью распаковать файлы игры «{0}»?
+
+Игра должна быть закрыта.</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>Подтверждение распаковки</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>Сжатие игры «{0}» ({1}) было прервано.
+
+Продолжить с места остановки? Уже сжатые файлы будут пропущены автоматически.</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>Продолжить сжатие</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>Сжатие изменяет только способ хранения файлов на NTFS.</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>Операция отменена</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>Операция не выполнена: {0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>Ошибка системной операции</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>Ожидаем подтверждение прав администратора…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {0} из {1} файлов</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · пропущено несжимаемых: {0} ({1})</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · не сжато файлов: {0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>Готово · освобождено {0} · общая экономия {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>Распаковка завершена частично · осталось файлов: {0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>Готово · распаковано {0} файлов</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>Анализируется: {0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>Сжимается: {0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>Распаковывается: {0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>Ожидаемая экономия: {0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>за всё время: {0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · с {0}</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · операций: {2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>Освобождено сжатием за всё время работы{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>Операций сжатия: {0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>Сэкономлено всего: {0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>Игра «{0}» уже сжата: {1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>Игра «{0}» сжата частично: {1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>Игра «{0}» не сжата</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>Состояние сжатия игры «{0}» не проверено</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>Игра «{0}» обновилась и требует дообработки</value></data>
 </root>

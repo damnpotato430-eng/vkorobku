@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using vKOROBKU.App.Models;
 using vKOROBKU.Protocol;
 
@@ -75,7 +76,7 @@ public sealed class WatchedGamesCoordinator
             var libraryGame = findLibraryGame(current.FolderPath);
             if (ShouldRescan(current, libraryGame?.SteamBuildId, DateTimeOffset.UtcNow, force))
             {
-                reportProgress($"Проверяем «{current.DisplayName}» ({position} из {watched.Count})…");
+                reportProgress(string.Format(Strings.Watcher_CheckingGame, current.DisplayName, position, watched.Count));
                 var sizes = await Task.Run(() => _folderSizeScanner.Measure(current.FolderPath, skipSet));
                 var hasDirectStorage = await Task.Run(() => _directStorageDetector.Detect(current.FolderPath));
                 current = current with
