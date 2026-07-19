@@ -1,4 +1,5 @@
 using vKOROBKU.App.Models;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Services;
 
@@ -16,7 +17,7 @@ public sealed class GameAnalysisService
         long maximumSampleBytes = 0,
         ISet<string>? skipExtensions = null)
     {
-        progress?.Report(new AnalysisProgressUpdate("Проверяем файловую систему…", 0));
+        progress?.Report(new AnalysisProgressUpdate(Strings.Analysis_CheckingFileSystem, 0));
 
         var inventoryService = new GameInventoryService(_physicalSizeService);
         var inventoryProgress = new Progress<string>(message =>
@@ -25,7 +26,7 @@ public sealed class GameAnalysisService
             () => inventoryService.CreateInventory(game.InstallPath, inventoryProgress, cancellationToken, skipExtensions),
             cancellationToken);
 
-        progress?.Report(new AnalysisProgressUpdate("Формируем репрезентативную выборку…", 7));
+        progress?.Report(new AnalysisProgressUpdate(Strings.Analysis_BuildingSample, 7));
         var prepared = await Task.Run(() =>
         {
             var logicalBytes = inventory.Sum(file => file.LogicalBytes);
@@ -41,20 +42,20 @@ public sealed class GameAnalysisService
                 .Sum(file => file.LogicalBytes);
             if (eligibleLogicalBytes == 0)
                 throw new InvalidOperationException(
-                    "Все файлы игры относятся к заведомо несжимаемым типам — сжатие не даст экономии.");
+                    Strings.Analysis_AllFilesIncompressible);
 
             var sampleLimit = maximumSampleBytes > 0
                 ? maximumSampleBytes
                 : SelectAutomaticSampleLimit(eligibleLogicalBytes);
             var plan = _samplePlanner.CreatePlan(inventory, sampleLimit);
             if (plan.Count == 0)
-                throw new InvalidOperationException("Не удалось сформировать выборку файлов.");
+                throw new InvalidOperationException(Strings.Analysis_SampleFailed);
 
             return (logicalBytes, physicalBytes, excludedPhysicalBytes, skipPhysicalBytes, eligibleLogicalBytes, sampleLimit, plan);
         }, cancellationToken);
 
         progress?.Report(new AnalysisProgressUpdate(
-            $"Формируем выборку до {ByteFormatter.Format(prepared.sampleLimit)}…", 9));
+            string.Format(Strings.Analysis_BuildingSampleUpTo, ByteFormatter.Format(prepared.sampleLimit)), 9));
         var requiredBytes = prepared.plan.Sum(fragment => (long)fragment.Length);
         var workspace = CreateWorkspace(game.InstallPath, requiredBytes);
         try
@@ -63,7 +64,7 @@ public sealed class GameAnalysisService
             var sampleBytes = sampleFiles.Sum(path => new FileInfo(path).Length);
             var baselineReadSpeed = await MeasureReadAsync(
                 sampleFiles,
-                "Измеряем скорость чтения без сжатия…",
+                Strings.Analysis_MeasuringBaseline,
                 30,
                 40,
                 progress,
@@ -77,10 +78,10 @@ public sealed class GameAnalysisService
                 var algorithm = algorithms[index];
                 var stageStart = 40 + index * 15;
                 var algorithmName = GetAlgorithmName(algorithm);
-                progress?.Report(new AnalysisProgressUpdate($"Сжимаем тестовую выборку: {algorithmName}…", stageStart));
+                progress?.Report(new AnalysisProgressUpdate(string.Format(Strings.Analysis_CompressingSample, algorithmName), stageStart));
                 await _compactService.CompressAsync(workspace, algorithm, cancellationToken);
 
-                progress?.Report(new AnalysisProgressUpdate($"Подсчитываем результат {algorithmName}…", stageStart + 4));
+                progress?.Report(new AnalysisProgressUpdate(string.Format(Strings.Analysis_CountingResult, algorithmName), stageStart + 4));
                 var compressedBytes = await Task.Run(
                     () => sampleFiles.Sum(path => _physicalSizeService.GetAllocatedSize(path)),
                     cancellationToken);
@@ -89,7 +90,7 @@ public sealed class GameAnalysisService
                 ratio = Math.Clamp(ratio, 0, 1.25);
                 var readSpeed = await MeasureReadAsync(
                     sampleFiles,
-                    $"Измеряем чтение {algorithmName}…",
+                    string.Format(Strings.Analysis_MeasuringRead, algorithmName),
                     stageStart + 5,
                     stageStart + 13,
                     progress,
@@ -108,12 +109,12 @@ public sealed class GameAnalysisService
 
                 if (algorithm != algorithms[^1])
                 {
-                    progress?.Report(new AnalysisProgressUpdate($"Готовим следующий режим после {algorithmName}…", stageStart + 14));
+                    progress?.Report(new AnalysisProgressUpdate(string.Format(Strings.Analysis_PreparingNext, algorithmName), stageStart + 14));
                     await _compactService.DecompressAsync(workspace, cancellationToken);
                 }
             }
 
-            progress?.Report(new AnalysisProgressUpdate("Анализ завершён", 100, sampleBytes, sampleBytes));
+            progress?.Report(new AnalysisProgressUpdate(Strings.Analysis_Done, 100, sampleBytes, sampleBytes));
             return new GameAnalysisResult(
                 prepared.logicalBytes,
                 prepared.physicalBytes,
@@ -143,7 +144,7 @@ public sealed class GameAnalysisService
             var fraction = Math.Clamp(completedWork / (double)totalWork, 0, 1);
             var percent = startPercent + (endPercent - startPercent) * fraction;
             progress?.Report(new AnalysisProgressUpdate(
-                $"{stage} Проход {update.Pass} из {update.PassCount}",
+                string.Format(Strings.Analysis_Pass, stage, update.Pass, update.PassCount),
                 percent,
                 completedWork,
                 totalWork));
@@ -169,10 +170,10 @@ public sealed class GameAnalysisService
     {
         var coverage = sampleBytes / (double)eligibleLogicalBytes;
         var (confidence, margin) = coverage >= 0.01 && fragmentCount >= 32
-            ? ("Высокая", 0.03)
+            ? (Strings.Confidence_High, 0.03)
             : coverage >= 0.0025 && fragmentCount >= 12
-                ? ("Средняя", 0.07)
-                : ("Низкая", 0.12);
+                ? (Strings.Confidence_Medium, 0.07)
+                : (Strings.Confidence_Low, 0.12);
 
         var untouchedPhysicalBytes = excludedPhysicalBytes + skipPhysicalBytes;
         var estimated = untouchedPhysicalBytes + (long)(eligibleLogicalBytes * ratio);
@@ -184,9 +185,9 @@ public sealed class GameAnalysisService
         var relativeSpeed = baselineReadSpeed <= 0 ? 1 : compressedReadSpeed / baselineReadSpeed;
         var performanceImpact = relativeSpeed switch
         {
-            >= 1.08 => "Вероятно быстрее",
-            < 0.88 => "Возможно медленнее",
-            _ => "Изменение незаметно"
+            >= 1.08 => Strings.Perf_LikelyFaster,
+            < 0.88 => Strings.Perf_PossiblySlower,
+            _ => Strings.Perf_NoChange
         };
 
         return new CompressionEstimate(
@@ -237,7 +238,7 @@ public sealed class GameAnalysisService
                 {
                     lastReportedPercent = percent;
                     progress?.Report(new AnalysisProgressUpdate(
-                        $"Подготовка выборки: {index + 1} из {plan.Count}",
+                        string.Format(Strings.Analysis_PreparingSampleIndex, index + 1, plan.Count),
                         percent,
                         processedBytes,
                         totalBytes));
@@ -254,12 +255,12 @@ public sealed class GameAnalysisService
     private static string CreateWorkspace(string gamePath, long requiredBytes)
     {
         var gameVolumeRoot = Path.GetPathRoot(Path.GetFullPath(gamePath))
-                             ?? throw new InvalidOperationException("Не удалось определить диск игры.");
+                             ?? throw new InvalidOperationException(Strings.Analysis_DriveUnknown);
         var drive = new DriveInfo(gameVolumeRoot);
         if (!drive.IsReady || !string.Equals(drive.DriveFormat, "NTFS", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Анализ XPRESS/LZX поддерживается только для игр на NTFS.");
+            throw new InvalidOperationException(Strings.Analysis_NtfsOnly);
         if (drive.AvailableFreeSpace < requiredBytes + 256L * 1024 * 1024)
-            throw new InvalidOperationException("Недостаточно свободного места для временной выборки.");
+            throw new InvalidOperationException(Strings.Analysis_NotEnoughSpace);
 
         var localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var systemVolumeRoot = Path.GetPathRoot(localApplicationData);

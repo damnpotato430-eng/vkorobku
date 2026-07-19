@@ -338,7 +338,7 @@
                                 <TextBlock Text="{Binding InstallPath}" Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}"
                                            FontSize="11" TextTrimming="CharacterEllipsis" />
                                 <Grid Margin="0,15,0,0">
-                                    <TextBlock Text="{Binding Source}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
+                                    <TextBlock Text="{Binding SourceText}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                         <TextBlock Text="{Binding ActualSizeText}" FontWeight="SemiBold"
                                                    Foreground="{StaticResource AccentBrush}" Margin="0,0,4,0">

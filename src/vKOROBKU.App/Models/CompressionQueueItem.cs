@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Models;
 
@@ -17,7 +18,7 @@ public enum QueueItemStatus
 public sealed class CompressionQueueItem(GameInfo game, string algorithm) : INotifyPropertyChanged
 {
     private QueueItemStatus _status = QueueItemStatus.Pending;
-    private string _statusText = "в очереди";
+    private string _statusText = Strings.QueueItem_Pending;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -51,7 +52,7 @@ public sealed class CompressionQueueItem(GameInfo game, string algorithm) : INot
 
     public long FreedBytes { get; private set; }
 
-    public void MarkRunning() => Set(QueueItemStatus.Running, "сжимается…");
+    public void MarkRunning() => Set(QueueItemStatus.Running, Strings.QueueItem_Running);
 
     public void MarkCompleted(long freedBytes, string statusText)
     {
@@ -59,7 +60,7 @@ public sealed class CompressionQueueItem(GameInfo game, string algorithm) : INot
         Set(QueueItemStatus.Completed, statusText);
     }
 
-    public void MarkCancelled() => Set(QueueItemStatus.Cancelled, "отменено");
+    public void MarkCancelled() => Set(QueueItemStatus.Cancelled, Strings.QueueItem_Cancelled);
     public void MarkFailed(string reason) => Set(QueueItemStatus.Failed, reason);
     public void MarkSkipped(string reason) => Set(QueueItemStatus.Skipped, reason);
 

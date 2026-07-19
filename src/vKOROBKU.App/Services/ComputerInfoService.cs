@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using vKOROBKU.App.Models;
@@ -31,7 +32,7 @@ public sealed class ComputerInfoService
     {
         const string keyPath = @"HARDWARE\DESCRIPTION\System\CentralProcessor\0";
         using var key = Registry.LocalMachine.OpenSubKey(keyPath);
-        return key?.GetValue("ProcessorNameString")?.ToString()?.Trim() ?? "Неизвестный процессор";
+        return key?.GetValue("ProcessorNameString")?.ToString()?.Trim() ?? Strings.System_UnknownProcessor;
     }
 
     private static ulong GetMemoryBytes()

@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App;
 
@@ -21,7 +22,7 @@ public partial class ManualGameIdentityWindow : Window
     {
         if (GameName.Length < 2)
         {
-            MessageBox.Show(this, "Введите название игры.", "vKOROBKU", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Strings.Identity_EnterName, "vKOROBKU", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
         DialogResult = true;

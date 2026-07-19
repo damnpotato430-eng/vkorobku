@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Models;
 
@@ -9,8 +10,8 @@ public sealed record ComputerInfo(
     string OperatingSystem,
     IReadOnlyList<DriveSummary> Drives)
 {
-    public string ProcessorText => $"{Processor} · {LogicalProcessorCount} потоков";
-    public string MemoryText => $"Оперативная память: {MemoryBytes / 1024d / 1024d / 1024d:0.#} ГБ";
+    public string ProcessorText => string.Format(Strings.System_ProcessorThreads, Processor, LogicalProcessorCount);
+    public string MemoryText => string.Format(Strings.System_Memory, ByteFormatter.Format((long)MemoryBytes));
 }
 
 public sealed class DriveSummary(
@@ -41,7 +42,9 @@ public sealed class DriveSummary(
         }
     }
 
-    public string DisplayText => $"{Name}  {FileSystem} · свободно {FreeBytes / 1024d / 1024d / 1024d:0.#} ГБ";
+    public string DisplayText => string.Format(Strings.Drive_Display, Name, FileSystem, ByteFormatter.Format(FreeBytes));
 
-    public string SavingsText => SavedBytes > 0 ? $"сэкономлено {ByteFormatter.Format(SavedBytes)}" : string.Empty;
+    public string SavingsText => SavedBytes > 0
+        ? string.Format(Strings.Drive_Savings, ByteFormatter.Format(SavedBytes))
+        : string.Empty;
 }

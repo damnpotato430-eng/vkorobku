@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Data;
 using Microsoft.Win32;
 using vKOROBKU.App.Models;
+using vKOROBKU.App.Resources;
 using vKOROBKU.App.Services;
 using vKOROBKU.Protocol;
 
@@ -37,7 +38,7 @@ public sealed class MainViewModel : ObservableObject
     private string _updateNoticeText = string.Empty;
     private string? _updateUrl;
     private string _searchText = string.Empty;
-    private string _selectedSortOption = "По имени";
+    private ChoiceOption _selectedSortOption;
     private UserPreferences _userPreferences;
     private bool _isWatcherCheckRunning;
     private string _watcherSummaryText = string.Empty;
@@ -52,16 +53,16 @@ public sealed class MainViewModel : ObservableObject
     private AnalysisModeOption? _selectedAnalysisMode;
     private CancellationTokenSource? _analysisCancellation;
     private CancellationTokenSource? _compressionCheckCancellation;
-    private string _statusText = "Готово к поиску игр";
-    private string _scanButtonText = "Найти игры";
-    private string _analysisButtonText = "Рассчитать экономию";
-    private string _analysisSummary = "Выберите игру и запустите безопасный анализ выборки.";
+    private string _statusText = Strings.Status_ReadyToScan;
+    private string _scanButtonText = Strings.Scan_FindGames;
+    private string _analysisButtonText = Strings.Analysis_ButtonCalculate;
+    private string _analysisSummary = Strings.Analysis_SelectGameHint;
     private bool _isAnalyzing;
     private bool _isOperating;
     private bool _isCheckingCompression;
     private bool _isExpertMode;
     private double _operationProgress;
-    private string _operationSummary = "Сжатие изменяет только способ хранения файлов на NTFS.";
+    private string _operationSummary = Strings.Operation_DefaultSummary;
     private string _totalSavingsText = string.Empty;
     private string _allTimeStatsText = string.Empty;
     private string _allTimeStatsTooltip = string.Empty;
@@ -70,14 +71,21 @@ public sealed class MainViewModel : ObservableObject
     private string? _activeCompressionAlgorithm;
     private string? _activeCompressionSavings;
     private bool _isMultiSelectMode;
-    private string _selectedQueueMethod = AutoQueueMethod;
+    private ChoiceOption _selectedQueueMethod;
     private string _queueSelectionText = string.Empty;
     private string _queueTitle = string.Empty;
     private bool _queueStopAfterCurrent;
     private bool _queueStopAll;
     private bool _isQueueRunning;
 
-    private const string AutoQueueMethod = "Авто (сбалансированный)";
+    private const string AutoQueueMethod = "auto";
+
+    /// <summary>A combo-box option whose identity is a stable id while the shown text
+    /// is localized — logic must never compare display strings.</summary>
+    public sealed record ChoiceOption(string Id, string DisplayText)
+    {
+        public override string ToString() => DisplayText;
+    }
 
     public MainViewModel()
     {
@@ -86,6 +94,9 @@ public sealed class MainViewModel : ObservableObject
         _isExpertMode = _userPreferences.ExpertMode;
         GamesView = CollectionViewSource.GetDefaultView(Games);
         GamesView.Filter = FilterGame;
+        // Must precede ApplySort — it reads the selected option's id.
+        _selectedSortOption = SortOptions[0];
+        _selectedQueueMethod = QueueMethodOptions[0];
         ApplySort();
         // Live sorting keeps a card in its correct slot when its state changes in place
         // (e.g. a game finishes compressing while sorted by "uncompressed first").
@@ -98,10 +109,10 @@ public sealed class MainViewModel : ObservableObject
         }
         _coverService = new CoverService(_gameIdentityService.FindSteamAppIdAsync);
         _coverBatchLoader = new CoverBatchLoader(_coverService);
-        AnalysisModes.Add(new AnalysisModeOption("Авто", "512 МБ–2 ГБ по размеру игры", 0));
-        AnalysisModes.Add(new AnalysisModeOption("Быстрый", "до 512 МБ", 512L * 1024 * 1024));
-        AnalysisModes.Add(new AnalysisModeOption("Точный", "до 1 ГБ", 1024L * 1024 * 1024));
-        AnalysisModes.Add(new AnalysisModeOption("Максимальный", "до 2 ГБ", 2L * 1024 * 1024 * 1024));
+        AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Auto, Strings.AnalysisMode_AutoHint, 0));
+        AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Fast, Strings.AnalysisMode_FastHint, 512L * 1024 * 1024));
+        AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Precise, Strings.AnalysisMode_PreciseHint, 1024L * 1024 * 1024));
+        AnalysisModes.Add(new AnalysisModeOption(Strings.AnalysisMode_Maximum, Strings.AnalysisMode_MaximumHint, 2L * 1024 * 1024 * 1024));
         SelectedAnalysisMode = AnalysisModes[2];
         RefreshLibraryCommand = new AsyncRelayCommand(RefreshLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
@@ -109,7 +120,7 @@ public sealed class MainViewModel : ObservableObject
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
-            () => SelectedGame?.Source == "Добавлено вручную" && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame?.Source == GameInfo.ManualSource && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
@@ -183,9 +194,14 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand AddToQueueCommand { get; }
 
     public ICollectionView GamesView { get; }
-    public IReadOnlyList<string> SortOptions { get; } = ["По имени", "Сначала крупные", "Сначала несжатые"];
+    public IReadOnlyList<ChoiceOption> SortOptions { get; } =
+    [
+        new("name", Strings.Sort_ByName),
+        new("largest", Strings.Sort_LargestFirst),
+        new("uncompressed", Strings.Sort_UncompressedFirst)
+    ];
 
-    public string SelectedSortOption
+    public ChoiceOption SelectedSortOption
     {
         get => _selectedSortOption;
         set { if (SetProperty(ref _selectedSortOption, value)) ApplySort(); }
@@ -203,7 +219,7 @@ public sealed class MainViewModel : ObservableObject
         set { if (SetProperty(ref _showOnlyDegraded, value)) GamesView.Refresh(); }
     }
 
-    public string DegradedFilterLabel => $"Требуют дожатия: {_degradedPaths.Count}";
+    public string DegradedFilterLabel => string.Format(Strings.Watcher_NeedsFinishingCount, _degradedPaths.Count);
 
     public bool IsMultiSelectMode
     {
@@ -221,12 +237,18 @@ public sealed class MainViewModel : ObservableObject
     }
 
     public Visibility MultiSelectVisibility => IsMultiSelectMode ? Visibility.Visible : Visibility.Collapsed;
-    public string MultiSelectToggleText => IsMultiSelectMode ? "Отменить выбор" : "Выбрать несколько";
+    public string MultiSelectToggleText => IsMultiSelectMode ? Strings.MultiSelect_Cancel : Strings.MultiSelect_Start;
 
-    public IReadOnlyList<string> QueueMethodOptions { get; } =
-        [AutoQueueMethod, "XPRESS4K", "XPRESS8K", "XPRESS16K", "LZX"];
+    public IReadOnlyList<ChoiceOption> QueueMethodOptions { get; } =
+    [
+        new(AutoQueueMethod, Strings.Queue_MethodAuto),
+        new("XPRESS4K", "XPRESS4K"),
+        new("XPRESS8K", "XPRESS8K"),
+        new("XPRESS16K", "XPRESS16K"),
+        new("LZX", "LZX")
+    ];
 
-    public string SelectedQueueMethod
+    public ChoiceOption SelectedQueueMethod
     {
         get => _selectedQueueMethod;
         set => SetProperty(ref _selectedQueueMethod, value);
@@ -294,10 +316,10 @@ public sealed class MainViewModel : ObservableObject
                 return;
             Estimates.Clear();
             SelectedEstimate = null;
-            AnalysisButtonText = "Рассчитать экономию";
+            AnalysisButtonText = Strings.Analysis_ButtonCalculate;
             AnalysisSummary = value is null
-                ? "Выберите игру и запустите безопасный анализ выборки."
-                : "Автоматический режим оценит игру и подберёт оптимальный способ экономии места.";
+                ? Strings.Analysis_SelectGameHint
+                : Strings.Analysis_AutoModeHint;
             if (value is not null)
                 RestoreSavedAnalysis(value);
             AnalyzeCommand.RaiseCanExecuteChanged();
@@ -427,7 +449,7 @@ public sealed class MainViewModel : ObservableObject
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility ManualGameVisibility =>
-        SelectedGame?.Source == "Добавлено вручную" ? Visibility.Visible : Visibility.Collapsed;
+        SelectedGame?.Source == GameInfo.ManualSource ? Visibility.Visible : Visibility.Collapsed;
 
     // A partially compressed game with a known algorithm gets a dedicated "finish"
     // panel instead of the mode selection, so algorithms are not mixed within one game.
@@ -458,8 +480,8 @@ public sealed class MainViewModel : ObservableObject
 
     public string FinishCompressionButtonText =>
         SelectedGame is { } selected && IsResumableAlgorithm(selected.CompressionAlgorithm)
-            ? $"Дожать · {selected.CompressionAlgorithm}"
-            : "Дожать";
+            ? $"{Strings.Action_Finish} · {selected.CompressionAlgorithm}"
+            : Strings.Action_Finish;
 
     public Visibility DirectStorageWarningVisibility =>
         SelectedGame?.HasDirectStorage == true && UncompressedPanelVisibility == Visibility.Visible
@@ -564,7 +586,7 @@ public sealed class MainViewModel : ObservableObject
     public string ActiveCompressionModeText => _activeCompressionAlgorithm ?? string.Empty;
 
     public string ActiveCompressionDetailsText =>
-        _activeCompressionSavings is null ? string.Empty : $"Ожидаемая экономия: {_activeCompressionSavings}";
+        _activeCompressionSavings is null ? string.Empty : string.Format(Strings.Active_ExpectedSavings, _activeCompressionSavings);
 
     // While a compression runs, the estimate list is replaced with a read-only card of
     // the chosen mode, so the selection cannot be toyed with mid-operation.
@@ -599,7 +621,7 @@ public sealed class MainViewModel : ObservableObject
         LoadOperationHistory();
         await RefreshLibraryAsync();
         if (interrupted > 0)
-            StatusText = "Предыдущая операция была прервана. Состояние игры будет проверено при выборе.";
+            StatusText = Strings.Status_PreviousInterrupted;
         await OfferToResumeInterruptedCompressionAsync();
         _ = CheckWatchedGamesAsync(false);
         _ = CheckForUpdatesAsync();
@@ -615,7 +637,7 @@ public sealed class MainViewModel : ObservableObject
                 return;
 
             _updateUrl = newer.Value.Url;
-            UpdateNoticeText = $"Доступна версия {newer.Value.Version.ToString(3)}";
+            UpdateNoticeText = string.Format(Strings.Update_Available, newer.Value.Version.ToString(3));
             OpenUpdateCommand.RaiseCanExecuteChanged();
             AppLog.Info($"Найдено обновление: {newer.Value.Version}");
         }
@@ -635,7 +657,7 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (Win32Exception exception)
         {
-            StatusText = $"Не удалось открыть браузер: {exception.Message}";
+            StatusText = string.Format(Strings.Status_BrowserFailed, exception.Message);
         }
     }
 
@@ -670,7 +692,7 @@ public sealed class MainViewModel : ObservableObject
             AppLog.Error("Проверка наблюдаемых игр не удалась", exception);
             WatcherHasFindings = false;
             ShowOnlyDegraded = false;
-            WatcherSummaryText = "Не удалось проверить обновления сжатых игр — подробности в журнале logs";
+            WatcherSummaryText = Strings.Watcher_CheckFailed;
         }
         finally
         {
@@ -702,15 +724,15 @@ public sealed class MainViewModel : ObservableObject
         {
             var reclaimable = outcome.Degraded.Sum(item => item.PotentialSavingsBytes);
             var savingsNote = reclaimable > 0
-                ? $" — можно вернуть ~{ByteFormatter.Format(reclaimable)}"
+                ? string.Format(Strings.Watcher_ReclaimableNote, ByteFormatter.Format(reclaimable))
                 : string.Empty;
-            WatcherSummaryText = $"Требуют дожатия: {_degradedPaths.Count}{savingsNote}";
+            WatcherSummaryText = string.Format(Strings.Watcher_NeedsFinishingCount, _degradedPaths.Count) + savingsNote;
         }
         else
         {
             WatcherSummaryText = outcome.WatchedCount == 0
                 ? string.Empty
-                : $"Наблюдение: {outcome.WatchedCount} сжатых игр, деградации сжатия нет";
+                : string.Format(Strings.Watcher_NoDecay, outcome.WatchedCount);
         }
 
         // The filter cannot stay on with nothing to show — that would leave an
@@ -773,13 +795,13 @@ public sealed class MainViewModel : ObservableObject
         using (GamesView.DeferRefresh())
         {
             GamesView.SortDescriptions.Clear();
-            switch (_selectedSortOption)
+            switch (_selectedSortOption.Id)
             {
-                case "Сначала крупные":
+                case "largest":
                     GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.LogicalSizeBytes), ListSortDirection.Descending));
                     GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.Name), ListSortDirection.Ascending));
                     break;
-                case "Сначала несжатые":
+                case "uncompressed":
                     GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.CompressionState), ListSortDirection.Ascending));
                     GamesView.SortDescriptions.Add(new SortDescription(nameof(GameInfo.LogicalSizeBytes), ListSortDirection.Descending));
                     break;
@@ -805,7 +827,7 @@ public sealed class MainViewModel : ObservableObject
         _userPreferences = dialog.Result with { ExpertMode = IsExpertMode };
         try { _preferences.Save(_userPreferences); }
         catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
-        StatusText = "Настройки сохранены";
+        StatusText = Strings.Status_SettingsSaved;
         _ = CheckWatchedGamesAsync(false);
     }
 
@@ -823,9 +845,8 @@ public sealed class MainViewModel : ObservableObject
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Сжатие игры «{game.Name}» ({latest.Algorithm}) было прервано.\n\n" +
-            "Продолжить с места остановки? Уже сжатые файлы будут пропущены автоматически.",
-            "Продолжить сжатие",
+            string.Format(Strings.Resume_Prompt, game.Name, latest.Algorithm),
+            Strings.Resume_Title,
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
@@ -845,8 +866,8 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task ScanLibrariesInternalAsync()
     {
-        ScanButtonText = "Поиск…";
-        StatusText = "Сканируем библиотеки игр";
+        ScanButtonText = Strings.Scan_InProgress;
+        StatusText = Strings.Status_ScanningLibraries;
 
         try
         {
@@ -883,12 +904,12 @@ public sealed class MainViewModel : ObservableObject
                     savedManualGame.Name,
                     manualPath,
                     savedManualGame.LogicalSizeBytes,
-                    "Добавлено вручную",
+                    GameInfo.ManualSource,
                     savedManualGame.SteamAppId)));
             }
 
             foreach (var manualGame in previousGames.Values.Where(game =>
-                         string.Equals(game.Source, "Добавлено вручную", StringComparison.OrdinalIgnoreCase) &&
+                         string.Equals(game.Source, GameInfo.ManualSource, StringComparison.OrdinalIgnoreCase) &&
                          Games.All(current => !string.Equals(current.InstallPath, game.InstallPath, StringComparison.OrdinalIgnoreCase))))
                 Games.Add(manualGame);
 
@@ -897,18 +918,18 @@ public sealed class MainViewModel : ObservableObject
                     string.Equals(game.InstallPath, selectedPath, StringComparison.OrdinalIgnoreCase));
 
             StatusText = foundGames.Count == 0
-                ? "Игры не найдены — добавьте папку вручную"
-                : $"Найдено игр: {foundGames.Count}";
+                ? Strings.Status_NoGamesFound
+                : string.Format(Strings.Status_GamesFound, foundGames.Count);
             RefreshCoversCommand.RaiseCanExecuteChanged();
             RefreshSavingsSummary();
         }
         catch (Exception exception)
         {
-            StatusText = $"Не удалось просканировать библиотеку: {exception.Message}";
+            StatusText = string.Format(Strings.Status_ScanFailed, exception.Message);
         }
         finally
         {
-            ScanButtonText = "Обновить библиотеку";
+            ScanButtonText = Strings.Scan_Refresh;
         }
     }
 
@@ -937,7 +958,7 @@ public sealed class MainViewModel : ObservableObject
     {
         var dialog = new OpenFolderDialog
         {
-            Title = "Выберите папку с игрой",
+            Title = Strings.AddFolder_DialogTitle,
             Multiselect = false
         };
 
@@ -945,7 +966,7 @@ public sealed class MainViewModel : ObservableObject
             return;
 
         var path = GamePath.Normalize(dialog.FolderName);
-        StatusText = "Определяем игру и рассчитываем размер…";
+        StatusText = Strings.Status_DetectingGame;
         var sizeTask = Task.Run(() => _fileTreeService.CalculateLogicalSize(path));
         var identityTask = _gameIdentityService.DetectAsync(path);
         var directStorageTask = Task.Run(() => _directStorageDetector.Detect(path));
@@ -953,7 +974,7 @@ public sealed class MainViewModel : ObservableObject
         var size = await sizeTask;
         var identity = await identityTask;
         var game = ApplySavedCompressionStatus(
-            new GameInfo(identity.Name, path, size, "Добавлено вручную", identity.SteamAppId));
+            new GameInfo(identity.Name, path, size, GameInfo.ManualSource, identity.SteamAppId));
         game.HasDirectStorage = await directStorageTask;
 
         var existing = Games.FirstOrDefault(item =>
@@ -971,7 +992,7 @@ public sealed class MainViewModel : ObservableObject
         catch (UnauthorizedAccessException) { }
 
         SelectedGame = game;
-        StatusText = $"Добавлена игра «{game.Name}»";
+        StatusText = string.Format(Strings.Status_GameAdded, game.Name);
         RefreshCoversCommand.RaiseCanExecuteChanged();
         RefreshSavingsSummary();
         _ = await LoadCoverAsync(game, false);
@@ -980,23 +1001,20 @@ public sealed class MainViewModel : ObservableObject
     private void RemoveSelectedGame()
     {
         var game = SelectedGame;
-        if (game?.Source != "Добавлено вручную" || IsAnalyzing || IsOperating || IsCheckingCompression)
+        if (game?.Source != GameInfo.ManualSource || IsAnalyzing || IsOperating || IsCheckingCompression)
             return;
 
-        var message = $"Убрать игру «{game.Name}» из библиотеки?\n\n" +
-                      "Игра будет убрана из библиотеки vKOROBKU. " +
-                      "Файлы на диске не изменяются и не удаляются.";
+        var message = string.Format(Strings.Remove_Prompt, game.Name);
         var isCompressed = game.CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
         if (isCompressed)
         {
-            message += "\n\nВнимание: игра останется сжатой. Чтобы вернуть файлы в исходное состояние, " +
-                       "сначала выполните распаковку.";
+            message += "\n\n" + Strings.Remove_StillCompressedNote;
         }
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
             message,
-            "Убрать из библиотеки",
+            Strings.Card_RemoveFromLibrary,
             MessageBoxButton.YesNo,
             isCompressed ? MessageBoxImage.Warning : MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
@@ -1027,7 +1045,7 @@ public sealed class MainViewModel : ObservableObject
         var gameName = game.Name;
         Games.Remove(game);
         SelectedGame = null;
-        StatusText = $"Игра «{gameName}» убрана из библиотеки";
+        StatusText = string.Format(Strings.Status_GameRemoved, gameName);
         RefreshCoversCommand.RaiseCanExecuteChanged();
         RaiseActionCommands();
         RefreshSavingsSummary();
@@ -1035,8 +1053,8 @@ public sealed class MainViewModel : ObservableObject
 
     private static void ShowRemoveGameError(string details) => MessageBox.Show(
         Application.Current.MainWindow,
-        $"Не удалось убрать игру из библиотеки. Проверьте доступ к локальным данным vKOROBKU.\n\n{details}",
-        "Ошибка удаления из библиотеки",
+        $"{Strings.Remove_Failed}\n\n{details}",
+        Strings.Remove_FailedTitle,
         MessageBoxButton.OK,
         MessageBoxImage.Error);
 
@@ -1065,14 +1083,14 @@ public sealed class MainViewModel : ObservableObject
     private async Task ReviewSelectedGameIdentityAsync()
     {
         var game = SelectedGame;
-        if (game is null || game.Source != "Добавлено вручную")
+        if (game is null || game.Source != GameInfo.ManualSource)
             return;
 
         var dialog = new ManualGameIdentityWindow(game.Name) { Owner = Application.Current.MainWindow };
         if (dialog.ShowDialog() != true)
             return;
 
-        StatusText = "Ищем игру и подходящую обложку…";
+        StatusText = Strings.Status_SearchingIdentity;
         var identity = await _gameIdentityService.FindByNameAsync(dialog.GameName);
         game.Name = identity.Name;
         game.SteamAppId = identity.SteamAppId;
@@ -1090,8 +1108,8 @@ public sealed class MainViewModel : ObservableObject
         ReviewIdentityCommand.RaiseCanExecuteChanged();
         _ = await LoadCoverAsync(game, true);
         StatusText = identity.SteamAppId is null
-            ? $"Название сохранено: «{game.Name}»"
-            : $"Игра определена: «{game.Name}»";
+            ? string.Format(Strings.Status_NameSaved, game.Name)
+            : string.Format(Strings.Status_GameIdentified, game.Name);
     }
 
     private void ShowOperations()
@@ -1165,9 +1183,9 @@ public sealed class MainViewModel : ObservableObject
                     current.CoverPath = coverPath;
             }),
             async completed => await dispatcher.InvokeAsync(() =>
-                StatusText = $"Загрузка обложек: {completed} из {snapshot.Length}"));
+                StatusText = string.Format(Strings.Status_LoadingCovers, completed, snapshot.Length)));
 
-        StatusText = result.FailureMessage ?? $"Библиотека готова · проверено обложек: {result.Completed}";
+        StatusText = result.FailureMessage ?? string.Format(Strings.Status_LibraryReady, result.Completed);
     }
 
     private async Task<bool> LoadCoverAsync(GameInfo game, bool forceRefresh)
@@ -1187,12 +1205,12 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (HttpRequestException exception)
         {
-            StatusText = $"Сервис обложек недоступен: {exception.Message}";
+            StatusText = string.Format(Strings.Status_CoversUnavailable, exception.Message);
             return false;
         }
         catch (TaskCanceledException)
         {
-            StatusText = "Сервис обложек не ответил вовремя";
+            StatusText = Strings.Covers_Timeout;
             return false;
         }
     }
@@ -1202,9 +1220,9 @@ public sealed class MainViewModel : ObservableObject
         var game = SelectedGame;
         if (game is null)
             return;
-        StatusText = $"Обновляем обложку «{game.Name}»…";
+        StatusText = string.Format(Strings.Status_RefreshingCover, game.Name);
         if (await LoadCoverAsync(game, true))
-            StatusText = $"Обложка «{game.Name}» проверена";
+            StatusText = string.Format(Strings.Status_CoverChecked, game.Name);
     }
 
     private Task AnalyzeSelectedGameAsync() =>
@@ -1219,10 +1237,10 @@ public sealed class MainViewModel : ObservableObject
         Estimates.Clear();
         _analysisCancellation = new CancellationTokenSource();
         IsAnalyzing = true;
-        SetActiveOperation($"Анализируется: {game.Name}", game.InstallPath);
+        SetActiveOperation(string.Format(Strings.Active_Analyzing, game.Name), game.InstallPath);
         OperationProgress = 0;
-        AnalysisButtonText = "Анализ выполняется…";
-        AnalysisSummary = "Инвентаризация файлов…";
+        AnalysisButtonText = Strings.Analysis_ButtonRunning;
+        AnalysisSummary = Strings.Analysis_Inventory;
         OperationSummary = AnalysisSummary;
 
         var tracker = OperationTracker.BeginAnalysis(
@@ -1290,8 +1308,8 @@ public sealed class MainViewModel : ObservableObject
             if (analyzedGameSelected)
                 AnalysisSummary = BuildSavedAnalysisSummary(result, analyzedAt);
             StatusText = cacheSaved
-                ? $"Анализ игры «{game.Name}» завершён и сохранён"
-                : $"Анализ игры «{game.Name}» завершён, но кэш записать не удалось";
+                ? string.Format(Strings.Analysis_DoneSaved, game.Name)
+                : string.Format(Strings.Analysis_DoneCacheFailed, game.Name);
             OperationSummary = StatusText;
             tracker.Finish(OperationJournalState.Completed, StatusText, new WorkerMessage(
                 "completed", StatusText,
@@ -1303,19 +1321,19 @@ public sealed class MainViewModel : ObservableObject
         catch (OperationCanceledException)
         {
             acceptAnalysisProgress = false;
-            OperationSummary = "Анализ отменён. Временные файлы удалены.";
+            OperationSummary = Strings.Analysis_CancelledDetail;
             if (IsGameSelected(game))
                 AnalysisSummary = OperationSummary;
-            StatusText = "Анализ отменён";
+            StatusText = Strings.Analysis_Cancelled;
             tracker.Finish(OperationJournalState.Cancelled, OperationSummary);
         }
         catch (Exception exception)
         {
             acceptAnalysisProgress = false;
-            OperationSummary = $"Анализ не выполнен: {exception.Message}";
+            OperationSummary = string.Format(Strings.Analysis_Failed, exception.Message);
             if (IsGameSelected(game))
                 AnalysisSummary = OperationSummary;
-            StatusText = "Ошибка анализа";
+            StatusText = Strings.Analysis_Error;
             tracker.Finish(OperationJournalState.Failed, OperationSummary);
         }
         finally
@@ -1326,7 +1344,7 @@ public sealed class MainViewModel : ObservableObject
             IsAnalyzing = false;
             ClearActiveOperation();
             if (IsGameSelected(game))
-                AnalysisButtonText = "Повторить анализ";
+                AnalysisButtonText = Strings.Analysis_ButtonRepeat;
         }
     }
 
@@ -1404,8 +1422,7 @@ public sealed class MainViewModel : ObservableObject
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Игра «{game.Name}» использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения " +
-            "и может замедлить загрузки.\n\nВсё равно сжать?",
+            string.Format(Strings.DirectStorage_ConfirmPrompt, game.Name),
             "DirectStorage",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1424,10 +1441,8 @@ public sealed class MainViewModel : ObservableObject
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Игра: {game.Name}\nМетод: {game.CompressionAlgorithm} (как при первоначальном сжатии)\n\n" +
-            "Будут сжаты только файлы без сжатия — уже сжатые пропускаются.\n" +
-            "Игра должна быть закрыта. Продолжить?",
-            "Дожать сжатие",
+            string.Format(Strings.Finish_Prompt, game.Name, game.CompressionAlgorithm),
+            Strings.Finish_Title,
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
@@ -1445,7 +1460,7 @@ public sealed class MainViewModel : ObservableObject
             return;
         if (!Directory.Exists(game.InstallPath))
         {
-            StatusText = $"Папка игры не найдена: {game.InstallPath}";
+            StatusText = string.Format(Strings.Status_FolderNotFound, game.InstallPath);
             return;
         }
 
@@ -1456,11 +1471,11 @@ public sealed class MainViewModel : ObservableObject
                 FileName = game.InstallPath,
                 UseShellExecute = true
             });
-            StatusText = $"Открываем папку игры «{game.Name}»";
+            StatusText = string.Format(Strings.Status_OpeningFolder, game.Name);
         }
         catch (Win32Exception exception)
         {
-            StatusText = $"Не удалось открыть проводник: {exception.Message}";
+            StatusText = string.Format(Strings.Status_ExplorerFailed, exception.Message);
         }
     }
 
@@ -1504,14 +1519,17 @@ public sealed class MainViewModel : ObservableObject
             return;
         }
 
-        AllTimeStatsText = $"за всё время: {ByteFormatter.Format(current.FreedBytes)}";
-        var since = current.FirstOperationAt is { } first ? $" · с {first:dd.MM.yyyy}" : string.Empty;
+        AllTimeStatsText = string.Format(Strings.Stats_AllTime, ByteFormatter.Format(current.FreedBytes));
+        var since = current.FirstOperationAt is { } first
+            ? string.Format(Strings.Stats_SinceDate, $"{first:dd.MM.yyyy}")
+            : string.Empty;
         var driveLines = current.Drives
             .OrderByDescending(pair => pair.Value.FreedBytes)
-            .Select(pair => $"{pair.Key} — {ByteFormatter.Format(pair.Value.FreedBytes)} · операций: {pair.Value.Operations}");
+            .Select(pair => string.Format(
+                Strings.Stats_DriveLine, pair.Key, ByteFormatter.Format(pair.Value.FreedBytes), pair.Value.Operations));
         AllTimeStatsTooltip =
-            $"Освобождено сжатием за всё время работы{since}\n" +
-            $"Операций сжатия: {current.Operations}\n\n" +
+            string.Format(Strings.Stats_TooltipHeader, since) + "\n" +
+            string.Format(Strings.Stats_OperationsCount, current.Operations) + "\n\n" +
             string.Join("\n", driveLines);
     }
 
@@ -1535,16 +1553,16 @@ public sealed class MainViewModel : ObservableObject
             drive.SavedBytes = savedByRoot.TryGetValue(drive.Name, out var savedBytes) ? savedBytes : 0;
 
         TotalSavingsText = totalSavedBytes > 0
-            ? $"Сэкономлено всего: {ByteFormatter.Format(totalSavedBytes)}"
+            ? string.Format(Strings.Stats_TotalSaved, ByteFormatter.Format(totalSavedBytes))
             : string.Empty;
     }
 
     private static string DescribeCompressionState(GameInfo game) => game.CompressionState switch
     {
-        GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {game.CompressionAlgorithm ?? "Windows"}",
-        GameCompressionState.PartiallyCompressed => $"Игра «{game.Name}» сжата частично: {game.CompressionAlgorithm ?? "Windows"}",
-        GameCompressionState.Uncompressed => $"Игра «{game.Name}» не сжата",
-        _ => $"Состояние сжатия игры «{game.Name}» не проверено"
+        GameCompressionState.Compressed => string.Format(Strings.State_AlreadyCompressed, game.Name, game.CompressionAlgorithm ?? "Windows"),
+        GameCompressionState.PartiallyCompressed => string.Format(Strings.State_PartiallyCompressed, game.Name, game.CompressionAlgorithm ?? "Windows"),
+        GameCompressionState.Uncompressed => string.Format(Strings.State_NotCompressed, game.Name),
+        _ => string.Format(Strings.State_NotChecked, game.Name)
     };
 
     private Task RecheckSelectedGameCompressionAsync()
@@ -1562,7 +1580,7 @@ public sealed class MainViewModel : ObservableObject
     private async Task RefreshCompressionStatusAsync(GameInfo game, CancellationToken cancellationToken)
     {
         IsCheckingCompression = true;
-        StatusText = $"Проверяем состояние сжатия игры «{game.Name}»…";
+        StatusText = string.Format(Strings.Status_CheckingState, game.Name);
         try
         {
             var detected = await _compressionDetector.DetectAsync(game.InstallPath, cancellationToken);
@@ -1591,17 +1609,17 @@ public sealed class MainViewModel : ObservableObject
                 buildChanged ? savedStatus?.SteamBuildId : game.SteamBuildId, hasDirectStorage);
             StatusText = state switch
             {
-                GameCompressionState.Compressed => $"Игра «{game.Name}» уже сжата: {detected.Algorithm ?? "Windows"}",
+                GameCompressionState.Compressed => string.Format(Strings.State_AlreadyCompressed, game.Name, detected.Algorithm ?? "Windows"),
                 GameCompressionState.PartiallyCompressed => buildChanged
-                    ? $"Игра «{game.Name}» обновилась и требует дообработки"
-                    : $"Игра «{game.Name}» сжата частично: {detected.Algorithm ?? "Windows"}",
-                _ => $"Игра «{game.Name}» не сжата"
+                    ? string.Format(Strings.State_UpdatedNeedsWork, game.Name)
+                    : string.Format(Strings.State_PartiallyCompressed, game.Name, detected.Algorithm ?? "Windows"),
+                _ => string.Format(Strings.State_NotCompressed, game.Name)
             };
         }
         catch (OperationCanceledException) { }
         catch (Exception exception)
         {
-            StatusText = $"Не удалось определить состояние сжатия: {exception.Message}";
+            StatusText = string.Format(Strings.Status_StateCheckFailed, exception.Message);
         }
         finally
         {
@@ -1704,15 +1722,19 @@ public sealed class MainViewModel : ObservableObject
             Estimates.Add(estimate);
         SelectedEstimate = ChooseBalancedEstimate(saved.Result.Estimates) ?? Estimates.FirstOrDefault();
         AnalysisSummary = game.IsAnalysisStale
-            ? "Игра обновилась — перед оптимизацией нужен новый быстрый анализ."
+            ? Strings.Analysis_StaleHint
             : BuildSavedAnalysisSummary(saved.Result, saved.AnalyzedAt);
-        AnalysisButtonText = "Повторить анализ";
-        StatusText = $"Загружен сохранённый анализ игры «{game.Name}»";
+        AnalysisButtonText = Strings.Analysis_ButtonRepeat;
+        StatusText = string.Format(Strings.Status_AnalysisLoaded, game.Name);
     }
 
     private static string BuildSavedAnalysisSummary(GameAnalysisResult result, DateTimeOffset analyzedAt) =>
-        $"Анализ от {analyzedAt:dd.MM.yyyy HH:mm} · {result.FileCount:N0} файлов · " +
-        $"выборка {ByteFormatter.Format(result.SampleBytes)} · физически занято {ByteFormatter.Format(result.CurrentPhysicalBytes)}";
+        string.Format(
+            Strings.Analysis_SavedSummary,
+            $"{analyzedAt:dd.MM.yyyy HH:mm}",
+            $"{result.FileCount:N0}",
+            ByteFormatter.Format(result.SampleBytes),
+            ByteFormatter.Format(result.CurrentPhysicalBytes));
 
     private async Task OptimizeSelectedGameAsync()
     {
@@ -1751,10 +1773,9 @@ public sealed class MainViewModel : ObservableObject
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Игра: {game.Name}\nАлгоритм: {estimate.AlgorithmText}\n" +
-            $"Прогноз размера: {estimate.EstimatedSizeText}\nЭкономия: {estimate.SavingsText}\n\n" +
-            "Игра должна быть закрыта. Продолжить?",
-            "Подтверждение сжатия",
+            string.Format(Strings.Compress_Prompt,
+                game.Name, estimate.AlgorithmText, estimate.EstimatedSizeText, estimate.SavingsText),
+            Strings.Compress_Title,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
         if (confirmation != MessageBoxResult.Yes)
@@ -1773,8 +1794,8 @@ public sealed class MainViewModel : ObservableObject
 
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Полностью распаковать файлы игры «{game.Name}»?\n\nИгра должна быть закрыта.",
-            "Подтверждение распаковки",
+            string.Format(Strings.Decompress_Prompt, game.Name),
+            Strings.Decompress_Title,
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
@@ -1795,12 +1816,12 @@ public sealed class MainViewModel : ObservableObject
         catch (OperationCanceledException exception)
         {
             OperationSummary = exception.Message;
-            StatusText = "Операция отменена";
+            StatusText = Strings.Operation_Cancelled;
         }
         catch (Exception exception)
         {
-            OperationSummary = $"Операция не выполнена: {exception.Message}";
-            StatusText = "Ошибка системной операции";
+            OperationSummary = string.Format(Strings.Operation_Failed, exception.Message);
+            StatusText = Strings.Operation_SystemError;
         }
         finally
         {
@@ -1820,13 +1841,15 @@ public sealed class MainViewModel : ObservableObject
     // a lost session is reported through the outcome so a queue can stop cleanly.
     private async Task<QueueJobOutcome> RunJobInSessionAsync(WorkerSession session, WorkerJob job)
     {
-        var tracker = OperationTracker.Begin(_operationJournal, UpsertOperation, job, "Ожидание Worker");
+        var tracker = OperationTracker.Begin(_operationJournal, UpsertOperation, job, Strings.Journal_WaitingWorker);
         var acceptWorkerProgress = true;
 
         var targetGame = Games.FirstOrDefault(item =>
             string.Equals(item.InstallPath, job.RootPath, StringComparison.OrdinalIgnoreCase));
         SetActiveOperation(
-            $"{(job.Operation == "compress" ? "Сжимается" : "Распаковывается")}: {targetGame?.Name ?? job.RootPath}",
+            string.Format(
+                job.Operation == "compress" ? Strings.Active_Compressing : Strings.Active_Decompressing,
+                targetGame?.Name ?? job.RootPath),
             job.RootPath);
         var selectedEstimate = SelectedEstimate;
         _activeCompressionAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
@@ -1836,7 +1859,7 @@ public sealed class MainViewModel : ObservableObject
             : null;
         NotifyActiveCompressionInfo();
         OperationProgress = 0;
-        OperationSummary = "Ожидаем подтверждение прав администратора…";
+        OperationSummary = Strings.Operation_WaitingUac;
         StatusText = OperationSummary;
 
         var progress = new Progress<WorkerMessage>(message =>
@@ -1846,7 +1869,7 @@ public sealed class MainViewModel : ObservableObject
             if (message.TotalBytes > 0)
                 OperationProgress = Math.Clamp(message.ProcessedBytes * 100d / message.TotalBytes, 0, 100);
             var counters = message.TotalFiles > 0
-                ? $" · {message.ProcessedFiles:N0} из {message.TotalFiles:N0} файлов"
+                ? string.Format(Strings.Operation_FilesCounter, $"{message.ProcessedFiles:N0}", $"{message.TotalFiles:N0}")
                 : string.Empty;
             OperationSummary = $"{message.Text}{counters}";
             StatusText = OperationSummary;
@@ -1859,14 +1882,14 @@ public sealed class MainViewModel : ObservableObject
             acceptWorkerProgress = false;
             if (result.Type == "error")
             {
-                OperationSummary = $"Операция не выполнена: {result.Text ?? "ошибка системного модуля"}";
-                StatusText = "Ошибка системной операции";
+                OperationSummary = string.Format(Strings.Operation_Failed, result.Text ?? Strings.Worker_Error);
+                StatusText = Strings.Operation_SystemError;
                 tracker.Finish(OperationJournalState.Failed, OperationSummary);
                 return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, result.Text);
             }
             if (result.Type == "cancelled")
             {
-                OperationSummary = result.Text ?? "Операция отменена";
+                OperationSummary = result.Text ?? Strings.Operation_Cancelled;
                 StatusText = OperationSummary;
                 tracker.Finish(OperationJournalState.Cancelled, OperationSummary, result);
                 // A cancelled run leaves the game part-converted at the NTFS level, so
@@ -1943,19 +1966,20 @@ public sealed class MainViewModel : ObservableObject
                 UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
 
             var skipNote = result.SkipListedFiles > 0
-                ? $" · пропущено несжимаемых: {result.SkipListedFiles:N0} ({ByteFormatter.Format(result.SkipListedBytes)})"
+                ? string.Format(Strings.Operation_SkippedNote, $"{result.SkipListedFiles:N0}", ByteFormatter.Format(result.SkipListedBytes))
                 : string.Empty;
             // ErrorCount are files compact.exe could not convert (locked by another
             // process, or no WOF benefit outside our exclusions) — the operation itself
             // succeeded, so the wording avoids the scary word "errors".
             var leftoverNote = result.ErrorCount > 0
-                ? $" · не сжато файлов: {result.ErrorCount:N0}"
+                ? string.Format(Strings.Operation_LeftoverNote, $"{result.ErrorCount:N0}")
                 : string.Empty;
             OperationSummary = job.Operation == "compress"
-                ? $"Готово · освобождено {ByteFormatter.Format(Math.Max(0, difference))} · общая экономия {ByteFormatter.Format(savedBytes)}{leftoverNote}{skipNote}"
+                ? string.Format(Strings.Operation_CompressDone,
+                      ByteFormatter.Format(Math.Max(0, difference)), ByteFormatter.Format(savedBytes)) + leftoverNote + skipNote
                 : decompressIncomplete
-                    ? $"Распаковка завершена частично · осталось файлов: {result.ErrorCount:N0}"
-                    : $"Готово · распаковано {result.ProcessedFiles:N0} файлов";
+                    ? string.Format(Strings.Operation_DecompressPartial, $"{result.ErrorCount:N0}")
+                    : string.Format(Strings.Operation_DecompressDone, $"{result.ProcessedFiles:N0}");
             StatusText = OperationSummary;
             Computer = _computerInfoService.GetComputerInfo();
             RefreshSavingsSummary();
@@ -1971,8 +1995,8 @@ public sealed class MainViewModel : ObservableObject
             // unusable, which the outcome reports so a queue stops instead of feeding
             // jobs into a dead process.
             acceptWorkerProgress = false;
-            OperationSummary = $"Операция не выполнена: {exception.Message}";
-            StatusText = "Ошибка системной операции";
+            OperationSummary = string.Format(Strings.Operation_Failed, exception.Message);
+            StatusText = Strings.Operation_SystemError;
             tracker.Finish(OperationJournalState.Failed, OperationSummary);
             return new QueueJobOutcome(QueueItemStatus.Failed, 0, true, exception.Message);
         }
@@ -2021,14 +2045,14 @@ public sealed class MainViewModel : ObservableObject
     {
         var selected = Games.Where(game => game.IsQueueSelected).ToList();
         QueueSelectionText = selected.Count == 0
-            ? "Отметьте игры галочками на карточках"
-            : $"Выбрано: {selected.Count} · {ByteFormatter.Format(selected.Sum(game => game.LogicalSizeBytes))}";
+            ? Strings.MultiSelect_Hint
+            : string.Format(Strings.MultiSelect_Selected, selected.Count, ByteFormatter.Format(selected.Sum(game => game.LogicalSizeBytes)));
     }
 
     private string ResolveQueueAlgorithm(GameInfo game)
     {
-        if (SelectedQueueMethod != AutoQueueMethod)
-            return SelectedQueueMethod;
+        if (SelectedQueueMethod.Id != AutoQueueMethod)
+            return SelectedQueueMethod.Id;
         // A partially compressed game keeps its current algorithm — mixing methods
         // inside one game is exactly the mess the queue must not create.
         if (game.CompressionState == GameCompressionState.PartiallyCompressed &&
@@ -2051,21 +2075,20 @@ public sealed class MainViewModel : ObservableObject
             .ToList();
         if (items.Count == 0)
         {
-            StatusText = "Все отмеченные игры используют DirectStorage — сжатие им не рекомендуется";
+            StatusText = Strings.Queue_AllDirectStorage;
             return;
         }
 
         var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
         if (items.Count > 12)
-            preview += $"\n…и ещё {items.Count - 12}";
+            preview += "\n" + string.Format(Strings.Queue_AndMore, items.Count - 12);
         var directStorageNote = directStorage.Count > 0
-            ? $"\n\nПропущено из-за DirectStorage: {directStorage.Count}"
+            ? "\n\n" + string.Format(Strings.Queue_DirectStorageSkipped, directStorage.Count)
             : string.Empty;
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Сжать игр: {items.Count} — одной очередью?\n\n{preview}{directStorageNote}\n\n" +
-            "Права администратора будут запрошены один раз. Игры должны быть закрыты.",
-            "Подтверждение очереди",
+            string.Format(Strings.Queue_StartPrompt, items.Count, preview + directStorageNote),
+            Strings.Queue_StartTitle,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
         if (confirmation != MessageBoxResult.Yes)
@@ -2099,16 +2122,15 @@ public sealed class MainViewModel : ObservableObject
         }
         if (items.Count == 0)
         {
-            StatusText = "Игры для дожатия не найдены в библиотеке";
+            StatusText = Strings.Queue_NoDegradedGames;
             return;
         }
 
         var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            $"Дожать игр: {items.Count} — одной очередью?\n\n{preview}\n\n" +
-            "Права администратора будут запрошены один раз. Игры должны быть закрыты.",
-            "Дожать все",
+            string.Format(Strings.Queue_FinishPrompt, items.Count, preview),
+            Strings.Watcher_RecompressAll,
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
@@ -2132,7 +2154,7 @@ public sealed class MainViewModel : ObservableObject
         _queueStopAll = false;
         IsOperating = true;
         IsQueueRunning = true;
-        QueueTitle = $"Очередь сжатия · подготовка ({items.Count} игр)";
+        QueueTitle = string.Format(Strings.Queue_TitlePreparing, items.Count);
         AppLog.Info($"Очередь запущена: {items.Count} игр — {string.Join(", ", items.Select(item => item.Title))}");
         try
         {
@@ -2143,11 +2165,11 @@ public sealed class MainViewModel : ObservableObject
                 position++;
                 if (_queueStopAll || _queueStopAfterCurrent)
                 {
-                    item.MarkSkipped("остановлено");
+                    item.MarkSkipped(Strings.QueueItem_Stopped);
                     continue;
                 }
 
-                QueueTitle = $"Очередь сжатия · {position} из {items.Count}";
+                QueueTitle = string.Format(Strings.Queue_TitleProgress, position, items.Count);
                 item.MarkRunning();
                 AppLog.Info($"Очередь: {position}/{items.Count} — запускаем «{item.Game.Name}» ({item.Algorithm})");
                 var outcome = await RunJobInSessionAsync(session, new WorkerJob(
@@ -2158,13 +2180,13 @@ public sealed class MainViewModel : ObservableObject
                 switch (outcome.Status)
                 {
                     case QueueItemStatus.Completed:
-                        item.MarkCompleted(outcome.FreedBytes, $"готово · освобождено {ByteFormatter.Format(outcome.FreedBytes)}");
+                        item.MarkCompleted(outcome.FreedBytes, string.Format(Strings.QueueItem_Done, ByteFormatter.Format(outcome.FreedBytes)));
                         break;
                     case QueueItemStatus.Cancelled:
                         item.MarkCancelled();
                         break;
                     default:
-                        item.MarkFailed(outcome.FailureReason ?? "не выполнено");
+                        item.MarkFailed(outcome.FailureReason ?? Strings.QueueItem_Failed);
                         break;
                 }
 
@@ -2175,13 +2197,13 @@ public sealed class MainViewModel : ObservableObject
         catch (OperationCanceledException exception)
         {
             OperationSummary = exception.Message;
-            StatusText = "Операция отменена";
+            StatusText = Strings.Operation_Cancelled;
             AppLog.Info($"Очередь: отменена — {exception.Message}");
         }
         catch (Exception exception)
         {
-            OperationSummary = $"Очередь прервана: {exception.Message}";
-            StatusText = "Ошибка системной операции";
+            OperationSummary = string.Format(Strings.Queue_Aborted, exception.Message);
+            StatusText = Strings.Operation_SystemError;
             AppLog.Error("Очередь прервана", exception);
         }
         finally
@@ -2189,14 +2211,14 @@ public sealed class MainViewModel : ObservableObject
             foreach (var item in QueueItems)
             {
                 if (item.Status is QueueItemStatus.Pending or QueueItemStatus.Running)
-                    item.MarkSkipped("остановлено");
+                    item.MarkSkipped(Strings.QueueItem_Stopped);
             }
             IsQueueRunning = false;
             IsOperating = false;
             ClearActiveOperation();
             var completedCount = QueueItems.Count(item => item.Status == QueueItemStatus.Completed);
             var freedBytes = QueueItems.Sum(item => item.FreedBytes);
-            QueueTitle = $"Очередь завершена · сжато {completedCount} из {QueueItems.Count} · освобождено {ByteFormatter.Format(freedBytes)}";
+            QueueTitle = string.Format(Strings.Queue_TitleDone, completedCount, QueueItems.Count, ByteFormatter.Format(freedBytes));
             OperationSummary = QueueTitle;
             StatusText = QueueTitle;
             AppLog.Info(QueueTitle);

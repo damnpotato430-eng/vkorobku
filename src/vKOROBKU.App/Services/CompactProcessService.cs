@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.Diagnostics;
 using vKOROBKU.App.Models;
 
@@ -41,7 +42,7 @@ public sealed class CompactProcessService
         foreach (var argument in arguments)
             startInfo.ArgumentList.Add(argument);
 
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не удалось запустить compact.exe.");
+        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException(Strings.Compact_StartFailed);
         var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
         var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
 
@@ -59,6 +60,7 @@ public sealed class CompactProcessService
         var output = await outputTask;
         var error = await errorTask;
         if (process.ExitCode != 0)
-            throw new InvalidOperationException($"compact.exe завершился с кодом {process.ExitCode}: {error}\n{output}".Trim());
+            throw new InvalidOperationException(
+                string.Format(Strings.Compact_ExitCode, process.ExitCode, $"{error}\n{output}".Trim()));
     }
 }

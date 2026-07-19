@@ -4,6 +4,7 @@ using System.IO.Pipes;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using vKOROBKU.App.Resources;
 using vKOROBKU.Protocol;
 
 namespace vKOROBKU.App.Services;
@@ -21,7 +22,7 @@ public sealed class CompressionWorkerClient
         await using var session = await StartSessionAsync(cancellationToken);
         var result = await session.RunJobAsync(job, progress, cancellationToken);
         if (result.Type == "error")
-            throw new InvalidOperationException(result.Text ?? "Ошибка системного модуля.");
+            throw new InvalidOperationException(result.Text ?? Strings.Worker_Error);
         return result;
     }
 
@@ -31,7 +32,7 @@ public sealed class CompressionWorkerClient
     {
         var workerPath = Path.Combine(AppContext.BaseDirectory, "vKOROBKU.Worker.exe");
         if (!File.Exists(workerPath))
-            throw new FileNotFoundException("Не найден системный модуль vKOROBKU.Worker.exe.", workerPath);
+            throw new FileNotFoundException(Strings.Worker_NotFound, workerPath);
 
         var session = await WorkerSession.StartAsync(workerPath, cancellationToken);
         _activeSession = session;
@@ -99,11 +100,11 @@ public sealed class WorkerSession : IAsyncDisposable
             }
             catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
             {
-                throw new OperationCanceledException("Запрос прав администратора отменён.", exception);
+                throw new OperationCanceledException(Strings.Worker_UacCancelled, exception);
             }
 
             if (worker is null)
-                throw new InvalidOperationException("Не удалось запустить системный модуль.");
+                throw new InvalidOperationException(Strings.Worker_StartFailed);
 
             using var connectionTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             connectionTimeout.CancelAfter(TimeSpan.FromSeconds(30));
@@ -123,7 +124,7 @@ public sealed class WorkerSession : IAsyncDisposable
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
-                throw new TimeoutException("Системный модуль не подключился за 30 секунд.");
+                throw new TimeoutException(Strings.Worker_ConnectTimeout);
             }
 
             var reader = new StreamReader(pipe, new UTF8Encoding(false), false, 4096, true);
@@ -133,7 +134,7 @@ public sealed class WorkerSession : IAsyncDisposable
             var hello = helloLine is null ? null : JsonSerializer.Deserialize<WorkerMessage>(helloLine, JsonOptions);
             if (hello?.Type != "hello" || !CryptographicOperations.FixedTimeEquals(
                     Encoding.ASCII.GetBytes(hello.Token ?? string.Empty), Encoding.ASCII.GetBytes(token)))
-                throw new InvalidOperationException("Не удалось подтвердить подлинность системного модуля.");
+                throw new InvalidOperationException(Strings.Worker_AuthFailed);
 
             AppLog.Info("Сессия воркера: запущена и подтверждена");
             return new WorkerSession(pipe, reader, writer, worker, tokenFile);
@@ -164,10 +165,10 @@ public sealed class WorkerSession : IAsyncDisposable
             if (line is null)
             {
                 AppLog.Error("Сессия воркера: соединение неожиданно закрылось", new IOException(job.RootPath));
-                throw new IOException("Системный модуль неожиданно завершил соединение.");
+                throw new IOException(Strings.Worker_ConnectionLost);
             }
             var message = JsonSerializer.Deserialize<WorkerMessage>(line, JsonOptions)
-                ?? throw new InvalidDataException("Получен некорректный ответ системного модуля.");
+                ?? throw new InvalidDataException(Strings.Worker_BadResponse);
             progress?.Report(message);
 
             if (message.Type is "completed" or "cancelled" or "error")
@@ -229,10 +230,8 @@ public sealed class WorkerSession : IAsyncDisposable
     // by a different Windows account.
     private static string DescribeEarlyWorkerExit(int exitCode) => exitCode switch
     {
-        2 => "Системный модуль не смог прочитать одноразовый файл авторизации. Обычно это происходит, " +
-             "когда права администратора подтверждает другая учётная запись Windows. Подтвердите запрос UAC " +
-             "той же учётной записью, под которой запущено приложение, или запустите vKOROBKU от имени администратора.",
-        _ => $"Системный модуль завершился до подключения (код {exitCode})."
+        2 => Strings.Worker_TokenExit,
+        _ => string.Format(Strings.Worker_EarlyExit, exitCode)
     };
 
     private async Task WriteAsync(string line, CancellationToken cancellationToken)

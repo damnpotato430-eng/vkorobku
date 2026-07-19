@@ -1,5 +1,6 @@
 using System.Net.Http;
 using vKOROBKU.App.Models;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Services;
 
@@ -48,11 +49,11 @@ public sealed class CoverBatchLoader(CoverService coverService)
             }
             catch (HttpRequestException)
             {
-                StopRemaining("Сервис обложек временно недоступен");
+                StopRemaining(Strings.Covers_Unavailable);
             }
             catch (TaskCanceledException) when (!cancellation.IsCancellationRequested)
             {
-                StopRemaining("Сервис обложек не ответил вовремя");
+                StopRemaining(Strings.Covers_Timeout);
             }
             catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { }
             finally

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using vKOROBKU.App.Resources;
 
 namespace vKOROBKU.App.Models;
 
@@ -32,20 +33,20 @@ public sealed record OperationJournalEntry(
     [JsonIgnore]
     public string OperationText => Operation switch
     {
-        "analysis" => "Анализ",
-        "compress" => $"Сжатие{(string.IsNullOrWhiteSpace(Algorithm) ? string.Empty : $" · {Algorithm}")}",
-        "decompress" => "Распаковка",
+        "analysis" => Strings.Journal_OperationAnalysis,
+        "compress" => $"{Strings.Journal_OperationCompress}{(string.IsNullOrWhiteSpace(Algorithm) ? string.Empty : $" · {Algorithm}")}",
+        "decompress" => Strings.Journal_OperationDecompress,
         _ => Operation
     };
 
     [JsonIgnore]
     public string StateText => State switch
     {
-        OperationJournalState.Running => "Выполняется",
-        OperationJournalState.Completed => "Завершено",
-        OperationJournalState.Cancelled => "Отменено",
-        OperationJournalState.Failed => "Ошибка",
-        OperationJournalState.Interrupted => "Прервано",
+        OperationJournalState.Running => Strings.Journal_StateRunning,
+        OperationJournalState.Completed => Strings.Journal_StateCompleted,
+        OperationJournalState.Cancelled => Strings.Journal_StateCancelled,
+        OperationJournalState.Failed => Strings.Journal_StateFailed,
+        OperationJournalState.Interrupted => Strings.Journal_StateInterrupted,
         _ => State.ToString()
     };
 
@@ -61,12 +62,15 @@ public sealed record OperationJournalEntry(
     [JsonIgnore]
     public string ProgressText => Operation == "analysis"
         ? TotalBytes > 0
-            ? $"{ProgressPercent:0}% · {ByteFormatter.Format(ProcessedBytes)} из {ByteFormatter.Format(TotalBytes)} на текущем этапе"
+            ? string.Format(Strings.Journal_ProgressStageBytes,
+                $"{ProgressPercent:0}", ByteFormatter.Format(ProcessedBytes), ByteFormatter.Format(TotalBytes))
             : $"{ProgressPercent:0}%"
         : TotalBytes > 0
-            ? $"{ProgressPercent:0}% · {ByteFormatter.Format(ProcessedBytes)} из {ByteFormatter.Format(TotalBytes)}"
+            ? string.Format(Strings.Journal_ProgressBytes,
+                $"{ProgressPercent:0}", ByteFormatter.Format(ProcessedBytes), ByteFormatter.Format(TotalBytes))
             : TotalFiles > 0
-                ? $"{ProgressPercent:0}% · {ProcessedFiles:N0} из {TotalFiles:N0} файлов"
+                ? string.Format(Strings.Journal_ProgressFiles,
+                    $"{ProgressPercent:0}", $"{ProcessedFiles:N0}", $"{TotalFiles:N0}")
                 : $"{ProgressPercent:0}%";
 
     [JsonIgnore]

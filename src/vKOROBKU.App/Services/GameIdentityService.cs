@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
@@ -38,14 +39,14 @@ public sealed partial class GameIdentityService
         if (steamMatch is null && executableCandidate is not null &&
             !string.Equals(executableCandidate, folderCandidate, StringComparison.OrdinalIgnoreCase))
             steamMatch = await TryFindSteamMatchAsync(executableCandidate, cancellationToken);
-        return steamMatch ?? new DetectedGameIdentity(candidate, null, "Имя папки или EXE");
+        return steamMatch ?? new DetectedGameIdentity(candidate, null, Strings.Identity_SourceFolderName);
     }
 
     public async Task<DetectedGameIdentity> FindByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var cleaned = CleanName(name);
         return await TryFindSteamMatchAsync(cleaned, cancellationToken)
-               ?? new DetectedGameIdentity(cleaned, null, "Указано пользователем");
+               ?? new DetectedGameIdentity(cleaned, null, Strings.Identity_SourceUser);
     }
 
     /// <summary>Resolves a Steam app id from a game name for cover lookup — lets non-Steam
@@ -209,7 +210,7 @@ public sealed partial class GameIdentityService
                 .ToArray();
             var best = matches.FirstOrDefault();
             return best is not null && best.Score >= 0.72
-                ? new DetectedGameIdentity(best.Name, best.Id, "Каталог Steam")
+                ? new DetectedGameIdentity(best.Name, best.Id, Strings.Identity_SourceSteamCatalog)
                 : null;
         }
         catch (JsonException) { return null; }

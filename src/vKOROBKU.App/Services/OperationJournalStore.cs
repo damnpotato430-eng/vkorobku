@@ -1,3 +1,4 @@
+using vKOROBKU.App.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using vKOROBKU.App.Models;
@@ -18,7 +19,7 @@ public sealed class OperationJournalStore
     private readonly object _sync = new();
 
     public Guid Begin(WorkerJob job) =>
-        Begin(job.RootPath, job.Operation, job.Algorithm, "Ожидание Worker");
+        Begin(job.RootPath, job.Operation, job.Algorithm, Strings.Journal_WaitingWorker);
 
     public Guid Begin(string installPath, string operation, string? algorithm, string message)
     {
@@ -94,7 +95,7 @@ public sealed class OperationJournalStore
                 {
                     FinishedAt = DateTimeOffset.Now,
                     State = OperationJournalState.Interrupted,
-                    Message = "Приложение было закрыто до завершения операции"
+                    Message = Strings.Journal_InterruptedByExit
                 };
                 count++;
             }
