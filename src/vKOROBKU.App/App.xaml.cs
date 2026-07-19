@@ -1,9 +1,12 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
+using vKOROBKU.App.Resources;
+using vKOROBKU.App.Services;
 
 namespace vKOROBKU.App;
 
@@ -30,7 +33,29 @@ public partial class App : Application
             Shutdown(0);
             return;
         }
+        ApplyLanguagePreference();
         base.OnStartup(e);
+    }
+
+    // Must run before the main window is created: XAML resolves the x:Static string
+    // properties at construction time. "auto" keeps the OS UI culture — the resource
+    // fallback then serves Russian to Russian systems and English to everything else.
+    private static void ApplyLanguagePreference()
+    {
+        try
+        {
+            var language = new UserPreferencesStore().Load().Language;
+            if (language is not ("ru" or "en"))
+                return;
+            var culture = CultureInfo.GetCultureInfo(language);
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+        }
+        catch (CultureNotFoundException) { }
+        catch (Exception exception)
+        {
+            AppLog.Error("Не удалось применить язык интерфейса", exception);
+        }
     }
 
     private static void ActivateRunningInstance()
@@ -72,7 +97,7 @@ public partial class App : Application
         if (_unhandledUiExceptionCount >= 3)
         {
             MessageBox.Show(
-                $"Ошибки повторяются, приложение будет закрыто. Отчёты сохранены в папке logs.\n\n{e.Exception.Message}",
+                $"{Strings.App_ErrorRepeated}\n\n{e.Exception.Message}",
                 "vKOROBKU",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -81,7 +106,7 @@ public partial class App : Application
         }
 
         MessageBox.Show(
-            $"Произошла непредвиденная ошибка, работа продолжается. Отчёт сохранён в папке logs.\n\n{e.Exception.Message}",
+            $"{Strings.App_ErrorContinues}\n\n{e.Exception.Message}",
             "vKOROBKU",
             MessageBoxButton.OK,
             MessageBoxImage.Error);

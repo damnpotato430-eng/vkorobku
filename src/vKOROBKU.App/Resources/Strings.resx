@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>Errors keep repeating, the application will close. Reports are saved in the logs folder.</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>An unexpected error occurred, work continues. A report is saved in the logs folder.</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>PACK GAMES SMARTER</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>Library</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>Operations</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>About</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>ANALYSIS AND COMPRESSION</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>XPRESS and LZX estimates are available after selecting a game</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>SYSTEM</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>Covers: Steam</value></data>
+  <data name="Update_OpenPageTooltip" xml:space="preserve"><value>Open the download page for the new version</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>Game library</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Find installed games and estimate the possible space savings</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>Refresh covers</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>Re-check and download covers for all games</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ Add folder</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>DRIVES</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>Recompress all</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Recompress every degraded game in one queue — administrator rights are requested once</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>Check now</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Search games…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Select several games and compress them in one queue</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Show only games that need finishing</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>Library sorting</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Compression method for the whole queue</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>Compress queue · 1 admin prompt</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Add to compression queue</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Refresh cover</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Check compression state</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Remove from library</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>The game uses DirectStorage. NTFS compression breaks its fast read path and can slow loading. Compression is not recommended.</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>GAME OPTIMIZATION</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>No game selected</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Expert mode</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Refine game</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>The game uses DirectStorage: NTFS compression breaks its fast read path and can slow loading. Compression is not recommended. In expert mode it is available after confirmation.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ANALYSIS ACCURACY</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>Cancel the current game and move to the next one</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Stop after current</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Let the current game finish, then stop the queue</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>Stop all</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Stop the queue immediately — the interrupted game can be finished later</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Savings: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Confidence: </value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>AUTOMATIC OPTIMIZATION</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU will analyze the files, benchmark read speed and pick a suitable XPRESS or LZX mode on its own.</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>Before changing any files the app shows a forecast and asks for confirmation.</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>COMPRESSING · SELECTED MODE</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>The mode is locked until the operation completes or is stopped.</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>GAME IS PARTIALLY COMPRESSED</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>Finish compression processes the remaining files with the same method — already compressed ones are skipped. The method can be changed after a full decompression.</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>GAME IS ALREADY COMPRESSED</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows transparently decompresses the files as they are read. The game content is unchanged.</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>Optimize game</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>Decompress game</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>The game is partially compressed — its files can be fully restored to the original state</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>Compress with selected mode</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>Compress the remaining files with the same method — already compressed ones are skipped</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Compressed games are checked at application startup and with the Check now button.</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>INTERFACE LANGUAGE</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Auto (system)</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>The language changes after the application is restarted.</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Check compressed games for updates at startup</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>COMPRESSION DECAY THRESHOLD, %</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>MINIMUM GAIN TO RECOMPRESS, MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>INCOMPRESSIBLE FILE TYPES</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>Skip files that are known to be incompressible (media, archives)</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>For example: .pak or pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>Add</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>Remove selected</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>Reset to the default list</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>Removes all manually added extensions</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>Default list ({0} extensions): {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>An extension looks like ".ext" — a dot and up to 15 characters without spaces.</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>The {0} extension is already in the default list.</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>The {0} extension is already added.</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>The decay threshold is a number from 1 to 100 percent.</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>The minimum gain is a whole number of megabytes, at least 1.</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>Remove all manually added extensions and return to the default list?</value></data>
+</root>

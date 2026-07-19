@@ -1,6 +1,7 @@
 <Window x:Class="vKOROBKU.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:res="clr-namespace:vKOROBKU.App.Resources"
         Title="vKOROBKU" Icon="Assets/vkorobku.ico"
         Width="1180" Height="820" MinWidth="1040" MinHeight="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
@@ -23,7 +24,7 @@
 
                 <StackPanel>
                     <TextBlock Text="vKOROBKU" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="УПАКУЙ ИГРЫ УМНЕЕ" Margin="0,4,0,0" FontSize="10" FontWeight="Bold"
+                    <TextBlock Text="{x:Static res:Strings.Sidebar_Tagline}" Margin="0,4,0,0" FontSize="10" FontWeight="Bold"
                                Foreground="{StaticResource MutedTextBrush}" />
                 </StackPanel>
 
@@ -31,18 +32,18 @@
                     <Border Background="#222B1D" CornerRadius="8" Padding="12,10">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="7" Height="7" Fill="{StaticResource AccentBrush}" Margin="0,0,9,0" />
-                            <TextBlock Text="Библиотека" FontWeight="SemiBold" />
+                            <TextBlock Text="{x:Static res:Strings.Nav_Library}" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>
-                    <Button Content="Операции" Command="{Binding ShowOperationsCommand}"
+                    <Button Content="{x:Static res:Strings.Nav_Operations}" Command="{Binding ShowOperationsCommand}"
                             Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <Button Content="Настройки" Command="{Binding ShowSettingsCommand}"
+                    <Button Content="{x:Static res:Strings.Nav_Settings}" Command="{Binding ShowSettingsCommand}"
                             Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <Button Content="О программе" Command="{Binding ShowAboutCommand}"
+                    <Button Content="{x:Static res:Strings.Nav_About}" Command="{Binding ShowAboutCommand}"
                             Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <TextBlock Text="АНАЛИЗ И СЖАТИЕ" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
+                    <TextBlock Text="{x:Static res:Strings.Sidebar_AnalysisSection}" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
                                Foreground="{StaticResource MutedTextBrush}" />
-                    <TextBlock Text="Оценка XPRESS и LZX доступна после выбора игры" Margin="12,0" TextWrapping="Wrap"
+                    <TextBlock Text="{x:Static res:Strings.Sidebar_AnalysisHint}" Margin="12,0" TextWrapping="Wrap"
                                Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
                 </StackPanel>
 
@@ -50,18 +51,18 @@
                         Visibility="{Binding UpdateNoticeVisibility}" Command="{Binding OpenUpdateCommand}"
                         Content="{Binding UpdateNoticeText}" Style="{StaticResource SecondaryButton}"
                         Foreground="{StaticResource AccentBrush}" FontSize="12" Padding="10,8"
-                        ToolTip="Открыть страницу загрузки новой версии" />
+                        ToolTip="{x:Static res:Strings.Update_OpenPageTooltip}" />
 
                 <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="12">
                     <StackPanel>
-                        <TextBlock Text="СИСТЕМА" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="{x:Static res:Strings.Sidebar_SystemSection}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
                         <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
                                    Foreground="{StaticResource TextBrush}" />
                         <TextBlock Text="{Binding Computer.OperatingSystem}" Margin="0,4,0,0" TextWrapping="Wrap" FontSize="11"
                                    Foreground="{StaticResource MutedTextBrush}" />
                         <TextBlock Text="{Binding Computer.MemoryText}" Margin="0,4,0,0" FontSize="11"
                                    Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="Обложки: Steam" Margin="0,8,0,0" FontSize="10"
+                        <TextBlock Text="{x:Static res:Strings.Sidebar_CoversSource}" Margin="0,8,0,0" FontSize="10"
                                    Foreground="{StaticResource MutedTextBrush}" />
                     </StackPanel>
                 </Border>
@@ -88,23 +89,23 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="Библиотека игр" FontSize="30" FontWeight="Bold" />
-                    <TextBlock Text="Найдите установленные игры и оцените возможную экономию места"
+                    <TextBlock Text="{x:Static res:Strings.Header_Title}" FontSize="30" FontWeight="Bold" />
+                    <TextBlock Text="{x:Static res:Strings.Header_Subtitle}"
                                Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" />
                 </StackPanel>
                 <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding RefreshLibraryCommand}"
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
-                <Button Grid.Column="3" Content="Обновить обложки" Command="{Binding RefreshCoversCommand}"
+                <Button Grid.Column="3" Content="{x:Static res:Strings.Header_RefreshCovers}" Command="{Binding RefreshCoversCommand}"
                         Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
-                        ToolTip="Заново проверить и скачать обложки всех игр" />
-                <Button Grid.Column="5" Content="+ Добавить папку" Command="{Binding AddFolderCommand}"
+                        ToolTip="{x:Static res:Strings.Header_RefreshCoversTooltip}" />
+                <Button Grid.Column="5" Content="{x:Static res:Strings.Header_AddFolder}" Command="{Binding AddFolderCommand}"
                         VerticalAlignment="Center" />
             </Grid>
 
             <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="18,15">
                 <StackPanel>
                     <Grid>
-                        <TextBlock Text="НАКОПИТЕЛИ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="{x:Static res:Strings.Drives_Section}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <TextBlock Text="{Binding TotalSavingsText}" FontSize="10"
                                        FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
@@ -162,9 +163,9 @@
                             </TextBlock.Style>
                         </TextBlock>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="Дожать все" Command="{Binding RecompressDegradedCommand}"
+                            <Button Content="{x:Static res:Strings.Watcher_RecompressAll}" Command="{Binding RecompressDegradedCommand}"
                                     Padding="10,6" FontSize="11" Margin="12,0,0,0"
-                                    ToolTip="Дожать все деградировавшие игры одной очередью — права администратора запрашиваются один раз">
+                                    ToolTip="{x:Static res:Strings.Watcher_RecompressAllTooltip}">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -176,7 +177,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Content="Проверить сейчас" Command="{Binding CheckWatchedGamesCommand}"
+                            <Button Content="{x:Static res:Strings.Watcher_CheckNow}" Command="{Binding CheckWatchedGamesCommand}"
                                     Style="{StaticResource SecondaryButton}" Padding="10,6" FontSize="11"
                                     Margin="12,0,0,0" />
                         </StackPanel>
@@ -211,7 +212,7 @@
                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
                                      BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
-                            <TextBlock Text="Поиск игры…" IsHitTestVisible="False" Margin="13,0,0,0" VerticalAlignment="Center"
+                            <TextBlock Text="{x:Static res:Strings.Search_Placeholder}" IsHitTestVisible="False" Margin="13,0,0,0" VerticalAlignment="Center"
                                        Foreground="{StaticResource MutedTextBrush}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -230,12 +231,12 @@
                                       IsChecked="{Binding IsMultiSelectMode, Mode=OneWay}"
                                       Command="{Binding ToggleMultiSelectCommand}"
                                       Content="{Binding MultiSelectToggleText}"
-                                      ToolTip="Отметить несколько игр и сжать их одной очередью" />
+                                      ToolTip="{x:Static res:Strings.MultiSelect_Tooltip}" />
                         <ToggleButton Grid.Column="3" Margin="0,0,12,0" Padding="12,8" FontSize="12"
                                       VerticalAlignment="Center"
                                       IsChecked="{Binding ShowOnlyDegraded}"
                                       Content="{Binding DegradedFilterLabel}"
-                                      ToolTip="Показать только игры, требующие дожатия">
+                                      ToolTip="{x:Static res:Strings.DegradedFilter_Tooltip}">
                             <ToggleButton.Style>
                                 <Style TargetType="ToggleButton" BasedOn="{StaticResource ExpertToggle}">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -249,7 +250,7 @@
                         </ToggleButton>
                         <ComboBox Grid.Column="4" Height="34" VerticalContentAlignment="Center"
                                   ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption}"
-                                  Style="{StaticResource DarkComboBox}" ToolTip="Сортировка библиотеки" />
+                                  Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Sort_Tooltip}" />
                     </Grid>
                     <Border Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" CornerRadius="8"
                             Padding="12,8" Visibility="{Binding MultiSelectVisibility}">
@@ -262,8 +263,8 @@
                             <TextBlock Text="{Binding QueueSelectionText}" VerticalAlignment="Center" FontSize="12" />
                             <ComboBox Grid.Column="1" Width="200" Height="30" Margin="12,0,0,0" VerticalContentAlignment="Center"
                                       ItemsSource="{Binding QueueMethodOptions}" SelectedItem="{Binding SelectedQueueMethod}"
-                                      Style="{StaticResource DarkComboBox}" ToolTip="Метод сжатия для всей очереди" />
-                            <Button Grid.Column="2" Content="Сжать очередь · 1 запрос прав" Command="{Binding StartQueueCommand}"
+                                      Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Queue_MethodTooltip}" />
+                            <Button Grid.Column="2" Content="{x:Static res:Strings.Queue_Start}" Command="{Binding StartQueueCommand}"
                                     Margin="12,0,0,0" Padding="12,6" FontSize="12" />
                         </Grid>
                     </Border>
@@ -288,11 +289,11 @@
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Header="Перейти в каталог" Command="{Binding OpenGameFolderCommand}" />
-                                        <MenuItem Header="Добавить в очередь сжатия" Command="{Binding AddToQueueCommand}" />
-                                        <MenuItem Header="Обновить обложку" Command="{Binding RefreshSelectedCoverCommand}" />
-                                        <MenuItem Header="Проверить состояние сжатия" Command="{Binding RecheckCompressionCommand}" />
-                                        <MenuItem Header="Убрать из библиотеки" Command="{Binding RemoveGameCommand}" />
+                                        <MenuItem Header="{x:Static res:Strings.Card_OpenFolder}" Command="{Binding OpenGameFolderCommand}" />
+                                        <MenuItem Header="{x:Static res:Strings.Card_AddToQueue}" Command="{Binding AddToQueueCommand}" />
+                                        <MenuItem Header="{x:Static res:Strings.Card_RefreshCover}" Command="{Binding RefreshSelectedCoverCommand}" />
+                                        <MenuItem Header="{x:Static res:Strings.Card_RecheckState}" Command="{Binding RecheckCompressionCommand}" />
+                                        <MenuItem Header="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}" />
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>
@@ -402,7 +403,7 @@
                                     </TextBlock>
                                 </Border>
                                 <Border CornerRadius="5" Padding="8,4" Margin="6,0,0,0" Background="#1B2333"
-                                        ToolTip="Игра использует DirectStorage. NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется.">
+                                        ToolTip="{x:Static res:Strings.Card_DirectStorageTooltip}">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -431,20 +432,20 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <StackPanel>
-                            <TextBlock Text="ОПТИМИЗАЦИЯ ИГРЫ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                            <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue=Игра не выбрана}"
+                            <TextBlock Text="{x:Static res:Strings.Panel_Section}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                            <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue={x:Static res:Strings.Panel_NoGameSelected}}"
                                        Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
                             <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,5,0,0" FontSize="12"
                                        FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
                             <WrapPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                <ToggleButton Content="Экспертный режим" IsChecked="{Binding IsExpertMode}"
+                                <ToggleButton Content="{x:Static res:Strings.Panel_ExpertMode}" IsChecked="{Binding IsExpertMode}"
                                               Visibility="{Binding UncompressedPanelVisibility}"
                                               Style="{StaticResource ExpertToggle}" />
-                                <Button Content="Уточнить игру" Command="{Binding ReviewIdentityCommand}"
+                                <Button Content="{x:Static res:Strings.Panel_ReviewIdentity}" Command="{Binding ReviewIdentityCommand}"
                                         Margin="8,0,0,0" Padding="10,6"
                                         Visibility="{Binding IdentityReviewVisibility}"
                                         Style="{StaticResource SecondaryButton}" />
-                                <Button Content="Убрать из библиотеки" Command="{Binding RemoveGameCommand}"
+                                <Button Content="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}"
                                         Margin="8,0,0,0" Padding="10,6"
                                         Visibility="{Binding ManualGameVisibility}"
                                         Style="{StaticResource SecondaryButton}" />
@@ -453,12 +454,12 @@
                                 <Border Margin="0,10,0,0" Padding="10,8" Background="#1B2333" CornerRadius="6"
                                         Visibility="{Binding DirectStorageWarningVisibility}">
                                     <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#7FB2FF"
-                                               Text="Игра использует DirectStorage: NTFS-сжатие ломает быстрый путь чтения и может замедлить загрузки. Сжатие не рекомендуется. В экспертном режиме оно доступно после подтверждения." />
+                                               Text="{x:Static res:Strings.Panel_DirectStorageWarning}" />
                                 </Border>
                                 <TextBlock Text="{Binding AnalysisSummary}" Margin="0,8,0,0" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" FontSize="13" />
                                 <StackPanel Visibility="{Binding ExpertOptimizationVisibility}">
-                                    <TextBlock Text="ТОЧНОСТЬ АНАЛИЗА" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
+                                    <TextBlock Text="{x:Static res:Strings.Panel_AnalysisAccuracy}" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
                                                Foreground="{StaticResource MutedTextBrush}" />
                                     <ComboBox ItemsSource="{Binding AnalysisModes}" SelectedItem="{Binding SelectedAnalysisMode}"
                                               DisplayMemberPath="DisplayText" Height="34" Padding="8,4"
@@ -507,15 +508,15 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <WrapPanel Margin="0,8,0,0" Visibility="{Binding QueueControlsVisibility}">
-                                    <Button Content="Пропустить" Command="{Binding SkipQueueItemCommand}"
+                                    <Button Content="{x:Static res:Strings.Queue_Skip}" Command="{Binding SkipQueueItemCommand}"
                                             Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
-                                            ToolTip="Отменить текущую игру и перейти к следующей" />
-                                    <Button Content="Стоп после текущей" Command="{Binding StopQueueAfterCurrentCommand}"
+                                            ToolTip="{x:Static res:Strings.Queue_SkipTooltip}" />
+                                    <Button Content="{x:Static res:Strings.Queue_StopAfterCurrent}" Command="{Binding StopQueueAfterCurrentCommand}"
                                             Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
-                                            ToolTip="Дать текущей игре досжаться и остановить очередь" />
-                                    <Button Content="Стоп всё" Command="{Binding StopQueueCommand}"
+                                            ToolTip="{x:Static res:Strings.Queue_StopAfterCurrentTooltip}" />
+                                    <Button Content="{x:Static res:Strings.Queue_StopAll}" Command="{Binding StopQueueCommand}"
                                             Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource StopButton}"
-                                            ToolTip="Остановить очередь немедленно — прерванная игра дожмётся позже" />
+                                            ToolTip="{x:Static res:Strings.Queue_StopAllTooltip}" />
                                 </WrapPanel>
                             </StackPanel>
                         </Border>
@@ -557,14 +558,14 @@
                                             <TextBlock Text="{Binding EstimatedSizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" />
                                         </Grid>
                                         <TextBlock Margin="0,5,0,0" Foreground="{StaticResource AccentBrush}">
-                                            <Run Text="Экономия: " /><Run Text="{Binding SavingsText, Mode=OneWay}" />
+                                            <Run Text="{x:Static res:Strings.Estimate_SavingsLabel}" /><Run Text="{Binding SavingsText, Mode=OneWay}" />
                                         </TextBlock>
                                         <TextBlock Text="{Binding PerformanceText}" Margin="0,4,0,0" FontSize="10"
                                                    TextWrapping="Wrap" Foreground="{StaticResource TextBrush}" />
                                         <Grid Margin="0,3,0,0">
                                             <TextBlock Text="{Binding RatioText}" FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
                                             <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="{StaticResource MutedTextBrush}">
-                                                <Run Text="Точность: " /><Run Text="{Binding Confidence, Mode=OneWay}" />
+                                                <Run Text="{x:Static res:Strings.Estimate_ConfidenceLabel}" /><Run Text="{Binding Confidence, Mode=OneWay}" />
                                             </TextBlock>
                                         </Grid>
                                     </StackPanel>
@@ -575,11 +576,11 @@
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding AutoInfoVisibility}">
                             <StackPanel>
-                                <TextBlock Text="АВТОМАТИЧЕСКАЯ ОПТИМИЗАЦИЯ" Foreground="{StaticResource AccentBrush}"
+                                <TextBlock Text="{x:Static res:Strings.Info_AutoTitle}" Foreground="{StaticResource AccentBrush}"
                                            FontSize="11" FontWeight="Bold" />
                                 <TextBlock Margin="0,12,0,0" FontSize="13" LineHeight="21" TextWrapping="Wrap"
-                                           Text="vKOROBKU проанализирует файлы, проверит скорость чтения и самостоятельно выберет подходящий режим XPRESS или LZX." />
-                                <TextBlock Text="Перед изменением файлов программа покажет прогноз и попросит подтверждение."
+                                           Text="{x:Static res:Strings.Info_AutoBody}" />
+                                <TextBlock Text="{x:Static res:Strings.Info_AutoConfirm}"
                                            Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" />
                             </StackPanel>
@@ -588,13 +589,13 @@
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding ActiveCompressionInfoVisibility}">
                             <StackPanel>
-                                <TextBlock Text="ИДЁТ СЖАТИЕ · ВЫБРАННЫЙ РЕЖИМ" Foreground="{StaticResource AccentBrush}"
+                                <TextBlock Text="{x:Static res:Strings.Info_ActiveTitle}" Foreground="{StaticResource AccentBrush}"
                                            FontSize="11" FontWeight="Bold" />
                                 <TextBlock Text="{Binding ActiveCompressionModeText}" Margin="0,10,0,0"
                                            FontSize="21" FontWeight="Bold" />
                                 <TextBlock Text="{Binding ActiveCompressionDetailsText}" Margin="0,6,0,0" FontSize="12"
                                            TextWrapping="Wrap" Foreground="{StaticResource TextBrush}" />
-                                <TextBlock Text="Режим зафиксирован до завершения или остановки операции."
+                                <TextBlock Text="{x:Static res:Strings.Info_ActiveLocked}"
                                            Margin="0,10,0,0" FontSize="11" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" />
                             </StackPanel>
@@ -603,10 +604,10 @@
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding PartialInfoVisibility}">
                             <StackPanel>
-                                <TextBlock Text="ИГРА СЖАТА ЧАСТИЧНО" Foreground="#FFB84D" FontSize="11" FontWeight="Bold" />
+                                <TextBlock Text="{x:Static res:Strings.Info_PartialTitle}" Foreground="#FFB84D" FontSize="11" FontWeight="Bold" />
                                 <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
                                            FontSize="13" LineHeight="22" TextWrapping="Wrap" />
-                                <TextBlock Text="«Дожать» сожмёт оставшиеся файлы тем же методом — уже сжатые пропускаются. Сменить метод сжатия можно после полной распаковки."
+                                <TextBlock Text="{x:Static res:Strings.Info_PartialBody}"
                                            Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" />
                             </StackPanel>
@@ -615,11 +616,11 @@
                         <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
                                 VerticalAlignment="Top" Visibility="{Binding CompressedPanelVisibility}">
                             <StackPanel>
-                                <TextBlock Text="ИГРА УЖЕ СЖАТА" Foreground="{StaticResource AccentBrush}"
+                                <TextBlock Text="{x:Static res:Strings.Info_CompressedTitle}" Foreground="{StaticResource AccentBrush}"
                                            FontSize="11" FontWeight="Bold" />
                                 <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
                                            FontSize="13" LineHeight="22" TextWrapping="Wrap" />
-                                <TextBlock Text="Файлы прозрачно распаковываются Windows во время чтения. Содержимое игры не изменено."
+                                <TextBlock Text="{x:Static res:Strings.Info_CompressedBody}"
                                            Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
                                            Foreground="{StaticResource MutedTextBrush}" />
                             </StackPanel>
@@ -644,15 +645,15 @@
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Оптимизировать игру" Command="{Binding OptimizeCommand}"
+                                <Button Content="{x:Static res:Strings.Action_Optimize}" Command="{Binding OptimizeCommand}"
                                         Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
+                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelCurrentCommand}"
                                         Style="{StaticResource StopButton}" />
                             </Grid>
-                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
                                     Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
                                     Visibility="{Binding PartiallyCompressedVisibility}"
-                                    ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
+                                    ToolTip="{x:Static res:Strings.Action_DecompressPartialTooltip}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding ExpertOptimizationVisibility}">
@@ -675,15 +676,15 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}"
                                         Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelCurrentCommand}"
+                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelCurrentCommand}"
                                         Style="{StaticResource StopButton}" />
                             </Grid>
-                            <Button Content="Сжать выбранным режимом" Command="{Binding CompressCommand}"
+                            <Button Content="{x:Static res:Strings.Action_CompressSelected}" Command="{Binding CompressCommand}"
                                     Margin="0,8,0,0" Style="{StaticResource PrimaryActionButton}" />
-                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
                                     Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
                                     Visibility="{Binding PartiallyCompressedVisibility}"
-                                    ToolTip="Игра сжата частично — можно полностью вернуть файлы в исходное состояние" />
+                                    ToolTip="{x:Static res:Strings.Action_DecompressPartialTooltip}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="3" Visibility="{Binding PartialPanelVisibility}">
@@ -706,11 +707,11 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Content="{Binding FinishCompressionButtonText}" Command="{Binding FinishCompressionCommand}"
                                         Style="{StaticResource PrimaryActionButton}"
-                                        ToolTip="Сжать оставшиеся файлы тем же методом — уже сжатые будут пропущены" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                        ToolTip="{x:Static res:Strings.Action_FinishTooltip}" />
+                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelOperationCommand}"
                                         Style="{StaticResource StopButton}" />
                             </Grid>
-                            <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
                                     Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}" />
                         </StackPanel>
 
@@ -732,9 +733,9 @@
                                     <ColumnDefinition Width="8" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Распаковать игру" Command="{Binding DecompressCommand}"
+                                <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
                                         Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="Стоп" Command="{Binding CancelOperationCommand}"
+                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelOperationCommand}"
                                         Style="{StaticResource StopButton}" />
                             </Grid>
                         </StackPanel>
