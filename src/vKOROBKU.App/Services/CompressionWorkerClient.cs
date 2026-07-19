@@ -22,7 +22,7 @@ public sealed class CompressionWorkerClient
         await using var session = await StartSessionAsync(cancellationToken);
         var result = await session.RunJobAsync(job, progress, cancellationToken);
         if (result.Type == "error")
-            throw new InvalidOperationException(result.Text ?? Strings.Worker_Error);
+            throw new InvalidOperationException(WorkerMessageText.Describe(result));
         return result;
     }
 

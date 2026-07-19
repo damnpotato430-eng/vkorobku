@@ -53,7 +53,7 @@ internal static class Program
                 var job = TryDeserialize<WorkerJob>(line);
                 if (job is null)
                 {
-                    await SendAsync(writer, new WorkerMessage("error", "Не получено задание."));
+                    await SendAsync(writer, new WorkerMessage("error", Code: WorkerCodes.NoJob));
                     return 3;
                 }
 
@@ -66,12 +66,17 @@ internal static class Program
                 }
                 catch (OperationCanceledException)
                 {
-                    await SendAsync(writer, new WorkerMessage("cancelled", "Операция остановлена. Уже обработанные файлы остаются в корректном состоянии."));
+                    await SendAsync(writer, new WorkerMessage("cancelled", Code: WorkerCodes.Cancelled));
+                }
+                catch (WorkerJobException jobException)
+                {
+                    await SendAsync(writer, new WorkerMessage("error", Code: jobException.Code, CodeArg: jobException.Arg));
                 }
                 catch (Exception exception)
                 {
                     // A failed job ends only that job — the queue decides whether to
-                    // continue with the next game or shut the session down.
+                    // continue with the next game or shut the session down. Only truly
+                    // unexpected failures fall back to the raw (unlocalized) message.
                     await SendAsync(writer, new WorkerMessage("error", exception.Message));
                 }
                 finally
@@ -113,19 +118,19 @@ internal static class Program
         var rootPath = ValidateJob(job);
         EnsureGameIsNotRunning(rootPath);
 
-        await SendAsync(writer, new WorkerMessage("status", "Сканируем файлы игры…"));
+        await SendAsync(writer, new WorkerMessage("status", Code: WorkerCodes.ScanningFiles));
         // compact.exe cannot compress sparse files, but it must still decompress
         // WOF-backed ones carrying the sparse flag (an interrupted conversion or a
         // stale Steam download flag) — otherwise they stay compressed forever.
         var (files, excludedPhysicalBytes) = EnumerateFiles(
             rootPath, includeSparse: job.Operation == "decompress", cancellationToken);
         if (files.Count == 0)
-            throw new InvalidOperationException("В каталоге нет доступных файлов для обработки.");
+            throw new WorkerJobException(WorkerCodes.NoFiles);
 
         var totalBytes = files.Sum(file => file.Length);
         var physicalBefore = MeasurePhysicalSize(files);
 
-        await SendAsync(writer, new WorkerMessage("status", "Проверяем, какие файлы уже обработаны…"));
+        await SendAsync(writer, new WorkerMessage("status", Code: WorkerCodes.CheckingProcessed));
         var skipExtensions = job.Operation == "compress" && job.SkipExtensions is { Length: > 0 }
             ? new HashSet<string>(job.SkipExtensions, StringComparer.OrdinalIgnoreCase)
             : null;
@@ -152,20 +157,16 @@ internal static class Program
         var skipListedBytes = skipListed.Sum(file => file.Length);
         long processedBytes = resumeSkippedBytes + skipListedBytes;
         var processedFiles = resumeSkippedFiles + skipListed.Count;
-        var preparationNotes = new List<string>();
-        if (resumeSkippedFiles > 0)
-            preparationNotes.Add($"уже обработано: {resumeSkippedFiles:N0}");
-        if (skipListed.Count > 0)
-            preparationNotes.Add($"пропущено несжимаемых: {skipListed.Count:N0} ({FormatSize(skipListedBytes)})");
         await SendAsync(writer, new WorkerMessage(
             "progress",
-            preparationNotes.Count > 0
-                ? $"Подготовка завершена — {string.Join(" · ", preparationNotes)}"
-                : "Подготовка завершена",
+            Code: WorkerCodes.Prepared,
             ProcessedBytes: processedBytes,
             TotalBytes: totalBytes,
             ProcessedFiles: processedFiles,
             TotalFiles: files.Count,
+            SkipListedFiles: skipListed.Count,
+            SkipListedBytes: skipListedBytes,
+            ResumeSkippedFiles: resumeSkippedFiles,
             PhysicalBefore: physicalBefore));
 
         var batches = BatchPlanner.CreateBatches(pendingFiles);
@@ -180,15 +181,14 @@ internal static class Program
                 failedBatches++;
                 if (failedBatches == 1)
                     await SendAsync(writer, new WorkerMessage(
-                        "status",
-                        $"compact.exe сообщил об ошибке (код {exitCode}). Обработка продолжается, пропущенные файлы будут учтены при проверке."));
+                        "status", Code: WorkerCodes.CompactError, CodeValue: exitCode));
             }
 
             processedBytes += batch.Sum(file => file.Length);
             processedFiles += batch.Count;
             await SendAsync(writer, new WorkerMessage(
                 "progress",
-                job.Operation == "compress" ? "Сжимаем файлы…" : "Распаковываем файлы…",
+                Code: job.Operation == "compress" ? WorkerCodes.Compressing : WorkerCodes.Decompressing,
                 ProcessedBytes: processedBytes,
                 TotalBytes: totalBytes,
                 ProcessedFiles: processedFiles,
@@ -198,9 +198,8 @@ internal static class Program
 
         await SendAsync(writer, new WorkerMessage(
             "status",
-            failedBatches == 0
-                ? "Проверяем результат обработки…"
-                : $"Проверяем результат обработки (пакетов с ошибками: {failedBatches})…",
+            Code: failedBatches == 0 ? WorkerCodes.Verifying : WorkerCodes.VerifyingWithErrors,
+            CodeValue: failedBatches,
             ProcessedBytes: processedBytes,
             TotalBytes: totalBytes,
             ProcessedFiles: processedFiles,
@@ -213,7 +212,7 @@ internal static class Program
         var skipListedPhysical = skipListed.Count == 0 ? 0 : MeasurePhysicalSize(skipListed);
         await SendAsync(writer, new WorkerMessage(
             "completed",
-            errorCount == 0 ? "Операция завершена" : "Операция завершена с пропущенными файлами",
+            Code: errorCount == 0 ? WorkerCodes.CompletedOk : WorkerCodes.CompletedWithSkipped,
             ProcessedBytes: processedBytes,
             TotalBytes: totalBytes,
             ProcessedFiles: processedFiles,
@@ -231,31 +230,26 @@ internal static class Program
     internal static bool IsSkipListed(WorkerFile file, HashSet<string> skipExtensions, long clusterSize) =>
         file.Length <= clusterSize || skipExtensions.Contains(Path.GetExtension(file.Path));
 
-    private static string FormatSize(long bytes) =>
-        bytes >= 1024L * 1024 * 1024 ? $"{bytes / 1024d / 1024 / 1024:0.#} ГБ"
-        : bytes >= 1024L * 1024 ? $"{bytes / 1024d / 1024:0.#} МБ"
-        : $"{Math.Max(1, bytes / 1024):N0} КБ";
-
     private static string ValidateJob(WorkerJob job)
     {
         if (job.Operation is not ("compress" or "decompress"))
-            throw new InvalidOperationException("Неизвестная операция.");
+            throw new WorkerJobException(WorkerCodes.UnknownOperation);
         if (job.Operation == "compress" && job.Algorithm is not ("XPRESS4K" or "XPRESS8K" or "XPRESS16K" or "LZX"))
-            throw new InvalidOperationException("Неизвестный алгоритм сжатия.");
+            throw new WorkerJobException(WorkerCodes.UnknownAlgorithm);
         if (string.IsNullOrWhiteSpace(job.RootPath) || !Path.IsPathFullyQualified(job.RootPath))
-            throw new InvalidOperationException("Некорректный путь игры.");
+            throw new WorkerJobException(WorkerCodes.BadPath);
 
         var rootPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(job.RootPath));
         if (!Directory.Exists(rootPath))
-            throw new DirectoryNotFoundException("Каталог игры не найден.");
+            throw new WorkerJobException(WorkerCodes.DirNotFound);
         if (string.Equals(rootPath, Path.TrimEndingDirectorySeparator(Path.GetPathRoot(rootPath)!), StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Нельзя обрабатывать корень диска.");
+            throw new WorkerJobException(WorkerCodes.DriveRoot);
         if ((File.GetAttributes(rootPath) & FileAttributes.ReparsePoint) != 0)
-            throw new InvalidOperationException("Корневой каталог игры является ссылкой или junction.");
+            throw new WorkerJobException(WorkerCodes.ReparseRoot);
 
         var drive = new DriveInfo(Path.GetPathRoot(rootPath)!);
         if (!drive.IsReady || !string.Equals(drive.DriveFormat, "NTFS", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Сжатие XPRESS/LZX доступно только на NTFS.");
+            throw new WorkerJobException(WorkerCodes.NotNtfs);
         return rootPath;
     }
 
@@ -270,10 +264,12 @@ internal static class Program
                 {
                     var executable = process.MainModule?.FileName;
                     if (executable is not null && executable.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidOperationException($"Сначала закройте процесс игры: {process.ProcessName}.exe");
+                        throw new WorkerJobException(WorkerCodes.GameRunning, process.ProcessName);
                 }
+                // MainModule access can fail for protected/exited processes; those are
+                // skipped. WorkerJobException is not caught here — it propagates.
                 catch (Win32Exception) { }
-                catch (InvalidOperationException exception) when (!exception.Message.StartsWith("Сначала закройте", StringComparison.Ordinal)) { }
+                catch (InvalidOperationException) { }
             }
         }
     }
@@ -373,7 +369,7 @@ internal static class Program
             foreach (var file in files)
                 startInfo.ArgumentList.Add(file.Path);
 
-            using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Не удалось запустить compact.exe.");
+            using var process = Process.Start(startInfo) ?? throw new WorkerJobException(WorkerCodes.CompactStartFailed);
             var outputTask = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
             var errorTask = process.StandardError.ReadToEndAsync(CancellationToken.None);
             try
@@ -473,4 +469,12 @@ internal static class Program
         return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
     }
 
+}
+
+/// <summary>A job failure the worker reports as a localizable code (with an optional
+/// argument) instead of a fixed-language message.</summary>
+internal sealed class WorkerJobException(string code, string? arg = null) : Exception
+{
+    public string Code { get; } = code;
+    public string? Arg { get; } = arg;
 }

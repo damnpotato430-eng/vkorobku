@@ -1871,7 +1871,7 @@ public sealed class MainViewModel : ObservableObject
             var counters = message.TotalFiles > 0
                 ? string.Format(Strings.Operation_FilesCounter, $"{message.ProcessedFiles:N0}", $"{message.TotalFiles:N0}")
                 : string.Empty;
-            OperationSummary = $"{message.Text}{counters}";
+            OperationSummary = $"{WorkerMessageText.Describe(message)}{counters}";
             StatusText = OperationSummary;
             tracker.ReportProgress(message, OperationSummary);
         });
@@ -1882,14 +1882,14 @@ public sealed class MainViewModel : ObservableObject
             acceptWorkerProgress = false;
             if (result.Type == "error")
             {
-                OperationSummary = string.Format(Strings.Operation_Failed, result.Text ?? Strings.Worker_Error);
+                OperationSummary = string.Format(Strings.Operation_Failed, WorkerMessageText.Describe(result));
                 StatusText = Strings.Operation_SystemError;
                 tracker.Finish(OperationJournalState.Failed, OperationSummary);
                 return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, result.Text);
             }
             if (result.Type == "cancelled")
             {
-                OperationSummary = result.Text ?? Strings.Operation_Cancelled;
+                OperationSummary = WorkerMessageText.Describe(result);
                 StatusText = OperationSummary;
                 tracker.Finish(OperationJournalState.Cancelled, OperationSummary, result);
                 // A cancelled run leaves the game part-converted at the NTFS level, so

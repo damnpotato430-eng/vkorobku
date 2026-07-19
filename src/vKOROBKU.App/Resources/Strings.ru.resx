@@ -339,4 +339,29 @@
   <data name="State_NotCompressed" xml:space="preserve"><value>Игра «{0}» не сжата</value></data>
   <data name="State_NotChecked" xml:space="preserve"><value>Состояние сжатия игры «{0}» не проверено</value></data>
   <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>Игра «{0}» обновилась и требует дообработки</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>Сканируем файлы игры…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>Проверяем, какие файлы уже обработаны…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>Подготовка завершена</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>Подготовка завершена — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>уже обработано: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>пропущено несжимаемых: {0} ({1})</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>Сжимаем файлы…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>Распаковываем файлы…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe сообщил об ошибке (код {0}). Обработка продолжается, пропущенные файлы будут учтены при проверке.</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>Проверяем результат обработки…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>Проверяем результат обработки (пакетов с ошибками: {0})…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>Операция завершена</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>Операция завершена с пропущенными файлами</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>Операция остановлена. Уже обработанные файлы остаются в корректном состоянии.</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>Не получено задание.</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>Неизвестная операция.</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>Неизвестный алгоритм сжатия.</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>Некорректный путь игры.</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>Каталог игры не найден.</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>Нельзя обрабатывать корень диска.</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>Корневой каталог игры является ссылкой или junction.</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>Сжатие XPRESS/LZX доступно только на NTFS.</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>В каталоге нет доступных файлов для обработки.</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>Сначала закройте процесс игры: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Не удалось запустить compact.exe.</value></data>
 </root>
