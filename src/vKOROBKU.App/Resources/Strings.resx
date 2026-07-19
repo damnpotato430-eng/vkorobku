@@ -339,4 +339,29 @@ Continue from where it stopped? Already compressed files are skipped automatical
   <data name="State_NotCompressed" xml:space="preserve"><value>The {0} game is not compressed</value></data>
   <data name="State_NotChecked" xml:space="preserve"><value>The compression state of {0} is not checked</value></data>
   <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>The {0} game was updated and needs finishing</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>Scanning game files…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>Checking which files are already processed…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>Preparation complete</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>Preparation complete — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>already processed: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>skipped incompressible: {0} ({1})</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>Compressing files…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>Decompressing files…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe reported an error (code {0}). Processing continues; skipped files are accounted for during verification.</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>Verifying the result…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>Verifying the result (batches with errors: {0})…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>Operation complete</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>Operation complete with skipped files</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>Operation stopped. Already processed files remain in a valid state.</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>No job was received.</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>Unknown operation.</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>Unknown compression algorithm.</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>Invalid game path.</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>Game folder not found.</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>The drive root cannot be processed.</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>The game root folder is a link or junction.</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>XPRESS/LZX compression is available only on NTFS.</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>There are no available files to process in the folder.</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>Close the game process first: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Could not start compact.exe.</value></data>
 </root>
