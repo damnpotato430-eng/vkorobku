@@ -5,65 +5,76 @@
 <h1 align="center">vKOROBKU</h1>
 
 <p align="center">
-  Сжатие игр штатными средствами Windows для экономии места на диске.
+  Game compression with built-in Windows tools to save disk space.
 </p>
 
 <p align="center">
-  <a href="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml"><img src="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml/badge.svg" alt="Статус сборки" /></a>
-  <a href="https://github.com/damnpotato430-eng/vkorobku/releases/latest"><img src="https://img.shields.io/github/v/release/damnpotato430-eng/vkorobku?include_prereleases&style=for-the-badge&logo=github&label=release&color=8BFF4D" alt="Последний релиз" /></a>
+  <b>English</b> | <a href="README.ru.md">Русский</a>
+</p>
+
+<p align="center">
+  <a href="#download">Download</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#development">Development</a> ·
+  <a href="#license">License</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml"><img src="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml/badge.svg" alt="Build status" /></a>
+  <a href="https://github.com/damnpotato430-eng/vkorobku/releases"><img src="https://img.shields.io/github/v/release/damnpotato430-eng/vkorobku?include_prereleases&style=for-the-badge&logo=github&label=release&color=8BFF4D" alt="Latest release" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows" alt="Windows 10/11" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-555555?style=for-the-badge" alt="GPL-3.0" /></a>
 </p>
 
-Игровое Windows-приложение для оценки и прозрачного сжатия установленных игр алгоритмами XPRESS и LZX. Игры продолжают работать как раньше — меняется только способ хранения файлов на NTFS.
+A Windows application that estimates and transparently compresses installed games with the XPRESS and LZX algorithms. Games keep working as before — only the way their files are stored on NTFS changes.
 
 <p align="center">
-  <img src="assets/screenshot-main.png" width="820" alt="Главное окно vKOROBKU" />
+  <img src="assets/screenshot-main.png" width="820" alt="vKOROBKU main window" />
 </p>
 
-> Предварительная версия: ядро работает и проверено на реальных библиотеках, продолжается полевое тестирование. Начинайте с игр, которые можно восстановить через проверку файлов Steam.
+> Preview version: the core works and has been verified on real game libraries; field testing continues. Start with games you can restore through Steam file verification.
 
-## Скачать
+## Download
 
-### [Скачать последнюю версию vKOROBKU для Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases/latest)
+### [Download the latest vKOROBKU release for Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases)
 
-Рекомендуется скачивать архив `vKOROBKU-v<версия>-win-x64.zip`, полностью распаковать его и запустить `vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен находиться рядом.
+Download the `vKOROBKU-v<version>-win-x64.zip` archive, extract it completely and run `vKOROBKU.exe`. Keep `vKOROBKU.Worker.exe` next to it.
 
-Релиз является self-contained: устанавливать .NET Runtime отдельно не требуется. Релизы собираются автоматически из тегов через GitHub Actions.
+Releases are self-contained: no separate .NET Runtime installation is required. They are built automatically from tags by GitHub Actions.
 
-## Целевая платформа
+## Target platform
 
 - Windows 10/11 x64
-- NTFS для операций XPRESS/LZX
+- NTFS for XPRESS/LZX operations
 
-## Возможности
+## Features
 
-**Анализ и сжатие**
+**Analysis and compression**
 
-- автоматический поиск игр Steam, Epic Games Store и GOG, а также Ubisoft Connect и EA App (экспериментально — на живых установках пока не проверялось); ручное добавление папок с определением игры;
-- предварительная оценка на безопасной выборке (512 МБ – 2 ГБ) с прогнозом для XPRESS4K/8K/16K и LZX и бенчмарком скорости чтения без системного кэша;
-- автоматический выбор алгоритма с балансом «экономия ↔ скорость чтения»: программа не жертвует скоростью загрузок ради пары сотен мегабайт;
-- сжатие, полная распаковка и отмена; прерванная операция продолжается с места остановки;
-- кнопка «Дожать» для обновившихся игр — сжимает только новые файлы тем же алгоритмом;
-- пропуск заведомо несжимаемых файлов (медиа, архивы — 41 тип, список настраивается): быстрее сжатие и точнее прогноз.
+- automatic discovery of Steam, Epic Games Store and GOG games, plus Ubisoft Connect and EA App (experimental — not yet verified on live installations); manual folder adding with game detection;
+- preliminary estimate on a safe sample (512 MB – 2 GB) with a forecast for XPRESS4K/8K/16K and LZX and a read-speed benchmark that bypasses the system cache;
+- automatic algorithm choice balancing savings against read speed: the app never sacrifices loading times for a couple hundred megabytes;
+- compression, full decompression and cancellation; an interrupted operation resumes where it stopped;
+- a "finish" button for updated games — compresses only the new files with the same algorithm;
+- skipping files that are known to be incompressible (media, archives — 41 types, configurable): faster compression and a more accurate forecast.
 
-**Наблюдение и безопасность**
+**Monitoring and safety**
 
-- наблюдение за сжатыми играми: при запуске приложение проверяет, не «расжались» ли игры после обновлений, и показывает, сколько места можно вернуть;
-- определение DirectStorage-игр: сжатие для них не рекомендуется и блокируется (в экспертном режиме — после явного подтверждения);
-- распознавание игр, сжатых ранее или сторонними инструментами, через WOF/NTFS;
-- права администратора запрашиваются только для самой операции сжатия — интерфейс всегда работает без повышения прав;
-- уведомление о выходе новой версии (без автоустановки).
+- watching compressed games: on startup the app checks whether games "decompressed themselves" after updates and shows how much space can be reclaimed;
+- DirectStorage detection: compression is discouraged and blocked for such games (available in expert mode after explicit confirmation);
+- recognition of games compressed earlier or by third-party tools, via WOF/NTFS;
+- administrator rights are requested only for the compression operation itself — the UI always runs unelevated;
+- new-version notification (no auto-install).
 
-**Интерфейс**
+**Interface**
 
-- сценарий «выбрать игру → Оптимизировать» одной кнопкой; необязательный экспертный режим с ручным выбором алгоритма и точности анализа;
-- цветные статусы на карточках, экономия по каждому диску и суммарно;
-- обложки Steam, в том числе для не-Steam игр по названию — без настройки и ключей; журнал операций и окно настроек.
+- the "pick a game → Optimize" one-button flow; an optional expert mode with manual algorithm and analysis-precision selection;
+- colored card statuses, savings per drive and in total;
+- Steam covers, including for non-Steam games matched by name — no setup or API keys; an operations journal and a settings window.
 
-## Разработка
+## Development
 
-Требуется .NET 10 SDK с Windows Desktop workload.
+Requires the .NET 10 SDK with the Windows Desktop workload.
 
 ```powershell
 dotnet restore
@@ -71,10 +82,10 @@ dotnet build vKOROBKU.sln
 dotnet run --project src/vKOROBKU.App
 ```
 
-Проект проверен сборкой с .NET SDK 10.0.302.
+The project is verified to build with .NET SDK 10.0.302.
 
-Подробности: [спецификация MVP](docs/MVP.md) и [архитектура](docs/ARCHITECTURE.md).
+Details: [MVP specification](docs/MVP.md) and [architecture](docs/ARCHITECTURE.md) (in Russian).
 
-## Лицензия
+## License
 
-GNU General Public License v3.0. См. [LICENSE](LICENSE).
+GNU General Public License v3.0. See [LICENSE](LICENSE).
