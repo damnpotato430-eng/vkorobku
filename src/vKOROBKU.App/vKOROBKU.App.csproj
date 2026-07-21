@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -23,12 +23,16 @@
     <Compile Include="..\CompressionHeuristics.cs" Link="CompressionHeuristics.cs" />
     <ProjectReference Include="..\vKOROBKU.Worker\vKOROBKU.Worker.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
-  <Target Name="CopyWorkerOutput" AfterTargets="Build">
+  <!-- Dev-build convenience: the app launches the worker from its own folder. In
+       runtime-specific (release) builds the worker sits in a win-x64 subfolder and
+       the packaging script ships its separately published single-file exe instead,
+       so the copy is skipped there. -->
+  <Target Name="CopyWorkerOutput" AfterTargets="Build" Condition="'$(RuntimeIdentifier)' == ''">
     <ItemGroup>
-      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.exe" />
-      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.dll" />
-      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.deps.json" />
-      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\net8.0-windows10.0.19041.0\vKOROBKU.Worker.runtimeconfig.json" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\$(TargetFramework)\vKOROBKU.Worker.exe" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\$(TargetFramework)\vKOROBKU.Worker.dll" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\$(TargetFramework)\vKOROBKU.Worker.deps.json" />
+      <WorkerOutput Include="..\vKOROBKU.Worker\bin\$(Configuration)\$(TargetFramework)\vKOROBKU.Worker.runtimeconfig.json" />
     </ItemGroup>
     <Copy SourceFiles="@(WorkerOutput)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
