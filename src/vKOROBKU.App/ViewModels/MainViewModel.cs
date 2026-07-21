@@ -118,6 +118,7 @@ public sealed class MainViewModel : ObservableObject
         RefreshLibraryCommand = new AsyncRelayCommand(RefreshLibraryAsync);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync);
         ShowOperationsCommand = new RelayCommand(ShowOperations);
+        ClearOperationsCommand = new RelayCommand(ClearOperationHistory);
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
@@ -176,6 +177,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand RefreshLibraryCommand { get; }
     public AsyncRelayCommand AddFolderCommand { get; }
     public RelayCommand ShowOperationsCommand { get; }
+    public RelayCommand ClearOperationsCommand { get; }
     public AsyncRelayCommand ReviewIdentityCommand { get; }
     public RelayCommand RemoveGameCommand { get; }
     public AsyncRelayCommand RecheckCompressionCommand { get; }
@@ -1209,6 +1211,25 @@ public sealed class MainViewModel : ObservableObject
             DataContext = this
         };
         window.Show();
+    }
+
+    private void ClearOperationHistory()
+    {
+        var owner = Application.Current.Windows.OfType<OperationsWindow>().FirstOrDefault()
+            ?? Application.Current.MainWindow;
+        var confirmation = MessageBox.Show(
+            owner,
+            Strings.Operations_ClearConfirm,
+            Strings.Operations_WindowTitle,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        try { _operationJournal.Clear(); }
+        catch (IOException exception) { AppLog.Error("Не удалось очистить журнал операций", exception); }
+        catch (UnauthorizedAccessException exception) { AppLog.Error("Не удалось очистить журнал операций", exception); }
+        LoadOperationHistory();
     }
 
     private void LoadOperationHistory()

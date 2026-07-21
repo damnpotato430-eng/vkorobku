@@ -265,6 +265,10 @@
 
 Игра будет убрана из библиотеки vKOROBKU. Файлы на диске не изменяются и не удаляются.</value></data>
   <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Внимание: игра останется сжатой. Чтобы вернуть файлы в исходное состояние, сначала выполните распаковку.</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>Очистить журнал</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>Очистить журнал операций?
+
+Активная операция (если идёт) останется в списке.</value></data>
   <data name="Hide_Prompt" xml:space="preserve"><value>Скрыть игру «{0}» из библиотеки?
 
 На диске ничего не меняется — игра остаётся установленной. Вернуть скрытые игры можно в настройках.</value></data>

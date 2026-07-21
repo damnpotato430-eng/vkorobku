@@ -265,6 +265,10 @@ Administrator rights will be requested once. The games must be closed.</value></
 
 The game is removed from the vKOROBKU library only. Files on disk are not changed or deleted.</value></data>
   <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Note: the game stays compressed. To restore its files to the original state, decompress it first.</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>Clear history</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>Clear the operations history?
+
+A running operation (if any) stays in the list.</value></data>
   <data name="Hide_Prompt" xml:space="preserve"><value>Hide {0} from the library?
 
 Nothing on disk changes — the game stays installed and untouched. Hidden games can be restored in Settings.</value></data>

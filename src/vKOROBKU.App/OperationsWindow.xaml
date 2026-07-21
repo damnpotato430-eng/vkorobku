@@ -80,8 +80,16 @@
                     VerticalAlignment="Center" Background="#A83A3A" Foreground="White" />
         </Grid>
 
-        <TextBlock Grid.Row="3" Text="{x:Static res:Strings.Operations_History}" FontSize="10" FontWeight="Bold"
-                   Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,8" />
+        <Grid Grid.Row="3" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{x:Static res:Strings.Operations_History}" FontSize="10" FontWeight="Bold"
+                       Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="{x:Static res:Strings.Operations_Clear}" Command="{Binding ClearOperationsCommand}"
+                    Padding="10,4" FontSize="11" Style="{StaticResource SecondaryButton}" />
+        </Grid>
         <ListBox Grid.Row="4" ItemsSource="{Binding Operations}" ItemTemplate="{StaticResource OperationCardTemplate}"
                  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemContainerStyle>

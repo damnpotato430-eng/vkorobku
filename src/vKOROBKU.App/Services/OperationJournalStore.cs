@@ -105,6 +105,19 @@ public sealed class OperationJournalStore
         }
     }
 
+    // A running operation survives the wipe: its entry is still being updated by
+    // the worker pump and feeds the "current operation" card.
+    public void Clear()
+    {
+        lock (_sync)
+        {
+            var entries = Read();
+            var kept = entries.Where(entry => entry.State == OperationJournalState.Running).ToList();
+            if (kept.Count != entries.Count)
+                Write(kept);
+        }
+    }
+
     private List<OperationJournalEntry> Read()
     {
         try
