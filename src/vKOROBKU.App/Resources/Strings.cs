@@ -266,6 +266,8 @@ public static class Strings
     public static string AddFolder_DialogTitle => Get(nameof(AddFolder_DialogTitle));
     public static string Remove_Prompt => Get(nameof(Remove_Prompt));
     public static string Remove_StillCompressedNote => Get(nameof(Remove_StillCompressedNote));
+    public static string Operations_Clear => Get(nameof(Operations_Clear));
+    public static string Operations_ClearConfirm => Get(nameof(Operations_ClearConfirm));
     public static string Hide_Prompt => Get(nameof(Hide_Prompt));
     public static string Status_GameHidden => Get(nameof(Status_GameHidden));
     public static string Settings_HiddenSection => Get(nameof(Settings_HiddenSection));
