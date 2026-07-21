@@ -4,7 +4,7 @@
 
 ## Что это
 
-Русско/англоязычное WPF-приложение (.NET 8, Windows) для прозрачного сжатия установленных игр штатным NTFS-механизмом WOF (compact.exe, алгоритмы XPRESS4K/8K/16K и LZX). Игры продолжают работать — меняется только способ хранения файлов. Репозиторий: `damnpotato430-eng/vkorobku`, лицензия GPL-3.0.
+Русско/англоязычное WPF-приложение (.NET 10, Windows) для прозрачного сжатия установленных игр штатным NTFS-механизмом WOF (compact.exe, алгоритмы XPRESS4K/8K/16K и LZX). Игры продолжают работать — меняется только способ хранения файлов. Репозиторий: `damnpotato430-eng/vkorobku`, лицензия GPL-3.0.
 
 ## Структура решения
 
@@ -63,7 +63,7 @@ docs/release-notes-v*.md  — заметки релизов (файл обяза
 - **Файлы с кириллицей редактировать только Edit-тулом** — PowerShell Get-Content/Set-Content ломает UTF-8 без BOM (мojibake). Безопасная альтернатива для вставок: `[IO.File]::ReadAllText/WriteAllText` с UTF8(false).
 - PS 5.1: двойные кавычки в аргументах native-команд ломаются → коммит-сообщения через `git commit -F файл` или Bash-heredoc.
 - bin/Debug лочится запущенным приложением — не убивать процесс пользователя; ждать закрытия (Monitor) и пересобирать. **Не использовать общий `-p:OutDir` для обхода** — тесты получают протухшую Worker.dll из обычного bin.
-- Локальный .NET SDK 8.0.422 лежит в scratchpad (`$env:DOTNET_ROOT = <scratchpad>\dotnet`); системного нет.
+- Локальный .NET SDK 10.0.302 лежит в scratchpad (`$env:DOTNET_ROOT = <scratchpad>\dotnet`); системного нет.
 - Интеграционный тест воркера запускает его через `dotnet vKOROBKU.Worker.dll` (муксер обходит requireAdministrator-манифест apphost'а) — работает локально без UAC и в CI.
 - git push иногда падает по порту 22 → фолбэк `ssh://git@ssh.github.com:443/...`.
 
@@ -73,7 +73,7 @@ docs/release-notes-v*.md  — заметки релизов (файл обяза
 $env:DOTNET_ROOT = "<scratchpad>\dotnet"
 & "$env:DOTNET_ROOT\dotnet.exe" build vKOROBKU.sln
 & "$env:DOTNET_ROOT\dotnet.exe" test tests\vKOROBKU.Tests\vKOROBKU.Tests.csproj --no-build
-# запуск: src\vKOROBKU.App\bin\Debug\net8.0-windows10.0.19041.0\vKOROBKU.exe
+# запуск: src\vKOROBKU.App\bin\Debug\net10.0-windows10.0.19041.0\vKOROBKU.exe
 ```
 
 Релиз: поднять версию в **трёх** местах (App.csproj, Worker.csproj, build-release.ps1) + создать `docs/release-notes-vX.Y.Z.md` → коммит «Prepare vX.Y.Z release» → тег `vX.Y.Z` → push тега → release.yml сам тестирует, собирает zip+sha256 и публикует (0.* → prerelease автоматически).
@@ -84,7 +84,6 @@ $env:DOTNET_ROOT = "<scratchpad>\dotnet"
 1. **Настройки на игру** — «не сжимать никогда», «закрепить алгоритм».
 2. **Сортировка «Лучшие кандидаты»** — по потенциальной экономии.
 3. **Подпись кода + winget** — против SmartScreen; нужно решение пользователя по сертификату/Azure Trusted Signing.
-4. **.NET 10 LTS** — обязательно до ноября 2026 (EOL .NET 8); сама миграция быстрая, риск только в новых warnings (TreatWarningsAsErrors включён).
 
 Мелочи: проверить Ubisoft/EA на живой установке и снять пометку «экспериментально» (README + release notes), скриншот README (можно с англ. UI), Battle.net-сканер по запросу, косметика — кеш анализа хранит «Точность/Прогноз» строкой на языке момента расчёта (лечится повторным анализом; чистое решение — код вместо строки в `SavedGameAnalysis`).
 

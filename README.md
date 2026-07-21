@@ -63,7 +63,7 @@
 
 ## Разработка
 
-Требуется .NET 8 SDK с Windows Desktop workload.
+Требуется .NET 10 SDK с Windows Desktop workload.
 
 ```powershell
 dotnet restore
@@ -71,7 +71,7 @@ dotnet build vKOROBKU.sln
 dotnet run --project src/vKOROBKU.App
 ```
 
-Проект проверен сборкой с .NET SDK 8.0.422.
+Проект проверен сборкой с .NET SDK 10.0.302.
 
 Подробности: [спецификация MVP](docs/MVP.md) и [архитектура](docs/ARCHITECTURE.md).
 
