@@ -1885,7 +1885,9 @@ public sealed class MainViewModel : ObservableObject
                 OperationSummary = string.Format(Strings.Operation_Failed, WorkerMessageText.Describe(result));
                 StatusText = Strings.Operation_SystemError;
                 tracker.Finish(OperationJournalState.Failed, OperationSummary);
-                return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, result.Text);
+                // Coded worker errors carry no Text — the rendered description keeps
+                // the queue chip informative ("not NTFS", "game is running", …).
+                return new QueueJobOutcome(QueueItemStatus.Failed, 0, false, WorkerMessageText.Describe(result));
             }
             if (result.Type == "cancelled")
             {

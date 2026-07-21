@@ -50,6 +50,10 @@ public partial class App : Application
             var culture = CultureInfo.GetCultureInfo(language);
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
+            // Number and size formatting follows the chosen language too, so an
+            // English UI does not mix in regional decimal commas.
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            Thread.CurrentThread.CurrentCulture = culture;
         }
         catch (CultureNotFoundException) { }
         catch (Exception exception)
