@@ -265,6 +265,14 @@
 
 Игра будет убрана из библиотеки vKOROBKU. Файлы на диске не изменяются и не удаляются.</value></data>
   <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Внимание: игра останется сжатой. Чтобы вернуть файлы в исходное состояние, сначала выполните распаковку.</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>Скрыть игру «{0}» из библиотеки?
+
+На диске ничего не меняется — игра остаётся установленной. Вернуть скрытые игры можно в настройках.</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>Игра «{0}» скрыта из библиотеки</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>СКРЫТЫЕ ИГРЫ</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Скрытых игр: {0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>Вернуть все</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Скрытые игры вернутся в библиотеку после обновления списка.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Не удалось убрать игру из библиотеки. Проверьте доступ к локальным данным vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Ошибка удаления из библиотеки</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Авто</value></data>

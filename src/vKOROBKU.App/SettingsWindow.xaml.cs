@@ -19,10 +19,11 @@ public partial class SettingsWindow : Window
 
     private readonly ObservableCollection<string> _userExtensions;
 
-    public SettingsWindow(UserPreferences preferences)
+    public SettingsWindow(UserPreferences preferences, int hiddenGamesCount)
     {
         InitializeComponent();
         Result = preferences;
+        UpdateHiddenGamesRow(hiddenGamesCount);
         foreach (var option in LanguageOptions)
             LanguageBox.Items.Add(option.Display());
         var languageIndex = Array.FindIndex(LanguageOptions, option => option.Value == preferences.Language);
@@ -40,6 +41,22 @@ public partial class SettingsWindow : Window
     }
 
     public UserPreferences Result { get; private set; }
+
+    // Set as soon as the user clicks "restore" — the caller honours it even when
+    // the dialog is later cancelled, so the click is never silently lost.
+    public bool RestoreHiddenRequested { get; private set; }
+
+    private void UpdateHiddenGamesRow(int count)
+    {
+        HiddenCountText.Text = string.Format(Strings.Settings_HiddenGamesCount, count);
+        RestoreHiddenButton.IsEnabled = count > 0;
+    }
+
+    private void RestoreHiddenClick(object sender, RoutedEventArgs e)
+    {
+        RestoreHiddenRequested = true;
+        UpdateHiddenGamesRow(0);
+    }
 
     private void AddExtensionClick(object sender, RoutedEventArgs e)
     {

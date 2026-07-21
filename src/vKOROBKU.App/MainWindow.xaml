@@ -447,7 +447,6 @@
                                         Style="{StaticResource SecondaryButton}" />
                                 <Button Content="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}"
                                         Margin="8,0,0,0" Padding="10,6"
-                                        Visibility="{Binding ManualGameVisibility}"
                                         Style="{StaticResource SecondaryButton}" />
                             </WrapPanel>
                             <StackPanel Visibility="{Binding UncompressedPanelVisibility}">

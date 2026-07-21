@@ -32,6 +32,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly CompressionStatsStore _statsStore = new();
     private readonly UserPreferencesStore _preferences = new();
     private readonly ManualGameStore _manualGameStore = new();
+    private readonly HiddenGamesStore _hiddenGames = new();
     private readonly WatchedGamesCoordinator _watcher = new();
     private readonly DirectStorageDetector _directStorageDetector = new();
     private readonly UpdateCheckService _updateCheckService = new();
@@ -120,7 +121,7 @@ public sealed class MainViewModel : ObservableObject
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
-            () => SelectedGame?.Source == GameInfo.ManualSource && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
@@ -309,7 +310,6 @@ public sealed class MainViewModel : ObservableObject
             NotifyCompressionPanelVisibility();
             NotifyActiveOperationLabel();
             OnPropertyChanged(nameof(IdentityReviewVisibility));
-            OnPropertyChanged(nameof(ManualGameVisibility));
             ReviewIdentityCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             if (sameGame)
@@ -448,8 +448,6 @@ public sealed class MainViewModel : ObservableObject
     public Visibility IdentityReviewVisibility =>
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
 
-    public Visibility ManualGameVisibility =>
-        SelectedGame?.Source == GameInfo.ManualSource ? Visibility.Visible : Visibility.Collapsed;
 
     // A partially compressed game with a known algorithm gets a dedicated "finish"
     // panel instead of the mode selection, so algorithms are not mixed within one game.
@@ -820,15 +818,39 @@ public sealed class MainViewModel : ObservableObject
 
     private void ShowSettings()
     {
-        var dialog = new SettingsWindow(_userPreferences) { Owner = Application.Current.MainWindow };
-        if (dialog.ShowDialog() != true)
-            return;
+        var dialog = new SettingsWindow(_userPreferences, _hiddenGames.Load().Count)
+        {
+            Owner = Application.Current.MainWindow
+        };
+        var saved = dialog.ShowDialog() == true;
+        if (saved)
+        {
+            _userPreferences = dialog.Result with { ExpertMode = IsExpertMode };
+            try { _preferences.Save(_userPreferences); }
+            catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
+            StatusText = Strings.Status_SettingsSaved;
+        }
 
-        _userPreferences = dialog.Result with { ExpertMode = IsExpertMode };
-        try { _preferences.Save(_userPreferences); }
-        catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
-        StatusText = Strings.Status_SettingsSaved;
-        _ = CheckWatchedGamesAsync(false);
+        // Restoring hidden games is an immediate action, honoured even when the
+        // dialog itself is cancelled — the click already expressed the intent.
+        if (dialog.RestoreHiddenRequested)
+        {
+            try { _hiddenGames.Clear(); }
+            catch (Exception exception) { AppLog.Error("Не удалось восстановить скрытые игры", exception); }
+            _ = RestoreHiddenGamesAsync();
+        }
+        else if (saved)
+        {
+            _ = CheckWatchedGamesAsync(false);
+        }
+    }
+
+    // The follow-up check re-seeds the watch list: restored compressed games were
+    // forgotten by the watcher on hiding and re-adopt from their kept saved status.
+    private async Task RestoreHiddenGamesAsync()
+    {
+        await RefreshLibraryAsync();
+        await CheckWatchedGamesAsync(false);
     }
 
     private async Task OfferToResumeInterruptedCompressionAsync()
@@ -872,6 +894,11 @@ public sealed class MainViewModel : ObservableObject
         try
         {
             var foundGames = await ScanAllLibrariesAsync();
+            var hiddenPaths = _hiddenGames.Load();
+            if (hiddenPaths.Count > 0)
+                foundGames = foundGames
+                    .Where(game => !hiddenPaths.Contains(game.InstallPath))
+                    .ToArray();
             var previousGames = Games.ToDictionary(
                 game => game.InstallPath,
                 StringComparer.OrdinalIgnoreCase);
@@ -1001,9 +1028,16 @@ public sealed class MainViewModel : ObservableObject
     private void RemoveSelectedGame()
     {
         var game = SelectedGame;
-        if (game?.Source != GameInfo.ManualSource || IsAnalyzing || IsOperating || IsCheckingCompression)
+        if (game is null || IsAnalyzing || IsOperating || IsCheckingCompression)
             return;
+        if (game.Source == GameInfo.ManualSource)
+            RemoveManualGame(game);
+        else
+            HideGame(game);
+    }
 
+    private void RemoveManualGame(GameInfo game)
+    {
         var message = string.Format(Strings.Remove_Prompt, game.Name);
         var isCompressed = game.CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
         if (isCompressed)
@@ -1049,6 +1083,54 @@ public sealed class MainViewModel : ObservableObject
         RefreshCoversCommand.RaiseCanExecuteChanged();
         RaiseActionCommands();
         RefreshSavingsSummary();
+    }
+
+    // Hiding is reversible (Settings → restore), so the saved compression status and
+    // the analysis cache are deliberately kept — the card comes back with its state.
+    private void HideGame(GameInfo game)
+    {
+        var message = string.Format(Strings.Hide_Prompt, game.Name);
+        var isCompressed = game.CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
+        if (isCompressed)
+        {
+            message += "\n\n" + Strings.Remove_StillCompressedNote;
+        }
+
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            message,
+            Strings.Card_RemoveFromLibrary,
+            MessageBoxButton.YesNo,
+            isCompressed ? MessageBoxImage.Warning : MessageBoxImage.Question);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            _hiddenGames.Add(game.InstallPath);
+        }
+        catch (IOException exception)
+        {
+            ShowRemoveGameError(exception.Message);
+            return;
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            ShowRemoveGameError(exception.Message);
+            return;
+        }
+
+        // A hidden game must not keep feeding the "needs recompression" banner.
+        _watcher.Forget(game.InstallPath);
+
+        var gameName = game.Name;
+        Games.Remove(game);
+        SelectedGame = null;
+        StatusText = string.Format(Strings.Status_GameHidden, gameName);
+        RefreshCoversCommand.RaiseCanExecuteChanged();
+        RaiseActionCommands();
+        RefreshSavingsSummary();
+        UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
     }
 
     private static void ShowRemoveGameError(string details) => MessageBox.Show(
