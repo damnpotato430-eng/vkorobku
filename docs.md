@@ -54,7 +54,7 @@ docs/release-notes-v*.md  — заметки релизов (файл обяза
 - Обложки (`CoverService`): Steam CDN по appid → GOG API по productId (`api.gog.com/v2/games/{id}` → boxArtImage) → поиск по имени в Steam storesearch. Негативный кеш 7 дней только при подтверждённом промахе (сетевые ошибки пробрасываются). Кеш в `Covers/`.
 
 ### Данные (%LOCALAPPDATA%\vKOROBKU)
-`preferences.json`, `watcher.json`, `compression-status.json` (статусы карточек, TTL доверия 6ч), `stats.json` (накопительная статистика «за всё время», только прибавление), `manual-games.json`, `hidden-games.json` (скрытые DirectStorage-игры — пути; скрытие переживает рескан, «Вернуть все» в настройках), журнал операций, кеш анализа, `Covers/`, `logs/` (app-*.log + crash-*.log).
+`preferences.json`, `watcher.json`, `compression-status.json` (статусы карточек, TTL доверия 6ч), `stats.json` (накопительная статистика «за всё время», только прибавление), `manual-games.json`, `hidden-games.json` (скрытые игры — пути; скрытие переживает рескан и снимает наблюдение, «Вернуть все» в настройках), журнал операций, кеш анализа, `Covers/`, `logs/` (app-*.log + crash-*.log).
 
 ## Рабочие соглашения (критично!)
 

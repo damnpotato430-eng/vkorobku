@@ -2,10 +2,9 @@ using System.Text.Json;
 
 namespace vKOROBKU.App.Services;
 
-/// <summary>Persistent set of install paths the user hid from the library
-/// (DirectStorage games that are pointless to compress). Launcher scanners keep
-/// rediscovering the folders on every refresh, so hiding must survive rescans —
-/// hence a store rather than an in-memory flag.</summary>
+/// <summary>Persistent set of install paths the user hid from the library.
+/// Launcher scanners keep rediscovering the folders on every refresh, so hiding
+/// must survive rescans — hence a store rather than an in-memory flag.</summary>
 public sealed class HiddenGamesStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };

@@ -121,7 +121,7 @@ public sealed class MainViewModel : ObservableObject
         ReviewIdentityCommand = new AsyncRelayCommand(ReviewSelectedGameIdentityAsync,
             () => SelectedGame?.NeedsIdentityReview == true);
         RemoveGameCommand = new RelayCommand(RemoveSelectedGame,
-            () => CanRemoveSelectedGame && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+            () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         RecheckCompressionCommand = new AsyncRelayCommand(RecheckSelectedGameCompressionAsync,
             () => SelectedGame is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
@@ -310,7 +310,6 @@ public sealed class MainViewModel : ObservableObject
             NotifyCompressionPanelVisibility();
             NotifyActiveOperationLabel();
             OnPropertyChanged(nameof(IdentityReviewVisibility));
-            OnPropertyChanged(nameof(RemoveGameVisibility));
             ReviewIdentityCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             if (sameGame)
@@ -449,15 +448,6 @@ public sealed class MainViewModel : ObservableObject
     public Visibility IdentityReviewVisibility =>
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
 
-    // Manual games can always be removed (the record is ours to delete); scanner
-    // games can only be hidden, and only when they use DirectStorage — compression
-    // is discouraged for them, so the card is dead weight in the library.
-    private bool CanRemoveSelectedGame =>
-        SelectedGame is { } game &&
-        (game.Source == GameInfo.ManualSource || game.HasDirectStorage == true);
-
-    public Visibility RemoveGameVisibility =>
-        CanRemoveSelectedGame ? Visibility.Visible : Visibility.Collapsed;
 
     // A partially compressed game with a known algorithm gets a dedicated "finish"
     // panel instead of the mode selection, so algorithms are not mixed within one game.
@@ -847,12 +837,20 @@ public sealed class MainViewModel : ObservableObject
         {
             try { _hiddenGames.Clear(); }
             catch (Exception exception) { AppLog.Error("Не удалось восстановить скрытые игры", exception); }
-            _ = RefreshLibraryAsync();
+            _ = RestoreHiddenGamesAsync();
         }
         else if (saved)
         {
             _ = CheckWatchedGamesAsync(false);
         }
+    }
+
+    // The follow-up check re-seeds the watch list: restored compressed games were
+    // forgotten by the watcher on hiding and re-adopt from their kept saved status.
+    private async Task RestoreHiddenGamesAsync()
+    {
+        await RefreshLibraryAsync();
+        await CheckWatchedGamesAsync(false);
     }
 
     private async Task OfferToResumeInterruptedCompressionAsync()
@@ -1030,7 +1028,7 @@ public sealed class MainViewModel : ObservableObject
     private void RemoveSelectedGame()
     {
         var game = SelectedGame;
-        if (game is null || !CanRemoveSelectedGame || IsAnalyzing || IsOperating || IsCheckingCompression)
+        if (game is null || IsAnalyzing || IsOperating || IsCheckingCompression)
             return;
         if (game.Source == GameInfo.ManualSource)
             RemoveManualGame(game);
@@ -1091,12 +1089,19 @@ public sealed class MainViewModel : ObservableObject
     // the analysis cache are deliberately kept — the card comes back with its state.
     private void HideGame(GameInfo game)
     {
+        var message = string.Format(Strings.Hide_Prompt, game.Name);
+        var isCompressed = game.CompressionState is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
+        if (isCompressed)
+        {
+            message += "\n\n" + Strings.Remove_StillCompressedNote;
+        }
+
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
-            string.Format(Strings.Hide_Prompt, game.Name),
+            message,
             Strings.Card_RemoveFromLibrary,
             MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            isCompressed ? MessageBoxImage.Warning : MessageBoxImage.Question);
         if (confirmation != MessageBoxResult.Yes)
             return;
 
@@ -1115,6 +1120,9 @@ public sealed class MainViewModel : ObservableObject
             return;
         }
 
+        // A hidden game must not keep feeding the "needs recompression" banner.
+        _watcher.Forget(game.InstallPath);
+
         var gameName = game.Name;
         Games.Remove(game);
         SelectedGame = null;
@@ -1122,6 +1130,7 @@ public sealed class MainViewModel : ObservableObject
         RefreshCoversCommand.RaiseCanExecuteChanged();
         RaiseActionCommands();
         RefreshSavingsSummary();
+        UpdateWatcherSummary(_watcher.ReadStoredState(_userPreferences));
     }
 
     private static void ShowRemoveGameError(string details) => MessageBox.Show(
@@ -1745,7 +1754,6 @@ public sealed class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(PartialInfoVisibility));
         OnPropertyChanged(nameof(FinishCompressionButtonText));
         OnPropertyChanged(nameof(DirectStorageWarningVisibility));
-        OnPropertyChanged(nameof(RemoveGameVisibility));
     }
 
     private void TrySaveCompressionStatus(

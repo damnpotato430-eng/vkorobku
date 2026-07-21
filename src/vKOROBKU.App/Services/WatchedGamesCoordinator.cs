@@ -158,6 +158,21 @@ public sealed class WatchedGamesCoordinator
         }
     }
 
+    // Hiding a game from the library also stops watching it: an invisible card must
+    // not keep feeding the "needs recompression" banner. When the game is restored,
+    // SeedFromLibrary re-adopts it from the kept saved status on the next check.
+    public void Forget(string folderPath)
+    {
+        try
+        {
+            _store.Remove(folderPath);
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("Не удалось убрать игру из наблюдения", exception);
+        }
+    }
+
     public void OnOperationCompleted(WorkerJob job, WorkerMessage result, GameCompressionState newState, GameInfo? processedGame)
     {
         try
