@@ -57,6 +57,37 @@ public sealed class LocalizationTests
         }
     }
 
+    // A translation that loses or invents a {N} placeholder either silently drops part
+    // of the message or throws FormatException at runtime — on the hot path of
+    // operation summaries. The placeholder sets must match the English base exactly.
+    [Fact]
+    public void Placeholders_MatchTheBase_InEveryCulture()
+    {
+        foreach (var key in ReadKeys(CultureInfo.InvariantCulture))
+        {
+            var basePlaceholders = ExtractPlaceholders(
+                Strings.ResourceManager.GetString(key, CultureInfo.InvariantCulture)!);
+            foreach (var culture in TranslatedCultures)
+            {
+                var translated = ExtractPlaceholders(
+                    Strings.ResourceManager.GetString(key, CultureInfo.GetCultureInfo(culture))!);
+                Assert.True(
+                    basePlaceholders.SetEquals(translated),
+                    $"Плейсхолдеры ключа {key} расходятся для культуры «{culture}»: " +
+                    $"база [{string.Join(" ", basePlaceholders)}], перевод [{string.Join(" ", translated)}]");
+            }
+        }
+    }
+
+    private static HashSet<string> ExtractPlaceholders(string value)
+    {
+        var placeholders = new HashSet<string>(StringComparer.Ordinal);
+        foreach (System.Text.RegularExpressions.Match match in
+                 System.Text.RegularExpressions.Regex.Matches(value, @"\{\d+\}"))
+            placeholders.Add(match.Value);
+        return placeholders;
+    }
+
     private static HashSet<string> ReadKeys(CultureInfo culture)
     {
         var resourceSet = Strings.ResourceManager.GetResourceSet(culture, true, tryParents: false);

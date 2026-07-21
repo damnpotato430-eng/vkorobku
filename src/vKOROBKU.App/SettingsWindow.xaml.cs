@@ -87,7 +87,11 @@ public partial class SettingsWindow : Window
 
     private void SaveClick(object sender, RoutedEventArgs e)
     {
-        if (!double.TryParse(DecayBox.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out var decay) ||
+        // Both decimal separators are accepted regardless of the active culture:
+        // a Russian-locale user typing "5.5" (or an English one typing "5,5") should
+        // not be rejected over punctuation.
+        var decayText = DecayBox.Text.Trim().Replace(',', '.');
+        if (!double.TryParse(decayText, NumberStyles.Float, CultureInfo.InvariantCulture, out var decay) ||
             decay is < 1 or > 100)
         {
             MessageBox.Show(this, Strings.Settings_DecayError,
