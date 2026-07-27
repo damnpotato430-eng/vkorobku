@@ -283,6 +283,13 @@
   <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Анализ выполняется…</value></data>
   <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Повторить анализ</value></data>
   <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Выберите игру и запустите безопасный анализ выборки.</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>Закрыть vKOROBKU?</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>Операция ещё выполняется. Если закрыть приложение, она прервётся: игра останется обработанной частично, а при следующем запуске будет предложено её дожать.
+
+Всё равно закрыть?</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>Анализ ещё выполняется. Если закрыть приложение, он прервётся — на диске ничего не изменится.
+
+Всё равно закрыть?</value></data>
   <data name="Welcome_Title" xml:space="preserve"><value>С ЧЕГО НАЧАТЬ</value></data>
   <data name="Welcome_Step1" xml:space="preserve"><value>1. Выберите игру в библиотеке слева.</value></data>
   <data name="Welcome_Step2" xml:space="preserve"><value>2. Нажмите «Анализ» — оценим экономию на небольшой выборке, на диске ничего не изменится.</value></data>

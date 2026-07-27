@@ -5,7 +5,7 @@
         Title="vKOROBKU" Icon="Assets/vkorobku.ico"
         Width="1180" Height="820" MinWidth="1040" MinHeight="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Closing="OnClosing">
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230" />
