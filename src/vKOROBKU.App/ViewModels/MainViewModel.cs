@@ -150,6 +150,10 @@ public sealed class MainViewModel : ObservableObject
         ToggleMultiSelectCommand = new RelayCommand(ToggleMultiSelectMode, () => Games.Count > 0 && !IsOperating);
         StartQueueCommand = new AsyncRelayCommand(StartQueueAsync,
             () => Games.Any(game => game.IsQueueSelected) && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        StartDecompressQueueCommand = new AsyncRelayCommand(StartDecompressQueueAsync,
+            () => Games.Any(game => game.IsQueueSelected) && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        SelectAllCompressedCommand = new RelayCommand(SelectAllCompressedGames,
+            () => !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         SkipQueueItemCommand = new AsyncRelayCommand(_workerClient.CancelAsync, () => IsQueueRunning);
         StopQueueAfterCurrentCommand = new RelayCommand(() => _queueStopAfterCurrent = true, () => IsQueueRunning);
         StopQueueCommand = new AsyncRelayCommand(StopQueueAsync, () => IsQueueRunning);
@@ -186,6 +190,8 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand CheckWatchedGamesCommand { get; }
     public RelayCommand ToggleMultiSelectCommand { get; }
     public AsyncRelayCommand StartQueueCommand { get; }
+    public AsyncRelayCommand StartDecompressQueueCommand { get; }
+    public RelayCommand SelectAllCompressedCommand { get; }
     public AsyncRelayCommand SkipQueueItemCommand { get; }
     public RelayCommand StopQueueAfterCurrentCommand { get; }
     public AsyncRelayCommand StopQueueCommand { get; }
@@ -423,6 +429,8 @@ public sealed class MainViewModel : ObservableObject
             FinishCompressionCommand.RaiseCanExecuteChanged();
             ToggleMultiSelectCommand.RaiseCanExecuteChanged();
             StartQueueCommand.RaiseCanExecuteChanged();
+            StartDecompressQueueCommand.RaiseCanExecuteChanged();
+            SelectAllCompressedCommand.RaiseCanExecuteChanged();
             RecompressDegradedCommand.RaiseCanExecuteChanged();
             AddToQueueCommand.RaiseCanExecuteChanged();
             NotifyCompressionPanelVisibility();
@@ -2177,6 +2185,7 @@ public sealed class MainViewModel : ObservableObject
             return;
         UpdateQueueSelectionSummary();
         StartQueueCommand.RaiseCanExecuteChanged();
+        StartDecompressQueueCommand.RaiseCanExecuteChanged();
     }
 
     private void UpdateQueueSelectionSummary()
@@ -2236,6 +2245,74 @@ public sealed class MainViewModel : ObservableObject
         await RunQueueAsync(items);
     }
 
+    private void SelectAllCompressedGames()
+    {
+        foreach (var game in Games)
+            game.IsQueueSelected = game.CompressionState
+                is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed;
+        UpdateQueueSelectionSummary();
+    }
+
+    private async Task StartDecompressQueueAsync()
+    {
+        var selected = Games
+            .Where(game => game.IsQueueSelected && game.CompressionState
+                is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed)
+            .ToList();
+        if (selected.Count == 0)
+        {
+            StatusText = Strings.Queue_NoCompressedGames;
+            return;
+        }
+
+        if (!ConfirmDecompressionFits(selected))
+            return;
+
+        var preview = string.Join("\n", selected.Take(12).Select(game => $"• {game.Name}"));
+        if (selected.Count > 12)
+            preview += "\n" + string.Format(Strings.Queue_AndMore, selected.Count - 12);
+        var confirmation = MessageBox.Show(
+            Application.Current.MainWindow,
+            string.Format(Strings.Queue_DecompressPrompt, selected.Count, preview),
+            Strings.Queue_DecompressTitle,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        IsMultiSelectMode = false;
+        await RunQueueAsync(selected
+            .Select(game => new CompressionQueueItem(game, game.CompressionAlgorithm ?? string.Empty, "decompress"))
+            .ToList());
+    }
+
+    // Refuses the batch before a single file is touched when a volume cannot hold the
+    // expansion. The worker checks again per job with its own measurements — this pass
+    // exists so the user learns which drive is short instead of watching the queue fail
+    // game by game.
+    private static bool ConfirmDecompressionFits(IReadOnlyList<GameInfo> games)
+    {
+        var growth = games.Select(game => new DecompressionSpacePlanner.GameGrowth(
+            Path.GetPathRoot(game.InstallPath) ?? string.Empty,
+            Math.Max(0, game.LogicalSizeBytes - game.CompressedPhysicalBytes)));
+        var shortfalls = DecompressionSpacePlanner.FindShortfalls(
+            growth, DecompressionSpacePlanner.GetAvailableSpace);
+        if (shortfalls.Count == 0)
+            return true;
+
+        var details = string.Join("\n", shortfalls.Select(shortfall => string.Format(
+            Strings.Queue_SpaceShortfallLine,
+            shortfall.DriveRoot,
+            ByteFormatter.Format(shortfall.MissingBytes))));
+        MessageBox.Show(
+            Application.Current.MainWindow,
+            string.Format(Strings.Queue_NotEnoughSpacePrompt, details),
+            Strings.Queue_DecompressTitle,
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
+        return false;
+    }
+
     private async Task RecompressDegradedAsync()
     {
         var degraded = _watcher.ReadStoredState(_userPreferences).Degraded;
@@ -2292,7 +2369,12 @@ public sealed class MainViewModel : ObservableObject
         _queueStopAll = false;
         IsOperating = true;
         IsQueueRunning = true;
-        QueueTitle = string.Format(Strings.Queue_TitlePreparing, items.Count);
+        // A queue is homogeneous by construction, so its wording is decided once:
+        // "freed N bytes" is meaningless for decompression, which consumes space.
+        var isDecompression = items.Count > 0 && items.All(item => item.IsDecompression);
+        QueueTitle = string.Format(
+            isDecompression ? Strings.Queue_DecompressTitlePreparing : Strings.Queue_TitlePreparing,
+            items.Count);
         AppLog.Info($"Очередь запущена: {items.Count} игр — {string.Join(", ", items.Select(item => item.Title))}");
         try
         {
@@ -2307,18 +2389,22 @@ public sealed class MainViewModel : ObservableObject
                     continue;
                 }
 
-                QueueTitle = string.Format(Strings.Queue_TitleProgress, position, items.Count);
+                QueueTitle = string.Format(
+                    isDecompression ? Strings.Queue_DecompressTitleProgress : Strings.Queue_TitleProgress,
+                    position, items.Count);
                 item.MarkRunning();
                 AppLog.Info($"Очередь: {position}/{items.Count} — запускаем «{item.Game.Name}» ({item.Algorithm})");
                 var outcome = await RunJobInSessionAsync(session, new WorkerJob(
-                    item.Game.InstallPath, "compress", item.Algorithm,
+                    item.Game.InstallPath, item.Operation, item.Algorithm,
                     CompressionSkipList.BuildEffectiveExtensions(_userPreferences)));
                 AppLog.Info($"Очередь: «{item.Game.Name}» — итог {outcome.Status}" +
                             (outcome.SessionLost ? " (сессия воркера потеряна)" : string.Empty));
                 switch (outcome.Status)
                 {
                     case QueueItemStatus.Completed:
-                        item.MarkCompleted(outcome.FreedBytes, string.Format(Strings.QueueItem_Done, ByteFormatter.Format(outcome.FreedBytes)));
+                        item.MarkCompleted(outcome.FreedBytes, isDecompression
+                            ? Strings.QueueItem_Decompressed
+                            : string.Format(Strings.QueueItem_Done, ByteFormatter.Format(outcome.FreedBytes)));
                         break;
                     case QueueItemStatus.Cancelled:
                         item.MarkCancelled();
@@ -2356,7 +2442,9 @@ public sealed class MainViewModel : ObservableObject
             ClearActiveOperation();
             var completedCount = QueueItems.Count(item => item.Status == QueueItemStatus.Completed);
             var freedBytes = QueueItems.Sum(item => item.FreedBytes);
-            QueueTitle = string.Format(Strings.Queue_TitleDone, completedCount, QueueItems.Count, ByteFormatter.Format(freedBytes));
+            QueueTitle = isDecompression
+                ? string.Format(Strings.Queue_DecompressTitleDone, completedCount, QueueItems.Count)
+                : string.Format(Strings.Queue_TitleDone, completedCount, QueueItems.Count, ByteFormatter.Format(freedBytes));
             OperationSummary = QueueTitle;
             StatusText = QueueTitle;
             AppLog.Info(QueueTitle);

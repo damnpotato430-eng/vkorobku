@@ -58,6 +58,28 @@
   <data name="Queue_AndMore" xml:space="preserve"><value>…и ещё {0}</value></data>
   <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>Пропущено из-за DirectStorage: {0}</value></data>
   <data name="Queue_NoDegradedGames" xml:space="preserve"><value>Игры для дожатия не найдены в библиотеке</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>Распаковать · 1 запрос прав</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>Вернуть отмеченные игры в исходное состояние одной очередью — права администратора запрашиваются один раз</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>Отметить все сжатые</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>Отметить все сжатые и частично сжатые игры</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>Очередь распаковки</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>Распаковать игр: {0} — одной очередью?
+
+{1}
+
+Файлы вернутся к исходному размеру, то есть сэкономленное сжатием место будет отдано обратно. Права администратора будут запрошены один раз. Игры должны быть закрыты.</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>Среди отмеченных игр нет сжатых</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>Не хватает свободного места, чтобы распаковать отмеченные игры:
+
+{0}
+
+Освободите место или снимите отметки с части игр.</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• диск {0} — не хватает {1}</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>Очередь распаковки · подготовка ({0} игр)</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>Очередь распаковки · {0} из {1}</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>Очередь завершена · распаковано {0} из {1}</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>распаковано</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>На диске не хватает свободного места: для распаковки нужно ещё {0}</value></data>
   <data name="Queue_TitlePreparing" xml:space="preserve"><value>Очередь сжатия · подготовка ({0} игр)</value></data>
   <data name="Queue_TitleProgress" xml:space="preserve"><value>Очередь сжатия · {0} из {1}</value></data>
   <data name="Queue_TitleDone" xml:space="preserve"><value>Очередь завершена · сжато {0} из {1} · освобождено {2}</value></data>

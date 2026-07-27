@@ -57,6 +57,7 @@ public static class WorkerCodes
     public const string ReparseRoot = "reparse_root";
     public const string NotNtfs = "not_ntfs";
     public const string NoFiles = "no_files";
+    public const string NotEnoughSpace = "not_enough_space";
     public const string GameRunning = "game_running";
     public const string CompactStartFailed = "compact_start_failed";
 }

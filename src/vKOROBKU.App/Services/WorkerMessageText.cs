@@ -31,6 +31,8 @@ public static class WorkerMessageText
         WorkerCodes.ReparseRoot => Strings.Worker_ReparseRoot,
         WorkerCodes.NotNtfs => Strings.Worker_NotNtfs,
         WorkerCodes.NoFiles => Strings.Worker_NoFiles,
+        WorkerCodes.NotEnoughSpace => string.Format(
+            Strings.Worker_NotEnoughSpace, ByteFormatter.Format(message.CodeValue)),
         WorkerCodes.GameRunning => string.Format(Strings.Worker_GameRunning, message.CodeArg),
         WorkerCodes.CompactStartFailed => Strings.Worker_CompactStartFailed,
         _ => message.Text ?? string.Empty
