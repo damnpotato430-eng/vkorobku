@@ -308,6 +308,7 @@ public sealed class MainViewModel : ObservableObject
             NotifyCompressionPanelVisibility();
             NotifyActiveOperationLabel();
             OnPropertyChanged(nameof(IdentityReviewVisibility));
+            NotifyWelcomeVisibility();
             ReviewIdentityCommand.RaiseCanExecuteChanged();
             RemoveGameCommand.RaiseCanExecuteChanged();
             if (sameGame)
@@ -445,6 +446,21 @@ public sealed class MainViewModel : ObservableObject
 
     public Visibility IdentityReviewVisibility =>
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
+
+    // The panel has nothing to say about a game when none is picked, so that space
+    // carries the "what is this and what do I do" answer instead — the moment a new
+    // user needs it, and out of the way as soon as they select something.
+    public Visibility WelcomeVisibility =>
+        SelectedGame is null ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility WelcomeStepsVisibility =>
+        SelectedGame is null && Games.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility EmptyLibraryVisibility =>
+        SelectedGame is null && Games.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility AnalysisSummaryVisibility =>
+        SelectedGame is null ? Visibility.Collapsed : Visibility.Visible;
 
 
     // A partially compressed game with a known algorithm gets a dedicated "finish"
@@ -2124,6 +2140,15 @@ public sealed class MainViewModel : ObservableObject
         }
         UpdateQueueSelectionSummary();
         ToggleMultiSelectCommand.RaiseCanExecuteChanged();
+        NotifyWelcomeVisibility();
+    }
+
+    private void NotifyWelcomeVisibility()
+    {
+        OnPropertyChanged(nameof(WelcomeVisibility));
+        OnPropertyChanged(nameof(WelcomeStepsVisibility));
+        OnPropertyChanged(nameof(EmptyLibraryVisibility));
+        OnPropertyChanged(nameof(AnalysisSummaryVisibility));
     }
 
     private void OnGamePropertyChanged(object? sender, PropertyChangedEventArgs e)
