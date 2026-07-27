@@ -15,8 +15,6 @@
   <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>Оценка XPRESS и LZX доступна после выбора игры</value></data>
   <data name="Sidebar_SystemSection" xml:space="preserve"><value>СИСТЕМА</value></data>
   <data name="Sidebar_CoversSource" xml:space="preserve"><value>Обложки: Steam</value></data>
-  <data name="Update_OpenPageTooltip" xml:space="preserve"><value>Открыть страницу загрузки новой версии</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Доступна версия {0}</value></data>
   <data name="Header_Title" xml:space="preserve"><value>Библиотека игр</value></data>
   <data name="Header_Subtitle" xml:space="preserve"><value>Найдите установленные игры и оцените возможную экономию места</value></data>
   <data name="Header_RefreshCovers" xml:space="preserve"><value>Обновить обложки</value></data>
@@ -218,15 +216,10 @@
   <data name="Perf_NoChange" xml:space="preserve"><value>Изменение незаметно</value></data>
   <data name="About_Description" xml:space="preserve"><value>Сжатие установленных игр штатными средствами Windows (XPRESS/LZX) для экономии места на диске. Игры продолжают работать как раньше — меняется только способ хранения файлов на NTFS.</value></data>
   <data name="About_RepoLink" xml:space="preserve"><value>Репозиторий на GitHub</value></data>
-  <data name="About_ReleasesLink" xml:space="preserve"><value>Последние версии и загрузка</value></data>
   <data name="About_LicenseLink" xml:space="preserve"><value>Лицензия GPL-3.0</value></data>
-  <data name="About_CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
   <data name="About_OpenLogs" xml:space="preserve"><value>Папка логов</value></data>
   <data name="About_Close" xml:space="preserve"><value>Закрыть</value></data>
   <data name="About_Version" xml:space="preserve"><value>Версия {0}</value></data>
-  <data name="About_UpToDate" xml:space="preserve"><value>У вас установлена последняя версия.</value></data>
-  <data name="About_UpdatesTitle" xml:space="preserve"><value>Обновления</value></data>
-  <data name="About_UpdateAvailable" xml:space="preserve"><value>Доступна версия {0}. Открыть страницу загрузки?</value></data>
   <data name="Operations_WindowTitle" xml:space="preserve"><value>Операции — vKOROBKU</value></data>
   <data name="Operations_NoActive" xml:space="preserve"><value>Сейчас активных операций нет</value></data>
   <data name="Operations_Subtitle" xml:space="preserve"><value>Одновременно выполняется одна безопасная операция. Здесь отображаются её ход и история.</value></data>
@@ -234,7 +227,6 @@
   <data name="Operations_History" xml:space="preserve"><value>ИСТОРИЯ</value></data>
   <data name="Status_ReadyToScan" xml:space="preserve"><value>Готово к поиску игр</value></data>
   <data name="Status_PreviousInterrupted" xml:space="preserve"><value>Предыдущая операция была прервана. Состояние игры будет проверено при выборе.</value></data>
-  <data name="Status_BrowserFailed" xml:space="preserve"><value>Не удалось открыть браузер: {0}</value></data>
   <data name="Status_SettingsSaved" xml:space="preserve"><value>Настройки сохранены</value></data>
   <data name="Status_ScanningLibraries" xml:space="preserve"><value>Сканируем библиотеки игр</value></data>
   <data name="Status_NoGamesFound" xml:space="preserve"><value>Игры не найдены — добавьте папку вручную</value></data>

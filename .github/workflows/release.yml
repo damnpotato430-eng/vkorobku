@@ -1,8 +1,15 @@
 name: Release
 
+# Binaries are distributed through Steam, not GitHub: pushing a tag no longer
+# publishes anything. This workflow stays as a manual escape hatch — it still
+# builds and publishes a GitHub release when explicitly asked for.
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version without the leading v (for example 0.1.11)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -25,17 +32,15 @@ jobs:
 
       - name: Build release package
         shell: pwsh
-        run: |
-          $version = $env:GITHUB_REF_NAME -replace '^v', ''
-          ./scripts/build-release.ps1 -Version $version
+        run: ./scripts/build-release.ps1 -Version '${{ inputs.version }}'
 
       - name: Assemble release notes
         shell: pwsh
         run: |
-          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          $version = '${{ inputs.version }}'
           $notes = "docs/release-notes-v$version.md"
           if (-not (Test-Path $notes)) {
-            throw "Не найден файл release notes: $notes. Добавьте его в docs/ и пересоздайте тег."
+            throw "Не найден файл release notes: $notes. Добавьте его в docs/ и повторите запуск."
           }
           $body = (Get-Content $notes -Raw) + "`n" + (Get-Content "artifacts/vKOROBKU-v$version-win-x64-checksum.md" -Raw)
           [IO.File]::WriteAllText("artifacts/release-body.md", $body, [Text.UTF8Encoding]::new($false))
@@ -45,9 +50,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          $version = '${{ inputs.version }}'
           $arguments = @(
-            $env:GITHUB_REF_NAME,
+            "v$version",
             '--title', "vKOROBKU v$version",
             '--notes-file', 'artifacts/release-body.md',
             "artifacts/vKOROBKU-v$version-win-x64.zip",

@@ -13,15 +13,14 @@
 </p>
 
 <p align="center">
-  <a href="#скачать">Скачать</a> ·
+  <a href="#как-получить">Как получить</a> ·
   <a href="#возможности">Возможности</a> ·
-  <a href="#разработка">Разработка</a> ·
+  <a href="#сборка-из-исходников">Сборка из исходников</a> ·
   <a href="#лицензия">Лицензия</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml"><img src="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml/badge.svg" alt="Статус сборки" /></a>
-  <a href="https://github.com/damnpotato430-eng/vkorobku/releases"><img src="https://img.shields.io/github/v/release/damnpotato430-eng/vkorobku?include_prereleases&style=for-the-badge&logo=github&label=release&color=8BFF4D" alt="Последний релиз" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows" alt="Windows 10/11" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-555555?style=for-the-badge" alt="GPL-3.0" /></a>
 </p>
@@ -34,13 +33,13 @@
 
 > Предварительная версия: ядро работает и проверено на реальных библиотеках, продолжается полевое тестирование. Начинайте с игр, которые можно восстановить через проверку файлов Steam.
 
-## Скачать
+## Как получить
 
-### [Скачать последнюю версию vKOROBKU для Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases)
+**Готовая сборка — в Steam** (скоро). Один доллар, автоматические обновления и поддержка развития проекта.
 
-Рекомендуется скачивать архив `vKOROBKU-v<версия>-win-x64.zip`, полностью распаковать его и запустить `vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен находиться рядом.
+**Бесплатно — собрать самому.** Исходники полностью открыты здесь под GPL-3.0, см. [Сборка из исходников](#сборка-из-исходников). Три команды — и получится ровно то же приложение.
 
-Релиз является self-contained: устанавливать .NET Runtime отдельно не требуется. Релизы собираются автоматически из тегов через GitHub Actions.
+Готовые сборки на GitHub больше не публикуются — [прошлые релизы](https://github.com/damnpotato430-eng/vkorobku/releases) остаются доступными, но не обновляются.
 
 ## Целевая платформа
 
@@ -72,15 +71,19 @@
 - цветные статусы на карточках, экономия по каждому диску и суммарно;
 - обложки Steam, в том числе для не-Steam игр по названию — без настройки и ключей; журнал операций и окно настроек.
 
-## Разработка
+## Сборка из исходников
 
-Требуется .NET 10 SDK с Windows Desktop workload.
+Требуется [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) с Windows Desktop workload.
 
 ```powershell
-dotnet restore
-dotnet build vKOROBKU.sln
-dotnet run --project src/vKOROBKU.App
+git clone https://github.com/damnpotato430-eng/vkorobku.git
+cd vkorobku
+dotnet build vKOROBKU.sln -c Release
 ```
+
+Затем запустите `src\vKOROBKU.App\bin\Release\net10.0-windows10.0.19041.0\vKOROBKU.exe`. Файл `vKOROBKU.Worker.exe` должен лежать рядом — приложение запускает его для операций с правами администратора.
+
+Чтобы получить самодостаточный пакет, идентичный Steam-сборке, выполните `scripts\build-release.ps1`.
 
 Проект проверен сборкой с .NET SDK 10.0.302.
 

@@ -35,9 +35,6 @@ public sealed class MainViewModel : ObservableObject
     private readonly HiddenGamesStore _hiddenGames = new();
     private readonly WatchedGamesCoordinator _watcher = new();
     private readonly DirectStorageDetector _directStorageDetector = new();
-    private readonly UpdateCheckService _updateCheckService = new();
-    private string _updateNoticeText = string.Empty;
-    private string? _updateUrl;
     private string _searchText = string.Empty;
     private ChoiceOption _selectedSortOption;
     private UserPreferences _userPreferences;
@@ -128,7 +125,6 @@ public sealed class MainViewModel : ObservableObject
         OpenGameFolderCommand = new RelayCommand(OpenSelectedGameFolder, () => SelectedGame is not null);
         ShowSettingsCommand = new RelayCommand(ShowSettings);
         ShowAboutCommand = new RelayCommand(ShowAbout);
-        OpenUpdateCommand = new RelayCommand(OpenUpdatePage, () => _updateUrl is not null);
         CheckWatchedGamesCommand = new AsyncRelayCommand(() => CheckWatchedGamesAsync(true),
             () => !_isWatcherCheckRunning && !IsAnalyzing && !IsOperating);
         FinishCompressionCommand = new AsyncRelayCommand(FinishCompressionAsync,
@@ -187,7 +183,6 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand ShowSettingsCommand { get; }
     public RelayCommand ShowAboutCommand { get; }
     public AsyncRelayCommand CheckWatchedGamesCommand { get; }
-    public RelayCommand OpenUpdateCommand { get; }
     public RelayCommand ToggleMultiSelectCommand { get; }
     public AsyncRelayCommand StartQueueCommand { get; }
     public AsyncRelayCommand SkipQueueItemCommand { get; }
@@ -559,19 +554,6 @@ public sealed class MainViewModel : ObservableObject
     public Visibility WatcherSummaryVisibility =>
         WatcherSummaryText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-    public string UpdateNoticeText
-    {
-        get => _updateNoticeText;
-        private set
-        {
-            if (SetProperty(ref _updateNoticeText, value))
-                OnPropertyChanged(nameof(UpdateNoticeVisibility));
-        }
-    }
-
-    public Visibility UpdateNoticeVisibility =>
-        UpdateNoticeText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-
     // Shown above the progress bar only while the user is browsing a different card,
     // so the target of the running operation stays visible.
     public string ActiveOperationLabel =>
@@ -624,41 +606,6 @@ public sealed class MainViewModel : ObservableObject
             StatusText = Strings.Status_PreviousInterrupted;
         await OfferToResumeInterruptedCompressionAsync();
         _ = CheckWatchedGamesAsync(false);
-        _ = CheckForUpdatesAsync();
-    }
-
-    private async Task CheckForUpdatesAsync()
-    {
-        try
-        {
-            var currentVersion = typeof(MainViewModel).Assembly.GetName().Version ?? new Version(0, 0);
-            var newer = await _updateCheckService.CheckForNewerReleaseAsync(currentVersion);
-            if (newer is null)
-                return;
-
-            _updateUrl = newer.Value.Url;
-            UpdateNoticeText = string.Format(Strings.Update_Available, newer.Value.Version.ToString(3));
-            OpenUpdateCommand.RaiseCanExecuteChanged();
-            AppLog.Info($"Найдено обновление: {newer.Value.Version}");
-        }
-        catch (Exception exception)
-        {
-            AppLog.Error("Проверка обновлений не удалась", exception);
-        }
-    }
-
-    private void OpenUpdatePage()
-    {
-        if (_updateUrl is null)
-            return;
-        try
-        {
-            using var browser = Process.Start(new ProcessStartInfo { FileName = _updateUrl, UseShellExecute = true });
-        }
-        catch (Win32Exception exception)
-        {
-            StatusText = string.Format(Strings.Status_BrowserFailed, exception.Message);
-        }
     }
 
     private async Task CheckWatchedGamesAsync(bool force)

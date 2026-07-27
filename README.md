@@ -13,15 +13,14 @@
 </p>
 
 <p align="center">
-  <a href="#download">Download</a> ·
+  <a href="#get-vkorobku">Get vKOROBKU</a> ·
   <a href="#features">Features</a> ·
-  <a href="#development">Development</a> ·
+  <a href="#build-from-source">Build from source</a> ·
   <a href="#license">License</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml"><img src="https://github.com/damnpotato430-eng/vkorobku/actions/workflows/build.yml/badge.svg" alt="Build status" /></a>
-  <a href="https://github.com/damnpotato430-eng/vkorobku/releases"><img src="https://img.shields.io/github/v/release/damnpotato430-eng/vkorobku?include_prereleases&style=for-the-badge&logo=github&label=release&color=8BFF4D" alt="Latest release" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows" alt="Windows 10/11" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-555555?style=for-the-badge" alt="GPL-3.0" /></a>
 </p>
@@ -34,13 +33,13 @@ A Windows application that estimates and transparently compresses installed game
 
 > Preview version: the core works and has been verified on real game libraries; field testing continues. Start with games you can restore through Steam file verification.
 
-## Download
+## Get vKOROBKU
 
-### [Download the latest vKOROBKU release for Windows x64](https://github.com/damnpotato430-eng/vkorobku/releases)
+**Ready-made build — on Steam** (coming soon). One dollar, automatic updates, and it supports the development of the project.
 
-Download the `vKOROBKU-v<version>-win-x64.zip` archive, extract it completely and run `vKOROBKU.exe`. Keep `vKOROBKU.Worker.exe` next to it.
+**Free — build it yourself.** The full source is here under GPL-3.0; see [Build from source](#build-from-source). It takes three commands and gives you exactly the same application.
 
-Releases are self-contained: no separate .NET Runtime installation is required. They are built automatically from tags by GitHub Actions.
+Prebuilt binaries are no longer published on GitHub — [older releases](https://github.com/damnpotato430-eng/vkorobku/releases) remain available but are not updated.
 
 ## Target platform
 
@@ -72,15 +71,19 @@ Releases are self-contained: no separate .NET Runtime installation is required. 
 - colored card statuses, savings per drive and in total;
 - Steam covers, including for non-Steam games matched by name — no setup or API keys; an operations journal and a settings window.
 
-## Development
+## Build from source
 
-Requires the .NET 10 SDK with the Windows Desktop workload.
+Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) with the Windows Desktop workload.
 
 ```powershell
-dotnet restore
-dotnet build vKOROBKU.sln
-dotnet run --project src/vKOROBKU.App
+git clone https://github.com/damnpotato430-eng/vkorobku.git
+cd vkorobku
+dotnet build vKOROBKU.sln -c Release
 ```
+
+Then run `src\vKOROBKU.App\bin\Release\net10.0-windows10.0.19041.0\vKOROBKU.exe`. Keep `vKOROBKU.Worker.exe` next to it — the app launches it for elevated operations.
+
+For a self-contained package identical to the Steam build, run `scripts\build-release.ps1`.
 
 The project is verified to build with .NET SDK 10.0.302.
 

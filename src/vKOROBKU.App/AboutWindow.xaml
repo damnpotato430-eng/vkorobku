@@ -29,10 +29,6 @@
                 <Hyperlink NavigateUri="https://github.com/damnpotato430-eng/vkorobku" RequestNavigate="OnNavigate"
                            Foreground="{StaticResource AccentBrush}"><Run Text="{x:Static res:Strings.About_RepoLink}" /></Hyperlink>
             </TextBlock>
-            <TextBlock FontSize="13" Margin="0,0,0,6">
-                <Hyperlink NavigateUri="https://github.com/damnpotato430-eng/vkorobku/releases/latest" RequestNavigate="OnNavigate"
-                           Foreground="{StaticResource AccentBrush}"><Run Text="{x:Static res:Strings.About_ReleasesLink}" /></Hyperlink>
-            </TextBlock>
             <TextBlock FontSize="13">
                 <Hyperlink NavigateUri="https://github.com/damnpotato430-eng/vkorobku/blob/main/LICENSE" RequestNavigate="OnNavigate"
                            Foreground="{StaticResource AccentBrush}"><Run Text="{x:Static res:Strings.About_LicenseLink}" /></Hyperlink>
@@ -47,9 +43,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Content="{x:Static res:Strings.About_CheckUpdates}" Click="CheckUpdatesClick" Padding="12,8"
-                    Style="{StaticResource SecondaryButton}" />
-            <Button Grid.Column="2" Content="{x:Static res:Strings.About_OpenLogs}" Click="OpenLogsClick" Padding="12,8"
+            <Button Content="{x:Static res:Strings.About_OpenLogs}" Click="OpenLogsClick" Padding="12,8"
                     Style="{StaticResource SecondaryButton}" />
             <Button Grid.Column="4" Content="{x:Static res:Strings.About_Close}" Click="CloseClick" Padding="16,8" />
         </Grid>
