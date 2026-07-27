@@ -34,8 +34,16 @@ public sealed record WatchedGame(
 
     // DirectStorage games are excluded from recompression offers: NTFS compression
     // breaks their fast read path, so the app never recommends compressing them.
+    //
+    // The two thresholds are independent triggers, not a combined gate. Requiring both
+    // made them cancel each other out on exactly the games worth recompressing: Dota 2
+    // earns ~33 GB from compression, so an update writing 1.2 GB of fresh uncompressed
+    // files is only a 3.8% decay and stayed silent under a 5% share threshold — the
+    // better a game compresses, the more absolute space it could hide behind a
+    // relative test. Either a large relative drift or a worthwhile absolute amount is
+    // now reason enough to offer finishing it.
     public bool NeedsRecompression(double decayThreshold, long minimumSavingsBytes) =>
         !HasDirectStorage &&
-        DecayPercentage > decayThreshold &&
-        PotentialSavingsBytes > minimumSavingsBytes;
+        PotentialSavingsBytes > 0 &&
+        (DecayPercentage > decayThreshold || PotentialSavingsBytes > minimumSavingsBytes);
 }
