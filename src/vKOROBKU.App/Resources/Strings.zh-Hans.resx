@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>错误反复出现，应用程序将关闭。报告已保存在 logs 文件夹中。</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>发生了意外错误，程序继续运行。报告已保存在 logs 文件夹中。</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>更聪明地压缩游戏</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>游戏库</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>操作</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>关于</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>分析与压缩</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>选择游戏后即可查看 XPRESS 和 LZX 预估</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>系统</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>封面来源：Steam</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>游戏库</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>查找已安装的游戏并预估可节省的空间</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>刷新封面</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>重新检查并下载所有游戏的封面</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ 添加文件夹</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>驱动器</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>全部补压</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>将所有压缩率下降的游戏放入同一队列补压 — 只需确认一次管理员权限</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>立即检查</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>正在检查 {0}（第 {1} / {2} 个）…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>需要补压：{0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — 可回收约 {0}</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>正在监视 {0} 个已压缩游戏 — 压缩率没有下降</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>无法检查已压缩游戏的更新 — 详情见 logs 文件夹</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>搜索游戏…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>选择多个游戏并放入同一队列压缩</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>多选</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>取消选择</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>在游戏卡片上勾选</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>已选择：{0} · {1}</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>仅显示需要补压的游戏</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>游戏库排序</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>按名称</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>体积大的优先</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>未压缩的优先</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>整个队列使用的压缩方式</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>自动（均衡）</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>压缩队列 · 1 次权限确认</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>将 {0} 个游戏放入同一队列压缩？
+
+{1}
+
+管理员权限只会请求一次。请先关闭这些游戏。</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>队列确认</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>将 {0} 个游戏放入同一队列补压？
+
+{1}
+
+管理员权限只会请求一次。请先关闭这些游戏。</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>所选游戏全部使用 DirectStorage — 不建议压缩</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…还有 {0} 个</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>因 DirectStorage 而跳过：{0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>游戏库中没有需要补压的游戏</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>解压 · 1 次权限确认</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>在同一队列中将勾选的游戏恢复原状 — 只需确认一次管理员权限</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>勾选全部已压缩</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>勾选所有已压缩和部分压缩的游戏</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>解压队列</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>将 {0} 个游戏放入同一队列解压？
+
+{1}
+
+文件将恢复原始大小，压缩节省的空间会被交还。管理员权限只会请求一次。请先关闭这些游戏。</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>勾选的游戏中没有已压缩的</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>可用空间不足，无法解压勾选的游戏：
+
+{0}
+
+请释放空间或取消勾选部分游戏。</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• 驱动器 {0} — 还差 {1}</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>解压队列 · 准备中（{0} 个游戏）</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>解压队列 · 第 {0} / {1} 个</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>队列已完成 · 已解压 {0} / {1}</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>已解压</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>驱动器可用空间不足：解压还需要 {0}</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>压缩队列 · 准备中（{0} 个游戏）</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>压缩队列 · 第 {0} / {1} 个</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>队列已完成 · 已压缩 {0} / {1} · 释放 {2}</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>队列已中止：{0}</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>跳过</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>取消当前游戏并转到下一个</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>完成当前后停止</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>让当前游戏处理完毕，然后停止队列</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>全部停止</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>立即停止队列 — 被中断的游戏之后可以补压</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>排队中</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>压缩中…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>已取消</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>已停止</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>完成 · 释放 {0}</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>未完成</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>打开文件夹</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>加入压缩队列</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>刷新封面</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>检查压缩状态</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>从游戏库移除</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>该游戏使用 DirectStorage。NTFS 压缩会破坏它的快速读取路径，可能拖慢加载。不建议压缩。</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>已压缩 · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>部分压缩 · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>未压缩</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>未检查</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>尚未计算大小</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>算法：{0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>实际占用：{0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>待确定</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>已释放：{0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>未确定</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>已压缩文件：{0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>检查时间：{0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>手动添加</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>游戏优化</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>未选择游戏</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>专家模式</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>更正游戏</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>该游戏使用 DirectStorage：NTFS 压缩会破坏它的快速读取路径，可能拖慢加载。不建议压缩。在专家模式下确认后仍可执行。</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>分析精度</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>可节省：</value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>可信度：</value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>样本压缩率：{0}%</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>重新分析即可比较读取速度</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}：未压缩 {1} → {2} MB/s（{3}%）</value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>自动优化</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU 会分析文件、测试读取速度，并自动选择合适的 XPRESS 或 LZX 模式。</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>在改动任何文件之前，程序会先给出预测并请求确认。</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>压缩中 · 已选模式</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>在操作完成或停止之前，模式已锁定。</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>游戏处于部分压缩状态</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>补压会用同一方式处理剩余文件 — 已压缩的会被跳过。完全解压之后才能更换方式。</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>游戏已压缩</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows 会在读取时透明地解压这些文件。游戏内容没有任何改变。</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>优化游戏</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>停止</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>解压游戏</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>游戏处于部分压缩状态 — 可以将文件完全恢复原状</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>用所选模式压缩</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>用同一方式压缩剩余文件 — 已压缩的会被跳过</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>补压</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>设置</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>已压缩的游戏会在应用启动时以及点击“立即检查”时进行检查。</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>界面语言</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>自动（跟随系统）</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>重启应用程序后语言才会改变。</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>界面缩放</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0}%（与 Windows 一致）</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>在 Windows 显示缩放之上额外应用 — 适合分辨率很高却仍设为 100% 的屏幕。立即生效。</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>启动时检查已压缩游戏是否有更新</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>压缩率下降阈值，%</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>触发补压的最小收益，MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>不可压缩的文件类型</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>跳过已知无法压缩的文件（媒体、压缩包）</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>例如：.pak 或 pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>添加</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>移除所选</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>恢复为默认列表</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>移除所有手动添加的扩展名</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>默认列表（{0} 个扩展名）：{1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>扩展名的格式为 “.ext” — 一个点加最多 15 个字符，且不含空格。</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>扩展名 {0} 已在默认列表中。</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>扩展名 {0} 已经添加过了。</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>下降阈值应为 1 到 100 之间的数字（百分比）。</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>最小收益应为不小于 1 的整数兆字节。</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>移除所有手动添加的扩展名并恢复默认列表？</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>B</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>KB</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>MB</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>GB</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>TB</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>分析</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>压缩</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>解压</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>进行中</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>已完成</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>已取消</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>错误</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>已中断</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>{0}% · 当前阶段 {1} / {2}</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>{0}% · {1} / {2}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>{0}% · {1} / {2} 个文件</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>正在等待 Worker</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>操作尚未完成，应用程序已被关闭</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} 线程</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>内存：{0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>未知处理器</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · 剩余 {2}</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>已节省 {0}</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>封面服务暂时不可用</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>封面服务未能及时响应</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>无法启动 compact.exe。</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe 退出，代码 {0}：{1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>系统模块错误。</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>未找到系统模块 vKOROBKU.Worker.exe。</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>管理员权限请求已被取消。</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>无法启动系统模块。</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>系统模块未能在 30 秒内连接。</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>无法验证系统模块的真实性。</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>系统模块意外关闭了连接。</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>收到了格式错误的系统模块响应。</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>系统模块无法读取一次性授权文件。这通常发生在由另一个 Windows 账户确认管理员提示时。请用运行本程序的同一账户确认 UAC 请求，或以管理员身份运行 vKOROBKU。</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>系统模块在连接前就退出了（代码 {0}）。</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>文件夹或 EXE 名称</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>用户输入</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Steam 目录</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>这是哪款游戏？</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>更正名称 — vKOROBKU 会尝试在 Steam 上找到该游戏并下载对应封面。</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>游戏名称</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>查找并保存</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>请输入游戏名称。</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>无法读取 {0}</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>已扫描文件：{0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>无法确定当前的 Windows 用户。</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>正在检查文件系统…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>正在构建代表性样本…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>该游戏的所有文件都属于已知不可压缩的类型 — 压缩不会带来任何节省。</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>无法构建文件样本。</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>正在构建样本，上限 {0}…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>正在测量未压缩状态下的读取速度…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>正在压缩测试样本：{0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>正在统计 {0} 的结果…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>正在测量 {0} 的读取速度…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>{0} 完成，正在准备下一个模式…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>分析完成</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} 第 {1} / {2} 轮</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>正在准备样本：{0} / {1}</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>无法确定游戏所在的驱动器。</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>XPRESS/LZX 分析仅支持位于 NTFS 上的游戏。</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>可用空间不足，无法创建临时样本。</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>高</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>中</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>低</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>可能更快</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>可能变慢</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>没有明显变化</value></data>
+  <data name="About_Description" xml:space="preserve"><value>使用 Windows 内置机制（XPRESS/LZX）压缩已安装的游戏以节省磁盘空间。游戏照常运行 — 改变的只是文件在 NTFS 上的存储方式。</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>GitHub 仓库</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>GPL-3.0 许可证</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>logs 文件夹</value></data>
+  <data name="About_Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="About_Version" xml:space="preserve"><value>版本 {0}</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>操作 — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>当前没有正在进行的操作</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>同一时间只会安全地执行一项操作。这里显示它的进度和历史。</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>停止</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>历史</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>已准备好搜索游戏</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>上一次操作被中断。选择游戏时会检查其状态。</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>设置已保存</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>正在扫描游戏库</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>未找到游戏 — 请手动添加文件夹</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>找到游戏：{0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>无法扫描游戏库：{0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>正在识别游戏并计算大小…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>已添加游戏 {0}</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>游戏 {0} 已从游戏库移除</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>正在查找游戏及匹配的封面…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>名称已保存：{0}</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>已识别游戏：{0}</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>正在加载封面：{0} / {1}</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>游戏库就绪 · 已检查封面：{0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>封面服务不可用：{0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>正在刷新 {0} 的封面…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>{0} 的封面已检查</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>未找到游戏文件夹：{0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>正在打开 {0} 的游戏文件夹</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>无法打开资源管理器：{0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>正在检查 {0} 的压缩状态…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>无法确定压缩状态：{0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>已载入 {0} 的已保存分析</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>查找游戏</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>搜索中…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>刷新游戏库</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>选择游戏文件夹</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>将 {0} 从游戏库移除？
+
+只会从 vKOROBKU 的游戏库中移除。磁盘上的文件不会被改动或删除。</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>注意：游戏仍处于压缩状态。若要将文件恢复原状，请先执行解压。</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>清空历史</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>清空操作历史？
+
+正在进行的操作（如果有）会保留在列表中。</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>将 {0} 从游戏库隐藏？
+
+磁盘上不会有任何改变 — 游戏依然保持安装状态。隐藏的游戏可以在设置中恢复。</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>游戏 {0} 已从游戏库隐藏</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>已隐藏的游戏</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>已隐藏的游戏：{0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>全部恢复</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>刷新列表后，隐藏的游戏会回到游戏库中。</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>无法将游戏从游戏库移除。请检查对 vKOROBKU 本地数据的访问权限。</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>移除游戏出错</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>自动</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>按游戏体积 512 MB–2 GB</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>快速</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>最多 512 MB</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>精确</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>最多 1 GB</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>最大</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>最多 2 GB</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>预估可节省空间</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>分析进行中…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>重新分析</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>选择一款游戏，然后运行安全的样本分析。</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>关闭 vKOROBKU？</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>操作仍在进行。关闭应用程序会中断它：游戏将停留在部分处理的状态，下次启动时会提示你补压。
+
+仍要关闭吗？</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>解压仍在进行。关闭应用程序会中断它：游戏将停留在部分解压的状态，重新运行解压即可让它恢复原状。
+
+仍要关闭吗？</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>分析仍在进行。关闭应用程序会中断它 — 磁盘上不会有任何改变。
+
+仍要关闭吗？</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>从这里开始</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. 在左侧的游戏库中选择一款游戏。</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. 点击“分析” — 它会在小样本上预估可节省的空间，不会改动磁盘上的任何内容。</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. 点击“优化” — 游戏会被压缩，并且照常启动。</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>文件不会被打包成压缩包：游戏读取时 Windows 会即时解压。任何游戏都可以用“解压”恢复原状。</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>暂时没有找到游戏。如果游戏并非通过 Steam、Epic Games Store 或 GOG 安装，请用上方的“+ 添加文件夹”添加它的目录。</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>自动模式会评估游戏并选出最合适的节省空间方式。</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>正在清点文件…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>{0} 的分析已完成并保存</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>{0} 的分析已完成，但缓存写入失败</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>分析已取消。临时文件已删除。</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>分析已取消</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>分析失败：{0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>分析出错</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>游戏已更新 — 优化之前需要重新做一次快速分析。</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>{0} 的分析 · {1} 个文件 · 样本 {2} · 实际占用 {3}</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>游戏 {0} 使用 DirectStorage。NTFS 压缩会破坏它的快速读取路径，可能拖慢加载。
+
+仍要压缩吗？</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>游戏：{0}
+方式：{1}（与最初压缩时相同）
+
+只会处理未压缩的文件 — 已压缩的会被跳过。
+请先关闭游戏。是否继续？</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>补压</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>游戏：{0}
+算法：{1}
+预计大小：{2}
+可节省：{3}
+
+请先关闭游戏。是否继续？</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>压缩确认</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>完全解压 {0} 的文件？
+
+请先关闭游戏。</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>解压确认</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>{0}（{1}）的压缩被中断了。
+
+要从中断处继续吗？已压缩的文件会被自动跳过。</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>继续压缩</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>压缩只会改变文件在 NTFS 上的存储方式。</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>操作已取消</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>操作失败：{0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>系统操作出错</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>正在等待管理员权限确认…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {0} / {1} 个文件</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · 已跳过不可压缩：{0}（{1}）</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · 未压缩的文件：{0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>完成 · 释放 {0} · 累计节省 {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>解压部分完成 · 剩余文件：{0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>完成 · 已解压 {0} 个文件</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>正在分析：{0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>正在压缩：{0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>正在解压：{0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>预计节省：{0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>累计：{0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · 自 {0} 起</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · 操作次数：{2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>本应用累计通过压缩释放的空间{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>压缩操作次数：{0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>累计节省：{0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>游戏 {0} 已经压缩：{1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>游戏 {0} 处于部分压缩状态：{1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>游戏 {0} 尚未压缩</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>尚未检查 {0} 的压缩状态</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>游戏 {0} 已更新，需要补压</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>正在扫描游戏文件…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>正在检查哪些文件已经处理过…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>准备完成</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>准备完成 — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>已处理：{0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>已跳过不可压缩：{0}（{1}）</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>正在压缩文件…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>正在解压文件…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe 报告了错误（代码 {0}）。处理会继续进行，被跳过的文件将在校验阶段统计。</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>正在校验结果…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>正在校验结果（出错的批次：{0}）…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>操作完成</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>操作完成，有文件被跳过</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>操作已停止。已处理的文件仍处于有效状态。</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>没有收到任务。</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>未知的操作。</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>未知的压缩算法。</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>游戏路径无效。</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>未找到游戏文件夹。</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>无法处理驱动器根目录。</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>游戏根目录是链接或联接点。</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>XPRESS/LZX 压缩仅在 NTFS 上可用。</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>该文件夹中没有可处理的文件。</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>请先关闭游戏进程：{0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>无法启动 compact.exe。</value></data>
+</root>

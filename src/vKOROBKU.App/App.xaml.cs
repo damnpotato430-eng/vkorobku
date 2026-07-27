@@ -50,7 +50,7 @@ public partial class App : Application
         try
         {
             var language = new UserPreferencesStore().Load().Language;
-            if (language is not ("ru" or "en"))
+            if (!AppLanguages.IsSelectable(language))
                 return;
             var culture = CultureInfo.GetCultureInfo(language);
             CultureInfo.DefaultThreadCurrentUICulture = culture;
