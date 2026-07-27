@@ -170,10 +170,10 @@ public sealed class GameAnalysisService
     {
         var coverage = sampleBytes / (double)eligibleLogicalBytes;
         var (confidence, margin) = coverage >= 0.01 && fragmentCount >= 32
-            ? (Strings.Confidence_High, 0.03)
+            ? (AnalysisConfidence.High, 0.03)
             : coverage >= 0.0025 && fragmentCount >= 12
-                ? (Strings.Confidence_Medium, 0.07)
-                : (Strings.Confidence_Low, 0.12);
+                ? (AnalysisConfidence.Medium, 0.07)
+                : (AnalysisConfidence.Low, 0.12);
 
         var untouchedPhysicalBytes = excludedPhysicalBytes + skipPhysicalBytes;
         var estimated = untouchedPhysicalBytes + (long)(eligibleLogicalBytes * ratio);
@@ -185,9 +185,9 @@ public sealed class GameAnalysisService
         var relativeSpeed = baselineReadSpeed <= 0 ? 1 : compressedReadSpeed / baselineReadSpeed;
         var performanceImpact = relativeSpeed switch
         {
-            >= 1.08 => Strings.Perf_LikelyFaster,
-            < 0.88 => Strings.Perf_PossiblySlower,
-            _ => Strings.Perf_NoChange
+            >= 1.08 => PerformanceImpact.LikelyFaster,
+            < 0.88 => PerformanceImpact.PossiblySlower,
+            _ => PerformanceImpact.NoChange
         };
 
         return new CompressionEstimate(

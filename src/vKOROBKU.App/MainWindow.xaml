@@ -559,7 +559,7 @@
                                         <Grid Margin="0,3,0,0">
                                             <TextBlock Text="{Binding RatioText}" FontSize="10" Foreground="{StaticResource MutedTextBrush}" />
                                             <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="{StaticResource MutedTextBrush}">
-                                                <Run Text="{x:Static res:Strings.Estimate_ConfidenceLabel}" /><Run Text="{Binding Confidence, Mode=OneWay}" />
+                                                <Run Text="{x:Static res:Strings.Estimate_ConfidenceLabel}" /><Run Text="{Binding ConfidenceText, Mode=OneWay}" />
                                             </TextBlock>
                                         </Grid>
                                     </StackPanel>

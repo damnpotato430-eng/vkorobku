@@ -58,8 +58,13 @@ public sealed class AnalysisCacheStore
         {
             if (!File.Exists(_cachePath))
                 return new AnalysisCache();
-            return JsonSerializer.Deserialize<AnalysisCache>(File.ReadAllText(_cachePath), JsonOptions)
-                   ?? new AnalysisCache();
+            var cache = JsonSerializer.Deserialize<AnalysisCache>(File.ReadAllText(_cachePath), JsonOptions);
+            // Version 1 stored confidence and performance as already-translated text.
+            // Such entries cannot be re-rendered in another language, so they are
+            // dropped — the user simply re-runs the analysis.
+            if (cache is null || cache.Version != AnalysisCache.CurrentVersion)
+                return new AnalysisCache();
+            return cache;
         }
         catch (IOException) { return new AnalysisCache(); }
         catch (JsonException) { return new AnalysisCache(); }
@@ -75,7 +80,9 @@ public sealed class AnalysisCacheStore
 
     private sealed class AnalysisCache
     {
-        public int Version { get; init; } = 1;
+        public const int CurrentVersion = 2;
+
+        public int Version { get; init; } = CurrentVersion;
         public List<SavedGameAnalysis> Analyses { get; init; } = [];
     }
 }
