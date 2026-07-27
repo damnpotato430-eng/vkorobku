@@ -11,7 +11,11 @@ public sealed record UserPreferences(
     IReadOnlyList<string>? UserSkipExtensions = null,
     // "auto" follows the OS language (English for anything without a translation);
     // otherwise a culture code of a shipped translation: "ru", "en".
-    string Language = "auto");
+    string Language = "auto",
+    // Extra zoom applied on top of the Windows display scaling, for high-resolution
+    // screens left at 100%. 100 means "whatever Windows says", which is why it is the
+    // default — someone already running Windows at 150% must not be scaled twice.
+    int UiScalePercent = 100);
 
 public sealed class UserPreferencesStore
 {

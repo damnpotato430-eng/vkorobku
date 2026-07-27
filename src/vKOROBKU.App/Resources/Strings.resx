@@ -147,6 +147,9 @@ Free up space or uncheck some games.</value></data>
   <data name="Settings_LanguageSection" xml:space="preserve"><value>INTERFACE LANGUAGE</value></data>
   <data name="Settings_LanguageAuto" xml:space="preserve"><value>Auto (system)</value></data>
   <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>The language changes after the application is restarted.</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>INTERFACE SCALE</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0}% (as in Windows)</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Applied on top of the Windows display scaling — useful on a high-resolution screen left at 100%. Takes effect immediately.</value></data>
   <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Check compressed games for updates at startup</value></data>
   <data name="Settings_DecayThreshold" xml:space="preserve"><value>COMPRESSION DECAY THRESHOLD, %</value></data>
   <data name="Settings_MinimumSavings" xml:space="preserve"><value>MINIMUM GAIN TO RECOMPRESS, MB</value></data>

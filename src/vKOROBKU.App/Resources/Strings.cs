@@ -142,6 +142,9 @@ public static class Strings
     public static string Settings_LanguageSection => Get(nameof(Settings_LanguageSection));
     public static string Settings_LanguageAuto => Get(nameof(Settings_LanguageAuto));
     public static string Settings_LanguageRestartHint => Get(nameof(Settings_LanguageRestartHint));
+    public static string Settings_ScaleSection => Get(nameof(Settings_ScaleSection));
+    public static string Settings_ScaleDefault => Get(nameof(Settings_ScaleDefault));
+    public static string Settings_ScaleHint => Get(nameof(Settings_ScaleHint));
     public static string Settings_WatcherEnabled => Get(nameof(Settings_WatcherEnabled));
     public static string Settings_DecayThreshold => Get(nameof(Settings_DecayThreshold));
     public static string Settings_MinimumSavings => Get(nameof(Settings_MinimumSavings));

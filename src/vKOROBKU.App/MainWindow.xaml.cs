@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using vKOROBKU.App.Resources;
+using vKOROBKU.App.Services;
 using vKOROBKU.App.ViewModels;
 
 namespace vKOROBKU.App;
@@ -14,13 +15,21 @@ public partial class MainWindow : Window
     private readonly MainViewModel _viewModel = new();
     private bool _closeApproved;
 
+    // The designer sizes are the 100% baseline the scale multiplies from.
+    private static readonly Size BaseMinimumSize = new(1040, 700);
+
     public MainWindow()
     {
         InitializeComponent();
         DataContext = _viewModel;
+        _viewModel.UiScaleChanged += ApplyUiScale;
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
+        ApplyUiScale(_viewModel.UiScalePercent);
     }
+
+    private void ApplyUiScale(int percent) =>
+        UiScale.Apply(this, RootGrid, percent, BaseMinimumSize);
 
     private void OnSourceInitialized(object? sender, EventArgs e)
     {
