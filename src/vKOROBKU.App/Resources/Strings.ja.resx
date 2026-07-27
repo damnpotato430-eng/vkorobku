@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>エラーが繰り返し発生しているため、アプリケーションを終了します。レポートは logs フォルダーに保存されています。</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>予期しないエラーが発生しましたが、動作は継続します。レポートを logs フォルダーに保存しました。</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>ゲームを賢く圧縮</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>ライブラリ</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>操作</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>情報</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>解析と圧縮</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>ゲームを選ぶと XPRESS と LZX の見積もりを表示できます</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>システム</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>カバー画像: Steam</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>ゲームライブラリ</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>インストール済みのゲームを検出し、節約できる容量を見積もります</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>カバーを更新</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>すべてのゲームのカバー画像を再確認してダウンロードします</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ フォルダーを追加</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>ドライブ</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>すべて再圧縮</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>圧縮率が下がったゲームをひとつのキューでまとめて再圧縮します — 管理者権限の確認は 1 回だけです</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>今すぐ確認</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>{0} を確認中（{2} 件中 {1} 件目）…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>再圧縮が必要: {0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — 約 {0} を取り戻せます</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>圧縮済みのゲーム {0} 件を監視中 — 圧縮率の低下はありません</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>圧縮済みゲームの更新を確認できませんでした — 詳細は logs フォルダーをご覧ください</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>ゲームを検索…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>複数のゲームを選んで、ひとつのキューでまとめて圧縮します</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>複数選択</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>選択を解除</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>カード上でゲームにチェックを入れてください</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>選択中: {0} · {1}</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>再圧縮が必要なゲームだけを表示します</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>ライブラリの並び替え</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>名前順</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>容量の大きい順</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>未圧縮を先に</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>キュー全体で使う圧縮方式</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>自動（バランス重視）</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>キューを圧縮 · 権限確認 1 回</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>{0} 本のゲームをひとつのキューで圧縮しますか？
+
+{1}
+
+管理者権限の確認は 1 回だけです。ゲームは終了しておいてください。</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>キューの確認</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>{0} 本のゲームの圧縮をひとつのキューで仕上げますか？
+
+{1}
+
+管理者権限の確認は 1 回だけです。ゲームは終了しておいてください。</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>選択したゲームはすべて DirectStorage を使用しています — 圧縮は推奨されません</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…ほか {0} 件</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>DirectStorage のためスキップ: {0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>ライブラリに再圧縮が必要なゲームは見つかりませんでした</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>展開 · 権限確認 1 回</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>チェックしたゲームをひとつのキューで元の状態に戻します — 管理者権限の確認は 1 回だけです</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>圧縮済みをすべてチェック</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>圧縮済みと一部圧縮済みのゲームをすべてチェックします</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>展開キュー</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>{0} 本のゲームをひとつのキューで展開しますか？
+
+{1}
+
+ファイルは元のサイズに戻るため、圧縮で節約した容量は返上されます。管理者権限の確認は 1 回だけです。ゲームは終了しておいてください。</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>チェックしたゲームに圧縮済みのものはありません</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>チェックしたゲームを展開するための空き容量が足りません:
+
+{0}
+
+容量を空けるか、一部のゲームのチェックを外してください。</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• ドライブ {0} — {1} 不足</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>展開キュー · 準備中（{0} 本）</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>展開キュー · {1} 件中 {0} 件目</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>キュー完了 · {1} 件中 {0} 件を展開</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>展開済み</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>ドライブの空き容量が足りません: 展開にはあと {0} 必要です</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>圧縮キュー · 準備中（{0} 本）</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>圧縮キュー · {1} 件中 {0} 件目</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>キュー完了 · {1} 件中 {0} 件を圧縮 · {2} を解放</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>キューが中断されました: {0}</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>スキップ</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>現在のゲームを中止して次に進みます</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>現在の処理後に停止</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>現在のゲームを最後まで処理してからキューを停止します</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>すべて停止</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>キューを直ちに停止します — 中断されたゲームは後で仕上げられます</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>待機中</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>圧縮中…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>停止</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>完了 · {0} を解放</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>未完了</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>フォルダーを開く</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>圧縮キューに追加</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>カバーを更新</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>圧縮状態を確認</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>ライブラリから外す</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>このゲームは DirectStorage を使用しています。NTFS 圧縮は高速読み込み経路を壊し、ロードが遅くなる場合があります。圧縮は推奨されません。</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>圧縮済み · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>一部圧縮済み · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>未圧縮</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>未確認</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>サイズ未計算</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>アルゴリズム: {0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>実サイズ: {0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>保留中</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>解放: {0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>未確定</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>圧縮済みファイル: {0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>確認日時: {0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>手動で追加</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>ゲームの最適化</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>ゲームが選択されていません</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>エキスパートモード</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>ゲームを修正</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>このゲームは DirectStorage を使用しています: NTFS 圧縮は高速読み込み経路を壊し、ロードが遅くなる場合があります。圧縮は推奨されません。エキスパートモードでは確認のうえ実行できます。</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>解析の精度</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>節約: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>信頼度: </value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>サンプルの圧縮率: {0}%</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>読み込み速度を比較するには解析をやり直してください</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}: 未圧縮 {1} → {2} MB/s（{3}%）</value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>自動最適化</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU がファイルを解析し、読み込み速度を計測して、適切な XPRESS または LZX モードを自動で選びます。</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>ファイルを変更する前に、予測を表示して確認を求めます。</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>圧縮中 · 選択したモード</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>操作が完了または停止するまで、モードは固定されます。</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>ゲームは一部だけ圧縮されています</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>仕上げの圧縮では、残りのファイルを同じ方式で処理します — 圧縮済みのものはスキップされます。方式を変えるには、いったん完全に展開してください。</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>ゲームはすでに圧縮されています</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows が読み込み時に透過的に展開します。ゲームの内容は変わりません。</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>ゲームを最適化</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>停止</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>ゲームを展開</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>このゲームは一部だけ圧縮されています — ファイルを完全に元の状態へ戻せます</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>選択したモードで圧縮</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>残りのファイルを同じ方式で圧縮します — 圧縮済みのものはスキップされます</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>圧縮を仕上げる</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>設定</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>圧縮済みのゲームは、アプリの起動時と「今すぐ確認」ボタンで確認されます。</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>表示言語</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>自動（システムに従う）</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>言語はアプリケーションを再起動すると切り替わります。</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>表示倍率</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0}%（Windows と同じ）</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Windows の拡大縮小に上乗せして適用されます — 高解像度の画面を 100% のままにしている場合に便利です。すぐに反映されます。</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>起動時に圧縮済みゲームの更新を確認する</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>圧縮率低下のしきい値、%</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>再圧縮を促す最小の節約量、MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>圧縮できないファイル形式</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>圧縮できないと分かっているファイルをスキップする（メディア、アーカイブ）</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>例: .pak または pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>追加</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>選択したものを削除</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>既定のリストに戻す</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>手動で追加した拡張子をすべて削除します</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>既定のリスト（{0} 個の拡張子）: {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>拡張子は「.ext」の形式です — ピリオドと、空白を含まない 15 文字までです。</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>拡張子 {0} はすでに既定のリストに含まれています。</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>拡張子 {0} はすでに追加されています。</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>低下のしきい値は 1 から 100 パーセントの数値です。</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>最小の節約量は 1 以上の整数（メガバイト）です。</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>手動で追加した拡張子をすべて削除して、既定のリストに戻しますか？</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>B</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>KB</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>MB</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>GB</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>TB</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>解析</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>圧縮</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>展開</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>実行中</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>完了</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>エラー</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>中断</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>{0}% · 現在の段階で {2} 中 {1}</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>{0}% · {2} 中 {1}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>{0}% · {2} 件中 {1} 件のファイル</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>Worker を待機中</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>操作が終わる前にアプリケーションが閉じられました</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} スレッド</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>メモリ: {0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>不明なプロセッサ</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · 空き {2}</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>{0} 節約</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>カバー画像のサービスが一時的に利用できません</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>カバー画像のサービスが時間内に応答しませんでした</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>compact.exe を起動できませんでした。</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe がコード {0} で終了しました: {1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>システムモジュールのエラーです。</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>システムモジュール vKOROBKU.Worker.exe が見つかりません。</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>管理者権限の要求がキャンセルされました。</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>システムモジュールを起動できませんでした。</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>システムモジュールが 30 秒以内に接続しませんでした。</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>システムモジュールの真正性を確認できませんでした。</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>システムモジュールが予期せず接続を切断しました。</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>システムモジュールから不正な形式の応答を受け取りました。</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>システムモジュールが使い捨ての認証ファイルを読み取れませんでした。これは通常、別の Windows アカウントで管理者の確認を行った場合に起こります。アプリケーションを実行しているアカウントで UAC の要求を承認するか、vKOROBKU を管理者として実行してください。</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>システムモジュールが接続前に終了しました（コード {0}）。</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>フォルダー名または EXE 名</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>ユーザーが入力</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Steam のカタログ</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>これはどのゲームですか？</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>名前を修正してください — vKOROBKU が Steam でゲームを探し、対応するカバー画像をダウンロードします。</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>ゲーム名</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>検索して保存</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>ゲーム名を入力してください。</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>{0} を読み取れませんでした</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>走査したファイル: {0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>現在の Windows ユーザーを特定できませんでした。</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>ファイルシステムを確認中…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>代表的なサンプルを作成中…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>このゲームのファイルはすべて圧縮できない種類です — 圧縮しても容量は節約できません。</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>ファイルのサンプルを作成できませんでした。</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>最大 {0} のサンプルを作成中…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>圧縮なしの読み込み速度を計測中…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>テストサンプルを圧縮中: {0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>{0} の結果を集計中…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>{0} の読み込みを計測中…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>{0} の次のモードを準備中…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>解析が完了しました</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} {2} 回中 {1} 回目</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>サンプルを準備中: {1} 件中 {0} 件目</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>ゲームのドライブを特定できませんでした。</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>XPRESS/LZX の解析は NTFS 上のゲームにのみ対応しています。</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>一時サンプル用の空き容量が足りません。</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>高</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>中</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>低</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>おそらく速くなります</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>遅くなる可能性があります</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>目立った変化はありません</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Windows 標準の仕組み（XPRESS/LZX）でインストール済みのゲームを圧縮し、ディスク容量を節約します。ゲームはこれまでどおり動作し、変わるのは NTFS 上でのファイルの保存方法だけです。</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>GitHub リポジトリ</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>GPL-3.0 ライセンス</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>logs フォルダー</value></data>
+  <data name="About_Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="About_Version" xml:space="preserve"><value>バージョン {0}</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>操作 — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>現在、実行中の操作はありません</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>安全のため、操作は一度にひとつだけ実行されます。その進捗と履歴をここに表示します。</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>停止</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>履歴</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>ゲームを検索する準備ができました</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>前回の操作は中断されました。ゲームの状態は選択時に確認されます。</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>設定を保存しました</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>ゲームライブラリを走査中</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>ゲームが見つかりません — フォルダーを手動で追加してください</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>見つかったゲーム: {0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>ライブラリを走査できませんでした: {0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>ゲームを判別してサイズを計算中…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>ゲームを追加しました: {0}</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>ゲーム {0} をライブラリから外しました</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>ゲームと一致するカバー画像を検索中…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>名前を保存しました: {0}</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>ゲームを判別しました: {0}</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>カバー画像を読み込み中: {1} 件中 {0} 件</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>ライブラリの準備完了 · 確認したカバー: {0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>カバー画像のサービスを利用できません: {0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>{0} のカバーを更新中…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>{0} のカバーを確認しました</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>ゲームフォルダーが見つかりません: {0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>{0} のゲームフォルダーを開いています</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>エクスプローラーを開けませんでした: {0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>{0} の圧縮状態を確認中…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>圧縮状態を特定できませんでした: {0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>{0} の保存済み解析を読み込みました</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>ゲームを検索</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>検索中…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>ライブラリを更新</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>ゲームのフォルダーを選択</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>{0} をライブラリから外しますか？
+
+vKOROBKU のライブラリから外れるだけです。ディスク上のファイルは変更も削除もされません。</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>注意: ゲームは圧縮されたままです。ファイルを元の状態に戻すには、先に展開してください。</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>履歴を消去</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>操作の履歴を消去しますか？
+
+実行中の操作（あれば）は一覧に残ります。</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>{0} をライブラリから隠しますか？
+
+ディスク上では何も変わりません — ゲームはインストールされたままです。隠したゲームは設定から戻せます。</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>ゲーム {0} をライブラリから隠しました</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>隠したゲーム</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>隠したゲーム: {0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>すべて戻す</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>一覧を更新すると、隠したゲームがライブラリに戻ります。</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>ゲームをライブラリから外せませんでした。vKOROBKU のローカルデータへのアクセス権を確認してください。</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>ライブラリからの削除エラー</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>自動</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>ゲームの容量に応じて 512 MB〜2 GB</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>高速</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>最大 512 MB</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>高精度</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>最大 1 GB</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>最大</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>最大 2 GB</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>節約量を見積もる</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>解析中…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>解析をやり直す</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>ゲームを選んで、安全なサンプル解析を実行してください。</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>vKOROBKU を閉じますか？</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>操作がまだ実行中です。アプリケーションを閉じると中断されます: ゲームは途中まで処理された状態になり、次回の起動時に仕上げるよう案内されます。
+
+それでも閉じますか？</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>展開がまだ実行中です。アプリケーションを閉じると中断されます: ゲームは途中まで展開された状態になり、もう一度展開を実行すれば元の状態に戻せます。
+
+それでも閉じますか？</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>解析がまだ実行中です。アプリケーションを閉じると中断されます — ディスク上では何も変わりません。
+
+それでも閉じますか？</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>はじめかた</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. 左のライブラリからゲームを選びます。</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2.「解析」を押します — 小さなサンプルで節約量を見積もるだけで、ディスク上は何も変わりません。</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3.「最適化」を押します — ゲームが圧縮され、これまでとまったく同じように起動します。</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>ファイルはアーカイブにまとめられません: ゲームが読み込むそばから Windows が展開します。どのゲームも「展開」で元の状態に戻せます。</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>まだゲームが見つかっていません。Steam、Epic Games Store、GOG 以外でインストールしたゲームは、上の「+ フォルダーを追加」からフォルダーを追加してください。</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>自動モードはゲームを評価し、容量を節約する最適な方法を選びます。</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>ファイルを棚卸し中…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>{0} の解析が完了し、保存されました</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>{0} の解析は完了しましたが、キャッシュを書き込めませんでした</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>解析をキャンセルしました。一時ファイルは削除されました。</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>解析をキャンセルしました</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>解析に失敗しました: {0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>解析エラー</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>ゲームが更新されました — 最適化の前に、もう一度クイック解析が必要です。</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>{0} の解析 · {1} 個のファイル · サンプル {2} · 実際の占有 {3}</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>ゲーム {0} は DirectStorage を使用しています。NTFS 圧縮は高速読み込み経路を壊し、ロードが遅くなる場合があります。
+
+それでも圧縮しますか？</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>ゲーム: {0}
+方式: {1}（最初の圧縮と同じ）
+
+未圧縮のファイルだけを処理します — 圧縮済みのものはスキップされます。
+ゲームを終了しておいてください。続行しますか？</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>圧縮を仕上げる</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>ゲーム: {0}
+アルゴリズム: {1}
+予測サイズ: {2}
+節約: {3}
+
+ゲームを終了しておいてください。続行しますか？</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>圧縮の確認</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>{0} のファイルを完全に展開しますか？
+
+ゲームを終了しておいてください。</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>展開の確認</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>{0}（{1}）の圧縮が中断されました。
+
+中断したところから続けますか？ 圧縮済みのファイルは自動的にスキップされます。</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>圧縮を続ける</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>圧縮で変わるのは、NTFS 上でのファイルの保存方法だけです。</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>操作をキャンセルしました</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>操作に失敗しました: {0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>操作中のシステムエラー</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>管理者権限の確認を待っています…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {1} 件中 {0} 件のファイル</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · 圧縮不可としてスキップ: {0}（{1}）</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · 圧縮されなかったファイル: {0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>完了 · {0} を解放 · 累計の節約 {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>展開は一部完了 · 残りのファイル: {0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>完了 · {0} 個のファイルを展開</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>解析中: {0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>圧縮中: {0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>展開中: {0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>見込みの節約: {0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>累計: {0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · {0} から</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · 操作回数: {2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>このアプリの利用開始から圧縮で解放した容量{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>圧縮の操作回数: {0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>累計の節約: {0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>ゲーム {0} はすでに圧縮されています: {1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>ゲーム {0} は一部だけ圧縮されています: {1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>ゲーム {0} は圧縮されていません</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>{0} の圧縮状態は未確認です</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>ゲーム {0} は更新されたため、仕上げの圧縮が必要です</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>ゲームのファイルを走査中…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>処理済みのファイルを確認中…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>準備が完了しました</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>準備が完了しました — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>処理済み: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>圧縮不可としてスキップ: {0}（{1}）</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>ファイルを圧縮中…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>ファイルを展開中…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe がエラーを報告しました（コード {0}）。処理は続行され、スキップされたファイルは検証時に集計されます。</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>結果を検証中…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>結果を検証中（エラーのあったバッチ: {0}）…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>操作が完了しました</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>スキップしたファイルがある状態で操作が完了しました</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>操作を停止しました。処理済みのファイルは有効な状態のままです。</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>ジョブを受け取っていません。</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>不明な操作です。</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>不明な圧縮アルゴリズムです。</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>ゲームのパスが不正です。</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>ゲームフォルダーが見つかりません。</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>ドライブのルートは処理できません。</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>ゲームのルートフォルダーはリンクまたはジャンクションです。</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>XPRESS/LZX 圧縮は NTFS でのみ利用できます。</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>フォルダーに処理できるファイルがありません。</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>先にゲームのプロセスを終了してください: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>compact.exe を起動できませんでした。</value></data>
+</root>

@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>Hatalar tekrarlanıyor, uygulama kapatılacak. Raporlar logs klasörüne kaydedildi.</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>Beklenmeyen bir hata oluştu, çalışma sürüyor. Rapor logs klasörüne kaydedildi.</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>OYUNLARI DAHA AKILLICA SIKIŞTIR</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>Kitaplık</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>İşlemler</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Ayarlar</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>Hakkında</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>ANALİZ VE SIKIŞTIRMA</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>XPRESS ve LZX tahminleri bir oyun seçtikten sonra görünür</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>SİSTEM</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>Kapaklar: Steam</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>Oyun kitaplığı</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Kurulu oyunları bulun ve kazanabileceğiniz alanı tahmin edin</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>Kapakları yenile</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>Tüm oyunların kapaklarını yeniden denetleyip indirir</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ Klasör ekle</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>SÜRÜCÜLER</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>Tümünü yeniden sıkıştır</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Sıkıştırması bozulmuş tüm oyunları tek kuyrukta yeniden sıkıştırır — yönetici izni bir kez istenir</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>Şimdi denetle</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>{0} denetleniyor ({2} içinden {1})…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>Tamamlanması gereken: {0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — yaklaşık {0} geri kazanılabilir</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>{0} sıkıştırılmış oyun izleniyor — sıkıştırma kaybı yok</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>Sıkıştırılmış oyunların güncellemeleri denetlenemedi — ayrıntılar logs klasöründe</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Oyun ara…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Birden çok oyun seçip tek kuyrukta sıkıştırın</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>Çoklu seçim</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>Seçimi iptal et</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>Oyunları kartları üzerinden işaretleyin</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>Seçilen: {0} · {1}</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Yalnızca tamamlanması gereken oyunları göster</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>Kitaplık sıralaması</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>Ada göre</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>Önce büyükler</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Önce sıkıştırılmamışlar</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Tüm kuyruk için sıkıştırma yöntemi</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Otomatik (dengeli)</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>Kuyruğu sıkıştır · 1 izin isteği</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>{0} oyun tek kuyrukta sıkıştırılsın mı?
+
+{1}
+
+Yönetici izni bir kez istenecek. Oyunlar kapalı olmalı.</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>Kuyruk onayı</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>{0} oyunun sıkıştırması tek kuyrukta tamamlansın mı?
+
+{1}
+
+Yönetici izni bir kez istenecek. Oyunlar kapalı olmalı.</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>Seçilen oyunların tümü DirectStorage kullanıyor — sıkıştırma önerilmez</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…ve {0} tane daha</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>DirectStorage nedeniyle atlandı: {0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>Kitaplıkta tamamlanması gereken oyun bulunamadı</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>Aç · 1 izin isteği</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>İşaretli oyunları tek kuyrukta özgün durumuna döndürür — yönetici izni bir kez istenir</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>Sıkıştırılmışların tümünü işaretle</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>Sıkıştırılmış ve kısmen sıkıştırılmış tüm oyunları işaretler</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>Açma kuyruğu</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>{0} oyun tek kuyrukta açılsın mı?
+
+{1}
+
+Dosyalar özgün boyutuna döner, yani sıkıştırmayla kazanılan alan geri verilir. Yönetici izni bir kez istenir. Oyunlar kapalı olmalı.</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>İşaretli oyunların hiçbiri sıkıştırılmış değil</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>İşaretli oyunları açmak için yeterli boş alan yok:
+
+{0}
+
+Yer açın ya da bazı oyunların işaretini kaldırın.</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• sürücü {0} — {1} eksik</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>Açma kuyruğu · hazırlanıyor ({0} oyun)</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>Açma kuyruğu · {1} içinden {0}</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>Kuyruk bitti · {1} içinden {0} açıldı</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>açıldı</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>Sürücüde yeterli boş alan yok: açmak için {0} daha gerekiyor</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>Sıkıştırma kuyruğu · hazırlanıyor ({0} oyun)</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>Sıkıştırma kuyruğu · {1} içinden {0}</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>Kuyruk bitti · {1} içinden {0} sıkıştırıldı · {2} kazanıldı</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>Kuyruk kesildi: {0}</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>Atla</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>Geçerli oyunu iptal edip sonrakine geçer</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Geçerli bitince durdur</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Geçerli oyunun bitmesini bekleyip kuyruğu durdurur</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>Tümünü durdur</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Kuyruğu hemen durdurur — yarıda kalan oyun sonra tamamlanabilir</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>kuyrukta</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>sıkıştırılıyor…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>iptal edildi</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>durduruldu</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>bitti · {0} kazanıldı</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>tamamlanmadı</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Klasörü aç</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Sıkıştırma kuyruğuna ekle</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Kapağı yenile</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Sıkıştırma durumunu denetle</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Kitaplıktan kaldır</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>Bu oyun DirectStorage kullanıyor. NTFS sıkıştırması hızlı okuma yolunu bozar ve yüklemeleri yavaşlatabilir. Sıkıştırma önerilmez.</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>Sıkıştırıldı · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>Kısmen sıkıştırıldı · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>Sıkıştırılmamış</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>Denetlenmedi</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>Boyut hesaplanmadı</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>Algoritma: {0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>Fiziksel boyut: {0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>bekliyor</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>Kazanılan: {0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>belirlenmedi</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>Sıkıştırılan dosyalar: {0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>Denetlendi: {0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>Elle eklendi</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>OYUN İYİLEŞTİRME</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Oyun seçilmedi</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Uzman modu</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Oyunu düzelt</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>Bu oyun DirectStorage kullanıyor: NTFS sıkıştırması hızlı okuma yolunu bozar ve yüklemeleri yavaşlatabilir. Sıkıştırma önerilmez. Uzman modunda onay verildikten sonra yapılabilir.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ANALİZ HASSASİYETİ</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Kazanç: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Güvenilirlik: </value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>Örneklem sıkıştırması: %{0}</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>Okuma hızını karşılaştırmak için analizi yineleyin</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}: sıkıştırmasız {1} → {2} MB/s (%{3})</value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>OTOMATİK İYİLEŞTİRME</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU dosyaları çözümler, okuma hızını ölçer ve uygun XPRESS ya da LZX kipini kendisi seçer.</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>Herhangi bir dosyayı değiştirmeden önce uygulama tahmini gösterir ve onay ister.</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>SIKIŞTIRILIYOR · SEÇİLEN KİP</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>İşlem bitene veya durdurulana kadar kip kilitlidir.</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>OYUN KISMEN SIKIŞTIRILMIŞ</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>Sıkıştırmayı tamamlama, kalan dosyaları aynı yöntemle işler — zaten sıkıştırılmış olanlar atlanır. Yöntem, tam açma işleminden sonra değiştirilebilir.</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>OYUN ZATEN SIKIŞTIRILMIŞ</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows dosyaları okunurken saydam biçimde açar. Oyunun içeriği değişmez.</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>Oyunu iyileştir</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>Durdur</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>Oyunu aç</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>Oyun kısmen sıkıştırılmış — dosyaları tümüyle özgün durumuna döndürülebilir</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>Seçilen kiple sıkıştır</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>Kalan dosyaları aynı yöntemle sıkıştırır — zaten sıkıştırılmış olanlar atlanır</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>Sıkıştırmayı tamamla</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Ayarlar</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Sıkıştırılmış oyunlar, uygulama açılışında ve «Şimdi denetle» düğmesiyle denetlenir.</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>ARAYÜZ DİLİ</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Otomatik (sistemdeki gibi)</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>Dil, uygulama yeniden başlatıldığında değişir.</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>ARAYÜZ ÖLÇEĞİ</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>%{0} (Windows'taki gibi)</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Windows ekran ölçeklemesinin üzerine uygulanır — %100'de bırakılmış yüksek çözünürlüklü ekranlarda işe yarar. Hemen etkili olur.</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Açılışta sıkıştırılmış oyunların güncellenip güncellenmediğini denetle</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>SIKIŞTIRMA KAYBI EŞİĞİ, %</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>YENİDEN SIKIŞTIRMA İÇİN EN AZ KAZANÇ, MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>SIKIŞTIRILAMAYAN DOSYA TÜRLERİ</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>Sıkıştırılamadığı bilinen dosyaları atla (ortam dosyaları, arşivler)</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>Örneğin: .pak ya da pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>Ekle</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>Seçileni kaldır</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>Varsayılan listeye dön</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>Elle eklenen tüm uzantıları kaldırır</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>İptal</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>Varsayılan liste ({0} uzantı): {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>Uzantı şöyle olmalı: «.ext» — bir nokta ve boşluksuz en çok 15 karakter.</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>{0} uzantısı zaten varsayılan listede.</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>{0} uzantısı zaten eklenmiş.</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>Kayıp eşiği 1 ile 100 arasında bir yüzde değeridir.</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>En az kazanç, en düşük 1 olmak üzere tam sayı megabayttır.</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>Elle eklenen tüm uzantılar kaldırılıp varsayılan listeye dönülsün mü?</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>B</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>KB</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>MB</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>GB</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>TB</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>Analiz</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>Sıkıştırma</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>Açma</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>Sürüyor</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>Tamamlandı</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>İptal edildi</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>Hata</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>Yarıda kaldı</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>%{0} · geçerli aşamada {2} içinden {1}</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>%{0} · {2} içinden {1}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>%{0} · {2} dosyadan {1} tanesi</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>Worker bekleniyor</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>İşlem bitmeden uygulama kapatıldı</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} iş parçacığı</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>RAM: {0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>Bilinmeyen işlemci</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · {2} boş</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>{0} kazanıldı</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>Kapak hizmeti geçici olarak kullanılamıyor</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>Kapak hizmeti zamanında yanıt vermedi</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>compact.exe başlatılamadı.</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe {0} koduyla sonlandı: {1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>Sistem bileşeni hatası.</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>vKOROBKU.Worker.exe sistem bileşeni bulunamadı.</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>Yönetici izni isteği iptal edildi.</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>Sistem bileşeni başlatılamadı.</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>Sistem bileşeni 30 saniye içinde bağlanmadı.</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>Sistem bileşeninin doğruluğu denetlenemedi.</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>Sistem bileşeni bağlantıyı beklenmedik biçimde kapattı.</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>Sistem bileşeninden bozuk bir yanıt alındı.</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>Sistem bileşeni tek kullanımlık yetkilendirme dosyasını okuyamadı. Bu genelde yönetici istemini başka bir Windows hesabının onaylamasıyla olur. UAC isteğini uygulamayı çalıştıran hesapla onaylayın ya da vKOROBKU'yu yönetici olarak çalıştırın.</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>Sistem bileşeni bağlanmadan önce sonlandı (kod {0}).</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>Klasör veya EXE adı</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>Kullanıcı girdi</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Steam kataloğu</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>Bu hangi oyun?</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>Adı düzeltin — vKOROBKU oyunu Steam'de bulmaya ve uygun kapağı indirmeye çalışacak.</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>OYUN ADI</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>Bul ve kaydet</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>Oyunun adını girin.</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>{0} okunamadı</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>Taranan dosyalar: {0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>Geçerli Windows kullanıcısı belirlenemedi.</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>Dosya sistemi denetleniyor…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>Temsili örneklem oluşturuluyor…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>Oyunun tüm dosyaları sıkıştırılamadığı bilinen türlerden — sıkıştırma hiçbir kazanç sağlamaz.</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>Dosya örneklemi oluşturulamadı.</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>En çok {0} büyüklüğünde örneklem oluşturuluyor…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>Sıkıştırmasız okuma hızı ölçülüyor…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>Sınama örneklemi sıkıştırılıyor: {0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>{0} sonucu hesaplanıyor…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>{0} okuması ölçülüyor…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>{0} sonrası bir sonraki kip hazırlanıyor…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>Analiz tamamlandı</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} Geçiş {2} içinden {1}</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>Örneklem hazırlanıyor: {1} içinden {0}</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>Oyunun bulunduğu sürücü belirlenemedi.</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>XPRESS/LZX analizi yalnızca NTFS üzerindeki oyunlar için desteklenir.</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>Geçici örneklem için yeterli boş alan yok.</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>Yüksek</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>Orta</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>Düşük</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>Büyük olasılıkla daha hızlı</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>Yavaşlayabilir</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>Belirgin bir değişiklik yok</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Kurulu oyunları Windows'un yerleşik araçlarıyla (XPRESS/LZX) sıkıştırarak disk alanı kazandırır. Oyunlar eskisi gibi çalışır — yalnızca dosyaların NTFS üzerinde saklanma biçimi değişir.</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>GitHub deposu</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>GPL-3.0 lisansı</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>logs klasörü</value></data>
+  <data name="About_Close" xml:space="preserve"><value>Kapat</value></data>
+  <data name="About_Version" xml:space="preserve"><value>Sürüm {0}</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>İşlemler — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>Şu anda süren bir işlem yok</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>Güvenlik için aynı anda tek bir işlem yürütülür. İlerlemesi ve geçmişi burada görünür.</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>Durdur</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>GEÇMİŞ</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>Oyunları aramaya hazır</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>Önceki işlem yarıda kaldı. Oyunun durumu seçildiğinde denetlenir.</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>Ayarlar kaydedildi</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>Oyun kitaplıkları taranıyor</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>Oyun bulunamadı — klasörü elle ekleyin</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>Bulunan oyunlar: {0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>Kitaplık taranamadı: {0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>Oyun tanınıyor ve boyutu hesaplanıyor…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>Oyun eklendi: {0}</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>{0} oyunu kitaplıktan kaldırıldı</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>Oyun ve uygun kapak aranıyor…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>Ad kaydedildi: {0}</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>Oyun tanındı: {0}</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>Kapaklar yükleniyor: {1} içinden {0}</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>Kitaplık hazır · denetlenen kapaklar: {0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>Kapak hizmeti kullanılamıyor: {0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>{0} kapağı yenileniyor…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>{0} kapağı denetlendi</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>Oyun klasörü bulunamadı: {0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>{0} oyununun klasörü açılıyor</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>Dosya Gezgini açılamadı: {0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>{0} sıkıştırma durumu denetleniyor…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>Sıkıştırma durumu belirlenemedi: {0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>{0} için kayıtlı analiz yüklendi</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>Oyunları bul</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>Aranıyor…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>Kitaplığı yenile</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>Oyun klasörünü seçin</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>{0} kitaplıktan kaldırılsın mı?
+
+Oyun yalnızca vKOROBKU kitaplığından kaldırılır. Diskteki dosyalar değiştirilmez veya silinmez.</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Dikkat: oyun sıkıştırılmış olarak kalır. Dosyalarını özgün durumuna döndürmek için önce açma işlemini yapın.</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>Geçmişi temizle</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>İşlem geçmişi temizlensin mi?
+
+Süren bir işlem varsa listede kalır.</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>{0} kitaplıkta gizlensin mi?
+
+Diskte hiçbir şey değişmez — oyun kurulu ve dokunulmamış kalır. Gizlenen oyunlar ayarlardan geri getirilebilir.</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>{0} oyunu kitaplıkta gizlendi</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>GİZLENEN OYUNLAR</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Gizlenen oyunlar: {0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>Tümünü geri getir</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Liste yenilendikten sonra gizlenen oyunlar kitaplığa döner.</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>Oyun kitaplıktan kaldırılamadı. vKOROBKU'nun yerel verilerine erişimi denetleyin.</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>Kitaplıktan kaldırma hatası</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>Otomatik</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>oyun boyutuna göre 512 MB–2 GB</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>Hızlı</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>en çok 512 MB</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>Hassas</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>en çok 1 GB</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>En yüksek</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>en çok 2 GB</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>Kazancı tahmin et</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Analiz sürüyor…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Analizi yinele</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Bir oyun seçin ve güvenli örneklem analizini çalıştırın.</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>vKOROBKU kapatılsın mı?</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>Bir işlem hâlâ sürüyor. Uygulamayı kapatmak onu durdurur: oyun kısmen işlenmiş kalır ve bir sonraki açılışta tamamlamanız önerilir.
+
+Yine de kapatılsın mı?</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>Açma işlemi hâlâ sürüyor. Uygulamayı kapatmak onu durdurur: oyun kısmen açılmış kalır ve açma işlemini yeniden çalıştırarak özgün durumuna döndürebilirsiniz.
+
+Yine de kapatılsın mı?</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>Analiz hâlâ sürüyor. Uygulamayı kapatmak onu durdurur — diskte hiçbir şey değişmez.
+
+Yine de kapatılsın mı?</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>NEREDEN BAŞLAMALI</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. Soldaki kitaplıktan bir oyun seçin.</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. «Analiz»e basın — kazanç küçük bir örneklem üzerinden tahmin edilir, diskte hiçbir şey değişmez.</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. «İyileştir»e basın — oyun sıkıştırılır ve tıpkı eskisi gibi açılmaya devam eder.</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>Dosyalar bir arşive konmaz: oyun onları okurken Windows anında açar. Her oyun «Aç» ile özgün durumuna döndürülebilir.</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>Henüz oyun bulunamadı. Bir oyun Steam, Epic Games Store veya GOG dışından kurulduysa, yukarıdaki «+ Klasör ekle» ile klasörünü ekleyin.</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>Otomatik kip oyunu değerlendirir ve alandan kazanmanın en iyi yolunu seçer.</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>Dosyalar sayılıyor…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>{0} analizi tamamlandı ve kaydedildi</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>{0} analizi tamamlandı ama önbellek yazılamadı</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>Analiz iptal edildi. Geçici dosyalar silindi.</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>Analiz iptal edildi</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>Analiz başarısız oldu: {0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>Analiz hatası</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>Oyun güncellendi — iyileştirmeden önce yeni bir hızlı analiz gerekiyor.</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>{0} tarihli analiz · {1} dosya · örneklem {2} · fiziksel olarak {3} yer kaplıyor</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>{0} oyunu DirectStorage kullanıyor. NTFS sıkıştırması hızlı okuma yolunu bozar ve yüklemeleri yavaşlatabilir.
+
+Yine de sıkıştırılsın mı?</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>Oyun: {0}
+Yöntem: {1} (ilk sıkıştırmadaki ile aynı)
+
+Yalnızca sıkıştırılmamış dosyalar işlenecek — zaten sıkıştırılmış olanlar atlanır.
+Oyun kapalı olmalı. Devam edilsin mi?</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>Sıkıştırmayı tamamla</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>Oyun: {0}
+Algoritma: {1}
+Beklenen boyut: {2}
+Kazanç: {3}
+
+Oyun kapalı olmalı. Devam edilsin mi?</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>Sıkıştırma onayı</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>{0} dosyaları tümüyle açılsın mı?
+
+Oyun kapalı olmalı.</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>Açma onayı</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>{0} ({1}) sıkıştırması yarıda kaldı.
+
+Kaldığı yerden sürdürülsün mü? Zaten sıkıştırılmış dosyalar kendiliğinden atlanır.</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>Sıkıştırmayı sürdür</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>Sıkıştırma yalnızca dosyaların NTFS üzerinde saklanma biçimini değiştirir.</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>İşlem iptal edildi</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>İşlem başarısız oldu: {0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>İşlemde sistem hatası</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>Yönetici izni onayı bekleniyor…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {1} dosyadan {0} tanesi</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · sıkıştırılamaz olarak atlandı: {0} ({1})</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · sıkıştırılmayan dosyalar: {0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>Bitti · {0} kazanıldı · toplam kazanç {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>Açma kısmen tamamlandı · kalan dosyalar: {0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>Bitti · {0} dosya açıldı</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>Çözümleniyor: {0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>Sıkıştırılıyor: {0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>Açılıyor: {0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>Beklenen kazanç: {0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>toplam: {0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · {0} tarihinden beri</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · işlem: {2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>Uygulamanın kullanıldığı süre boyunca sıkıştırmayla kazanılan{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>Sıkıştırma işlemleri: {0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>Toplam kazanç: {0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>{0} oyunu zaten sıkıştırılmış: {1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>{0} oyunu kısmen sıkıştırılmış: {1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>{0} oyunu sıkıştırılmamış</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>{0} için sıkıştırma durumu denetlenmedi</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>{0} oyunu güncellendi ve tamamlanması gerekiyor</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>Oyun dosyaları taranıyor…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>Hangi dosyaların işlendiği denetleniyor…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>Hazırlık tamamlandı</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>Hazırlık tamamlandı — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>zaten işlenmiş: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>sıkıştırılamaz olarak atlandı: {0} ({1})</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>Dosyalar sıkıştırılıyor…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>Dosyalar açılıyor…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe bir hata bildirdi (kod {0}). İşlem sürüyor; atlanan dosyalar doğrulama sırasında sayılır.</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>Sonuç doğrulanıyor…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>Sonuç doğrulanıyor (hatalı yığınlar: {0})…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>İşlem tamamlandı</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>İşlem, atlanan dosyalarla tamamlandı</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>İşlem durduruldu. Zaten işlenmiş dosyalar geçerli durumda kalır.</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>Herhangi bir görev alınmadı.</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>Bilinmeyen işlem.</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>Bilinmeyen sıkıştırma algoritması.</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>Geçersiz oyun yolu.</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>Oyun klasörü bulunamadı.</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>Sürücünün kök dizini işlenemez.</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>Oyunun kök klasörü bir bağlantı veya junction.</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>XPRESS/LZX sıkıştırması yalnızca NTFS üzerinde kullanılabilir.</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>Klasörde işlenebilecek dosya yok.</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>Önce oyunun sürecini kapatın: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>compact.exe başlatılamadı.</value></data>
+</root>
