@@ -35,7 +35,7 @@ A Windows application that estimates and transparently compresses installed game
 
 ## Get vKOROBKU
 
-**Ready-made build — on Steam** (coming soon). One dollar, automatic updates, and it supports the development of the project.
+**Ready-made build — on Steam** (coming soon). A ready build with automatic updates, and buying it supports the development of the project. The application stays open source either way — the Steam copy is convenience, not a different program.
 
 **Free — build it yourself.** The full source is here under GPL-3.0; see [Build from source](#build-from-source). It takes three commands and gives you exactly the same application.
 
