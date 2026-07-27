@@ -26,8 +26,6 @@ public static class Strings
     public static string Sidebar_AnalysisHint => Get(nameof(Sidebar_AnalysisHint));
     public static string Sidebar_SystemSection => Get(nameof(Sidebar_SystemSection));
     public static string Sidebar_CoversSource => Get(nameof(Sidebar_CoversSource));
-    public static string Update_OpenPageTooltip => Get(nameof(Update_OpenPageTooltip));
-    public static string Update_Available => Get(nameof(Update_Available));
     public static string Header_Title => Get(nameof(Header_Title));
     public static string Header_Subtitle => Get(nameof(Header_Subtitle));
     public static string Header_RefreshCovers => Get(nameof(Header_RefreshCovers));
@@ -221,15 +219,10 @@ public static class Strings
     public static string Perf_NoChange => Get(nameof(Perf_NoChange));
     public static string About_Description => Get(nameof(About_Description));
     public static string About_RepoLink => Get(nameof(About_RepoLink));
-    public static string About_ReleasesLink => Get(nameof(About_ReleasesLink));
     public static string About_LicenseLink => Get(nameof(About_LicenseLink));
-    public static string About_CheckUpdates => Get(nameof(About_CheckUpdates));
     public static string About_OpenLogs => Get(nameof(About_OpenLogs));
     public static string About_Close => Get(nameof(About_Close));
     public static string About_Version => Get(nameof(About_Version));
-    public static string About_UpToDate => Get(nameof(About_UpToDate));
-    public static string About_UpdatesTitle => Get(nameof(About_UpdatesTitle));
-    public static string About_UpdateAvailable => Get(nameof(About_UpdateAvailable));
     public static string Operations_WindowTitle => Get(nameof(Operations_WindowTitle));
     public static string Operations_NoActive => Get(nameof(Operations_NoActive));
     public static string Operations_Subtitle => Get(nameof(Operations_Subtitle));
@@ -237,7 +230,6 @@ public static class Strings
     public static string Operations_History => Get(nameof(Operations_History));
     public static string Status_ReadyToScan => Get(nameof(Status_ReadyToScan));
     public static string Status_PreviousInterrupted => Get(nameof(Status_PreviousInterrupted));
-    public static string Status_BrowserFailed => Get(nameof(Status_BrowserFailed));
     public static string Status_SettingsSaved => Get(nameof(Status_SettingsSaved));
     public static string Status_ScanningLibraries => Get(nameof(Status_ScanningLibraries));
     public static string Status_NoGamesFound => Get(nameof(Status_NoGamesFound));

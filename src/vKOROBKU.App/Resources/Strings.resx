@@ -15,8 +15,6 @@
   <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>XPRESS and LZX estimates are available after selecting a game</value></data>
   <data name="Sidebar_SystemSection" xml:space="preserve"><value>SYSTEM</value></data>
   <data name="Sidebar_CoversSource" xml:space="preserve"><value>Covers: Steam</value></data>
-  <data name="Update_OpenPageTooltip" xml:space="preserve"><value>Open the download page for the new version</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Version {0} is available</value></data>
   <data name="Header_Title" xml:space="preserve"><value>Game library</value></data>
   <data name="Header_Subtitle" xml:space="preserve"><value>Find installed games and estimate the possible space savings</value></data>
   <data name="Header_RefreshCovers" xml:space="preserve"><value>Refresh covers</value></data>
@@ -218,15 +216,10 @@ Administrator rights will be requested once. The games must be closed.</value></
   <data name="Perf_NoChange" xml:space="preserve"><value>No noticeable change</value></data>
   <data name="About_Description" xml:space="preserve"><value>Compresses installed games with the built-in Windows tools (XPRESS/LZX) to save disk space. Games keep working as before — only the way files are stored on NTFS changes.</value></data>
   <data name="About_RepoLink" xml:space="preserve"><value>GitHub repository</value></data>
-  <data name="About_ReleasesLink" xml:space="preserve"><value>Latest versions and downloads</value></data>
   <data name="About_LicenseLink" xml:space="preserve"><value>GPL-3.0 license</value></data>
-  <data name="About_CheckUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="About_OpenLogs" xml:space="preserve"><value>Logs folder</value></data>
   <data name="About_Close" xml:space="preserve"><value>Close</value></data>
   <data name="About_Version" xml:space="preserve"><value>Version {0}</value></data>
-  <data name="About_UpToDate" xml:space="preserve"><value>You have the latest version.</value></data>
-  <data name="About_UpdatesTitle" xml:space="preserve"><value>Updates</value></data>
-  <data name="About_UpdateAvailable" xml:space="preserve"><value>Version {0} is available. Open the download page?</value></data>
   <data name="Operations_WindowTitle" xml:space="preserve"><value>Operations — vKOROBKU</value></data>
   <data name="Operations_NoActive" xml:space="preserve"><value>No active operations right now</value></data>
   <data name="Operations_Subtitle" xml:space="preserve"><value>One safe operation runs at a time. Its progress and history are shown here.</value></data>
@@ -234,7 +227,6 @@ Administrator rights will be requested once. The games must be closed.</value></
   <data name="Operations_History" xml:space="preserve"><value>HISTORY</value></data>
   <data name="Status_ReadyToScan" xml:space="preserve"><value>Ready to scan for games</value></data>
   <data name="Status_PreviousInterrupted" xml:space="preserve"><value>The previous operation was interrupted. The game state is checked on selection.</value></data>
-  <data name="Status_BrowserFailed" xml:space="preserve"><value>Could not open the browser: {0}</value></data>
   <data name="Status_SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
   <data name="Status_ScanningLibraries" xml:space="preserve"><value>Scanning game libraries</value></data>
   <data name="Status_NoGamesFound" xml:space="preserve"><value>No games found — add a folder manually</value></data>

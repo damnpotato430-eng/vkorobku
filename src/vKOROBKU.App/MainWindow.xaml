@@ -47,11 +47,6 @@
                                Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
                 </StackPanel>
 
-                <Button Grid.Row="3" VerticalAlignment="Bottom" Margin="0,0,0,12"
-                        Visibility="{Binding UpdateNoticeVisibility}" Command="{Binding OpenUpdateCommand}"
-                        Content="{Binding UpdateNoticeText}" Style="{StaticResource SecondaryButton}"
-                        Foreground="{StaticResource AccentBrush}" FontSize="12" Padding="10,8"
-                        ToolTip="{x:Static res:Strings.Update_OpenPageTooltip}" />
 
                 <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="12">
                     <StackPanel>
