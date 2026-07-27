@@ -1868,6 +1868,26 @@ public sealed class MainViewModel : ObservableObject
         await _workerClient.CancelAsync();
     }
 
+    /// <summary>True while something is running that the user would not want to lose
+    /// by closing the window.</summary>
+    public bool HasWorkInProgress => IsOperating || IsQueueRunning || IsAnalyzing;
+
+    /// <summary>Distinguishes the two kinds of loss: a compression leaves the game
+    /// half-processed (resumable next launch), an analysis only wastes its own time.</summary>
+    public bool HasFileChangingWorkInProgress => IsOperating || IsQueueRunning;
+
+    // Closing the window would break the pipe, which the worker already treats as
+    // "the app is gone" and cancels the job. Asking first and cancelling explicitly
+    // turns that silent abort into a deliberate one, and lets the worker kill
+    // compact.exe on its own terms instead of racing the process exit.
+    public async Task StopAllWorkAsync()
+    {
+        _queueStopAll = true;
+        _analysisCancellation?.Cancel();
+        try { await _workerClient.CancelAsync(); }
+        catch (Exception exception) { AppLog.Error("Не удалось остановить операцию при закрытии", exception); }
+    }
+
     private async Task CompressSelectedGameAsync()
     {
         var game = SelectedGame;

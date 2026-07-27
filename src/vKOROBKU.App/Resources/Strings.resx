@@ -283,6 +283,13 @@ Nothing on disk changes — the game stays installed and untouched. Hidden games
   <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Analysis in progress…</value></data>
   <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Repeat analysis</value></data>
   <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Select a game and run a safe sample analysis.</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>Close vKOROBKU?</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>An operation is still running. Closing the application stops it: the game stays partly processed, and you will be offered to finish it on the next launch.
+
+Close anyway?</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>The analysis is still running. Closing the application stops it — nothing on disk changes.
+
+Close anyway?</value></data>
   <data name="Welcome_Title" xml:space="preserve"><value>GETTING STARTED</value></data>
   <data name="Welcome_Step1" xml:space="preserve"><value>1. Pick a game in the library on the left.</value></data>
   <data name="Welcome_Step2" xml:space="preserve"><value>2. Run Analyze — it estimates the savings on a small sample and changes nothing on disk.</value></data>

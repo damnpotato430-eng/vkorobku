@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using vKOROBKU.App.Resources;
 using vKOROBKU.App.ViewModels;
 
 namespace vKOROBKU.App;
@@ -10,6 +12,7 @@ namespace vKOROBKU.App;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel = new();
+    private bool _closeApproved;
 
     public MainWindow()
     {
@@ -32,6 +35,27 @@ public partial class MainWindow : Window
     {
         Loaded -= OnLoaded;
         await _viewModel.InitializeAsync();
+    }
+
+    // Closing cannot be awaited, so the first pass cancels the close, stops the work
+    // and then closes again — the flag keeps that second pass from asking twice.
+    private async void OnClosing(object? sender, CancelEventArgs e)
+    {
+        if (_closeApproved || !_viewModel.HasWorkInProgress)
+            return;
+
+        e.Cancel = true;
+        var prompt = _viewModel.HasFileChangingWorkInProgress
+            ? Strings.Close_OperationPrompt
+            : Strings.Close_AnalysisPrompt;
+        var confirmation = MessageBox.Show(
+            this, prompt, Strings.Close_Title, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (confirmation != MessageBoxResult.Yes)
+            return;
+
+        _closeApproved = true;
+        await _viewModel.StopAllWorkAsync();
+        Close();
     }
 
     private void OnGameItemPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)

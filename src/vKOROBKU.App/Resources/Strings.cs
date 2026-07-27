@@ -280,6 +280,9 @@ public static class Strings
     public static string Analysis_ButtonRunning => Get(nameof(Analysis_ButtonRunning));
     public static string Analysis_ButtonRepeat => Get(nameof(Analysis_ButtonRepeat));
     public static string Analysis_SelectGameHint => Get(nameof(Analysis_SelectGameHint));
+    public static string Close_Title => Get(nameof(Close_Title));
+    public static string Close_OperationPrompt => Get(nameof(Close_OperationPrompt));
+    public static string Close_AnalysisPrompt => Get(nameof(Close_AnalysisPrompt));
     public static string Welcome_Title => Get(nameof(Welcome_Title));
     public static string Welcome_Step1 => Get(nameof(Welcome_Step1));
     public static string Welcome_Step2 => Get(nameof(Welcome_Step2));
