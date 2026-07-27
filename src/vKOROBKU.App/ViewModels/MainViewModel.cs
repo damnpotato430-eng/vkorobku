@@ -69,6 +69,7 @@ public sealed class MainViewModel : ObservableObject
     private string _activeOperationDescription = string.Empty;
     private string? _activeCompressionAlgorithm;
     private string? _activeCompressionSavings;
+    private bool _activeOperationIsDecompression;
     private bool _isMultiSelectMode;
     private ChoiceOption _selectedQueueMethod;
     private string _queueSelectionText = string.Empty;
@@ -1607,6 +1608,7 @@ public sealed class MainViewModel : ObservableObject
         _activeOperationDescription = string.Empty;
         _activeCompressionAlgorithm = null;
         _activeCompressionSavings = null;
+        _activeOperationIsDecompression = false;
         NotifyActiveOperationLabel();
         NotifyActiveCompressionInfo();
     }
@@ -1880,9 +1882,13 @@ public sealed class MainViewModel : ObservableObject
     /// by closing the window.</summary>
     public bool HasWorkInProgress => IsOperating || IsQueueRunning || IsAnalyzing;
 
-    /// <summary>Distinguishes the two kinds of loss: a compression leaves the game
-    /// half-processed (resumable next launch), an analysis only wastes its own time.</summary>
+    /// <summary>Distinguishes the two kinds of loss: an operation leaves the game
+    /// half-processed, an analysis only wastes its own time.</summary>
     public bool HasFileChangingWorkInProgress => IsOperating || IsQueueRunning;
+
+    /// <summary>Which half-processed state the user would be left with — the close
+    /// prompt promises "finish it next launch", which is only true for compression.</summary>
+    public bool IsDecompressionInProgress => _activeOperationIsDecompression;
 
     // Closing the window would break the pipe, which the worker already treats as
     // "the app is gone" and cancels the job. Asking first and cancelling explicitly
@@ -1987,6 +1993,7 @@ public sealed class MainViewModel : ObservableObject
                 targetGame?.Name ?? job.RootPath),
             job.RootPath);
         var selectedEstimate = SelectedEstimate;
+        _activeOperationIsDecompression = job.Operation == "decompress";
         _activeCompressionAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
         _activeCompressionSavings = job.Operation == "compress" && selectedEstimate is not null &&
                                     selectedEstimate.AlgorithmText == job.Algorithm

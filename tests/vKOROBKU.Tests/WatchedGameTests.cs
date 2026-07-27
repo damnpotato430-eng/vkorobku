@@ -52,21 +52,58 @@ public sealed class WatchedGameTests
         Assert.True(game.NeedsRecompression(DecayThreshold, MinimumSavings));
     }
 
+    // Either threshold on its own is reason enough. Demanding both let each one hide
+    // what the other was meant to catch.
     [Fact]
-    public void NeedsRecompression_SmallAbsoluteSavings_IsFalse()
+    public void NeedsRecompression_LargeShareButSmallAmount_IsTrue()
     {
         var game = Game(compressed: 600 * MiB, uncompressed: 1024 * MiB, checkedSize: 900 * MiB);
 
         Assert.True(game.DecayPercentage > DecayThreshold);
+        Assert.True(game.PotentialSavingsBytes < MinimumSavings);
+        Assert.True(game.NeedsRecompression(DecayThreshold, MinimumSavings));
+    }
+
+    [Fact]
+    public void NeedsRecompression_LargeAmountButSmallShare_IsTrue()
+    {
+        var game = Game(compressed: 60 * GiB, uncompressed: 100 * GiB, checkedSize: 61 * GiB);
+
+        Assert.True(game.DecayPercentage < DecayThreshold);
+        Assert.True(game.PotentialSavingsBytes > MinimumSavings);
+        Assert.True(game.NeedsRecompression(DecayThreshold, MinimumSavings));
+    }
+
+    /// <summary>Real figures from a Dota 2 watch entry: the game earns ~33 GB from
+    /// compression, so updates writing 1.19 GB of fresh files amount to a 3.8% decay.
+    /// Under the old "both thresholds" rule those gigabytes stayed invisible.</summary>
+    [Fact]
+    public void NeedsRecompression_HeavilyCompressedGameAfterUpdates_IsTrue()
+    {
+        var dota = Game(
+            compressed: 40_114_506_447,
+            uncompressed: 73_492_137_998,
+            checkedSize: 41_387_086_523);
+
+        Assert.Equal(0.038, dota.DecayPercentage, 3);
+        Assert.True(dota.NeedsRecompression(DecayThreshold, MinimumSavings));
+    }
+
+    [Fact]
+    public void NeedsRecompression_NeitherThresholdReached_IsFalse()
+    {
+        var game = Game(compressed: 60 * GiB, uncompressed: 100 * GiB, checkedSize: 60 * GiB + 100 * MiB);
+
+        Assert.True(game.DecayPercentage < DecayThreshold);
+        Assert.True(game.PotentialSavingsBytes < MinimumSavings);
         Assert.False(game.NeedsRecompression(DecayThreshold, MinimumSavings));
     }
 
     [Fact]
-    public void NeedsRecompression_SmallDecayShare_IsFalse()
+    public void NeedsRecompression_NothingToReclaim_IsFalse()
     {
-        var game = Game(compressed: 60 * GiB, uncompressed: 100 * GiB, checkedSize: 61 * GiB);
+        var game = Game(compressed: 6 * GiB, uncompressed: 10 * GiB, checkedSize: 6 * GiB);
 
-        Assert.True(game.PotentialSavingsBytes > MinimumSavings);
         Assert.False(game.NeedsRecompression(DecayThreshold, MinimumSavings));
     }
 
