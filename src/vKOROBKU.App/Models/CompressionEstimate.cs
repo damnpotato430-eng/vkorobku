@@ -10,15 +10,32 @@ public enum CompressionAlgorithm
     Lzx
 }
 
+public enum AnalysisConfidence
+{
+    High,
+    Medium,
+    Low
+}
+
+public enum PerformanceImpact
+{
+    LikelyFaster,
+    NoChange,
+    PossiblySlower
+}
+
+// Confidence and PerformanceImpact are codes, not translated text: the analysis is
+// cached on disk, so storing the rendered string would freeze the language of the
+// moment it was calculated and leak Russian into an English UI (and vice versa).
 public sealed record CompressionEstimate(
     CompressionAlgorithm Algorithm,
     long EstimatedPhysicalBytes,
     long MinimumSavingsBytes,
     long MaximumSavingsBytes,
     double SampleRatio,
-    string Confidence,
+    AnalysisConfidence Confidence,
     double ReadMegabytesPerSecond,
-    string PerformanceImpact,
+    PerformanceImpact PerformanceImpact,
     double BaselineReadMegabytesPerSecond = 0)
 {
     public string AlgorithmText => Algorithm switch
@@ -28,6 +45,20 @@ public sealed record CompressionEstimate(
         CompressionAlgorithm.Xpress16K => "XPRESS16K",
         CompressionAlgorithm.Lzx => "LZX",
         _ => Algorithm.ToString()
+    };
+
+    public string ConfidenceText => Confidence switch
+    {
+        AnalysisConfidence.High => Strings.Confidence_High,
+        AnalysisConfidence.Medium => Strings.Confidence_Medium,
+        _ => Strings.Confidence_Low
+    };
+
+    public string PerformanceImpactText => PerformanceImpact switch
+    {
+        PerformanceImpact.LikelyFaster => Strings.Perf_LikelyFaster,
+        PerformanceImpact.PossiblySlower => Strings.Perf_PossiblySlower,
+        _ => Strings.Perf_NoChange
     };
 
     public string EstimatedSizeText => ByteFormatter.Format(EstimatedPhysicalBytes);
@@ -41,7 +72,7 @@ public sealed record CompressionEstimate(
         ? Strings.Estimate_RepeatForSpeed
         : string.Format(
             Strings.Estimate_Performance,
-            PerformanceImpact,
+            PerformanceImpactText,
             $"{BaselineReadMegabytesPerSecond:0}",
             $"{ReadMegabytesPerSecond:0}",
             $"{ReadSpeedChangePercent:+0;-0;0}");

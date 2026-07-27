@@ -73,6 +73,6 @@ public sealed class BalancedEstimateTests
         long minimumSavingsBytes,
         double readMegabytesPerSecond,
         double baselineMegabytesPerSecond) =>
-        new(algorithm, 0, minimumSavingsBytes, minimumSavingsBytes, 0.5, "Высокая",
-            readMegabytesPerSecond, "—", baselineMegabytesPerSecond);
+        new(algorithm, 0, minimumSavingsBytes, minimumSavingsBytes, 0.5, AnalysisConfidence.High,
+            readMegabytesPerSecond, PerformanceImpact.NoChange, baselineMegabytesPerSecond);
 }
