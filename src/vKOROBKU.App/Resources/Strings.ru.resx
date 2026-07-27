@@ -283,6 +283,12 @@
   <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Анализ выполняется…</value></data>
   <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Повторить анализ</value></data>
   <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Выберите игру и запустите безопасный анализ выборки.</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>С ЧЕГО НАЧАТЬ</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. Выберите игру в библиотеке слева.</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. Нажмите «Анализ» — оценим экономию на небольшой выборке, на диске ничего не изменится.</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. Нажмите «Оптимизировать» — игра сожмётся и продолжит запускаться точно так же.</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>Файлы не упаковываются в архив: Windows распаковывает их на лету, пока игра их читает. Любую игру можно вернуть в исходное состояние кнопкой «Распаковать».</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>Игры пока не найдены. Если игра установлена не через Steam, Epic Games Store или GOG, добавьте её папку кнопкой «+ Добавить папку» наверху.</value></data>
   <data name="Analysis_AutoModeHint" xml:space="preserve"><value>Автоматический режим оценит игру и подберёт оптимальный способ экономии места.</value></data>
   <data name="Analysis_Inventory" xml:space="preserve"><value>Инвентаризация файлов…</value></data>
   <data name="Analysis_DoneSaved" xml:space="preserve"><value>Анализ игры «{0}» завершён и сохранён</value></data>

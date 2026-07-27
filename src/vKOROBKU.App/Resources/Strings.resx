@@ -283,6 +283,12 @@ Nothing on disk changes — the game stays installed and untouched. Hidden games
   <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Analysis in progress…</value></data>
   <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Repeat analysis</value></data>
   <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Select a game and run a safe sample analysis.</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>GETTING STARTED</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. Pick a game in the library on the left.</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. Run Analyze — it estimates the savings on a small sample and changes nothing on disk.</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. Press Optimize — the game is compressed and keeps launching exactly as before.</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>Files are not packed into an archive: Windows unpacks them on the fly as the game reads them. Any game can be returned to its original state with Decompress.</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>No games found yet. If a game is installed outside Steam, Epic Games Store or GOG, add its folder with "+ Add folder" above.</value></data>
   <data name="Analysis_AutoModeHint" xml:space="preserve"><value>The automatic mode evaluates the game and picks the best way to save space.</value></data>
   <data name="Analysis_Inventory" xml:space="preserve"><value>Taking file inventory…</value></data>
   <data name="Analysis_DoneSaved" xml:space="preserve"><value>The {0} analysis is complete and saved</value></data>

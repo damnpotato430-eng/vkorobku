@@ -451,7 +451,30 @@
                                                Text="{x:Static res:Strings.Panel_DirectStorageWarning}" />
                                 </Border>
                                 <TextBlock Text="{Binding AnalysisSummary}" Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Visibility="{Binding AnalysisSummaryVisibility}"
                                            Foreground="{StaticResource MutedTextBrush}" FontSize="13" />
+
+                                <Border Margin="0,10,0,0" Padding="14,12" Background="#151A23" CornerRadius="8"
+                                        Visibility="{Binding WelcomeVisibility}">
+                                    <StackPanel>
+                                        <TextBlock Text="{x:Static res:Strings.Welcome_Title}" FontSize="10" FontWeight="Bold"
+                                                   Foreground="{StaticResource AccentBrush}" />
+                                        <StackPanel Visibility="{Binding WelcomeStepsVisibility}">
+                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step1}" Margin="0,9,0,0"
+                                                       TextWrapping="Wrap" FontSize="12" />
+                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step2}" Margin="0,6,0,0"
+                                                       TextWrapping="Wrap" FontSize="12" />
+                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step3}" Margin="0,6,0,0"
+                                                       TextWrapping="Wrap" FontSize="12" />
+                                        </StackPanel>
+                                        <TextBlock Text="{x:Static res:Strings.Welcome_EmptyLibrary}" Margin="0,9,0,0"
+                                                   Visibility="{Binding EmptyLibraryVisibility}"
+                                                   TextWrapping="Wrap" FontSize="12" />
+                                        <TextBlock Text="{x:Static res:Strings.Welcome_Reassurance}" Margin="0,11,0,0"
+                                                   TextWrapping="Wrap" FontSize="11"
+                                                   Foreground="{StaticResource MutedTextBrush}" />
+                                    </StackPanel>
+                                </Border>
                                 <StackPanel Visibility="{Binding ExpertOptimizationVisibility}">
                                     <TextBlock Text="{x:Static res:Strings.Panel_AnalysisAccuracy}" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
                                                Foreground="{StaticResource MutedTextBrush}" />
