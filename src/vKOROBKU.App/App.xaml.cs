@@ -37,11 +37,16 @@ public partial class App : Application
         base.OnStartup(e);
     }
 
+    /// <summary>The UI culture Windows gave us, captured before any override — this
+    /// is what the "auto" language option resolves to.</summary>
+    public static CultureInfo StartupUICulture { get; private set; } = CultureInfo.CurrentUICulture;
+
     // Must run before the main window is created: XAML resolves the x:Static string
     // properties at construction time. "auto" keeps the OS UI culture — the resource
     // fallback then serves Russian to Russian systems and English to everything else.
     private static void ApplyLanguagePreference()
     {
+        StartupUICulture = CultureInfo.CurrentUICulture;
         try
         {
             var language = new UserPreferencesStore().Load().Language;
