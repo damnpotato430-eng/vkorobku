@@ -21,6 +21,8 @@ public static class AppLanguages
         new("ru", "Русский"),
         new("de", "Deutsch"),
         new("es", "Español"),
+        new("fr", "Français"),
+        new("pt-BR", "Português (Brasil)"),
         new("zh-Hans", "简体中文")
     ];
 
