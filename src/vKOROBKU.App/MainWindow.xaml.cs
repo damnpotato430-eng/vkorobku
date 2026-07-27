@@ -45,9 +45,13 @@ public partial class MainWindow : Window
             return;
 
         e.Cancel = true;
-        var prompt = _viewModel.HasFileChangingWorkInProgress
-            ? Strings.Close_OperationPrompt
-            : Strings.Close_AnalysisPrompt;
+        var prompt = _viewModel switch
+        {
+            { HasFileChangingWorkInProgress: true, IsDecompressionInProgress: true } =>
+                Strings.Close_DecompressPrompt,
+            { HasFileChangingWorkInProgress: true } => Strings.Close_OperationPrompt,
+            _ => Strings.Close_AnalysisPrompt
+        };
         var confirmation = MessageBox.Show(
             this, prompt, Strings.Close_Title, MessageBoxButton.YesNo, MessageBoxImage.Warning);
         if (confirmation != MessageBoxResult.Yes)

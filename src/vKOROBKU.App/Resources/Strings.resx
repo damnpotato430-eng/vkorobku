@@ -309,6 +309,9 @@ Nothing on disk changes — the game stays installed and untouched. Hidden games
   <data name="Close_OperationPrompt" xml:space="preserve"><value>An operation is still running. Closing the application stops it: the game stays partly processed, and you will be offered to finish it on the next launch.
 
 Close anyway?</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>Decompression is still running. Closing the application stops it: the game stays partly decompressed, and you can finish returning it to its original state by running the decompression again.
+
+Close anyway?</value></data>
   <data name="Close_AnalysisPrompt" xml:space="preserve"><value>The analysis is still running. Closing the application stops it — nothing on disk changes.
 
 Close anyway?</value></data>
