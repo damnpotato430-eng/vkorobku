@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Data;
@@ -771,6 +772,7 @@ public sealed class MainViewModel : ObservableObject
         {
             Owner = Application.Current.MainWindow
         };
+        var previousLanguage = _userPreferences.Language;
         var saved = dialog.ShowDialog() == true;
         if (saved)
         {
@@ -778,6 +780,8 @@ public sealed class MainViewModel : ObservableObject
             try { _preferences.Save(_userPreferences); }
             catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
             StatusText = Strings.Status_SettingsSaved;
+            if (!string.Equals(previousLanguage, _userPreferences.Language, StringComparison.OrdinalIgnoreCase))
+                ShowLanguageRestartNotice(_userPreferences.Language);
         }
 
         // Restoring hidden games is an immediate action, honoured even when the
@@ -792,6 +796,43 @@ public sealed class MainViewModel : ObservableObject
         {
             _ = CheckWatchedGamesAsync(false);
         }
+    }
+
+    // The notice speaks the language the user just switched *to*: the whole point of
+    // the message is that the rest of the UI has not caught up yet, so saying it in
+    // the outgoing language would be the wrong half of the change. The strings are
+    // resolved before the modal opens — leaving the culture swapped while the dialog
+    // pumps messages would bleed it into the rest of the UI.
+    private static void ShowLanguageRestartNotice(string language)
+    {
+        var previous = Thread.CurrentThread.CurrentUICulture;
+        string message;
+        string title;
+        try
+        {
+            Thread.CurrentThread.CurrentUICulture = ResolveLanguageCulture(language);
+            message = Strings.Settings_LanguageRestartHint;
+            title = Strings.Settings_Title;
+        }
+        finally
+        {
+            Thread.CurrentThread.CurrentUICulture = previous;
+        }
+
+        MessageBox.Show(
+            Application.Current.MainWindow,
+            message,
+            title,
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
+
+    private static CultureInfo ResolveLanguageCulture(string language)
+    {
+        if (language is not ("ru" or "en"))
+            return App.StartupUICulture;
+        try { return CultureInfo.GetCultureInfo(language); }
+        catch (CultureNotFoundException) { return App.StartupUICulture; }
     }
 
     // The follow-up check re-seeds the watch list: restored compressed games were
