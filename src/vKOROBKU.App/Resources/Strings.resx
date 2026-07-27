@@ -58,6 +58,28 @@ Administrator rights will be requested once. The games must be closed.</value></
   <data name="Queue_AndMore" xml:space="preserve"><value>…and {0} more</value></data>
   <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>Skipped because of DirectStorage: {0}</value></data>
   <data name="Queue_NoDegradedGames" xml:space="preserve"><value>No games to finish were found in the library</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>Decompress · 1 prompt</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>Return the checked games to their original state in one queue — administrator rights are requested once</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>Check all compressed</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>Check every compressed and partly compressed game</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>Decompression queue</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>Decompress {0} game(s) in one queue?
+
+{1}
+
+The files return to their original size, so the space saved by compression is given back. Administrator rights are requested once. The games must be closed.</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>None of the checked games are compressed</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>There is not enough free space to decompress the checked games:
+
+{0}
+
+Free up space or uncheck some games.</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• drive {0} — {1} short</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>Decompression queue · preparing ({0} games)</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>Decompression queue · {0} of {1}</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>Queue finished · decompressed {0} of {1}</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>decompressed</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>Not enough free space on the drive: {0} more is needed to decompress</value></data>
   <data name="Queue_TitlePreparing" xml:space="preserve"><value>Compression queue · preparing ({0} games)</value></data>
   <data name="Queue_TitleProgress" xml:space="preserve"><value>Compression queue · {0} of {1}</value></data>
   <data name="Queue_TitleDone" xml:space="preserve"><value>Queue finished · compressed {0} of {1} · freed {2}</value></data>

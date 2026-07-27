@@ -70,7 +70,8 @@ internal static class Program
                 }
                 catch (WorkerJobException jobException)
                 {
-                    await SendAsync(writer, new WorkerMessage("error", Code: jobException.Code, CodeArg: jobException.Arg));
+                    await SendAsync(writer, new WorkerMessage(
+                        "error", Code: jobException.Code, CodeArg: jobException.Arg, CodeValue: jobException.Value));
                 }
                 catch (Exception exception)
                 {
@@ -129,6 +130,8 @@ internal static class Program
 
         var totalBytes = files.Sum(file => file.Length);
         var physicalBefore = MeasurePhysicalSize(files);
+        if (job.Operation == "decompress")
+            EnsureEnoughFreeSpace(rootPath, totalBytes - physicalBefore);
 
         await SendAsync(writer, new WorkerMessage("status", Code: WorkerCodes.CheckingProcessed));
         var skipExtensions = job.Operation == "compress" && job.SkipExtensions is { Length: > 0 }
@@ -394,6 +397,31 @@ internal static class Program
         return exitCode;
     }
 
+    // Decompression expands the files back to their logical size. Filling the volume
+    // mid-way would leave the game half-converted, and on a system drive a full disk
+    // destabilises Windows itself — so the job is refused before a byte is written.
+    // The margin keeps the volume from being driven to literally zero free space.
+    private const long FreeSpaceMarginBytes = 1024L * 1024 * 1024;
+
+    private static void EnsureEnoughFreeSpace(string rootPath, long growthBytes)
+    {
+        if (growthBytes <= 0)
+            return;
+        var root = Path.GetPathRoot(rootPath);
+        if (string.IsNullOrEmpty(root))
+            return;
+
+        long available;
+        try { available = new DriveInfo(root).AvailableFreeSpace; }
+        catch (IOException) { return; }
+        catch (UnauthorizedAccessException) { return; }
+        catch (ArgumentException) { return; }
+
+        var required = growthBytes + FreeSpaceMarginBytes;
+        if (available < required)
+            throw new WorkerJobException(WorkerCodes.NotEnoughSpace, value: required - available);
+    }
+
     private static long MeasurePhysicalSize(IEnumerable<WorkerFile> files)
     {
         long total = 0;
@@ -473,8 +501,9 @@ internal static class Program
 
 /// <summary>A job failure the worker reports as a localizable code (with an optional
 /// argument) instead of a fixed-language message.</summary>
-internal sealed class WorkerJobException(string code, string? arg = null) : Exception
+internal sealed class WorkerJobException(string code, string? arg = null, long value = 0) : Exception
 {
     public string Code { get; } = code;
     public string? Arg { get; } = arg;
+    public long Value { get; } = value;
 }

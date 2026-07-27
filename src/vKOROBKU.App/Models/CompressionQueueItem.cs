@@ -14,8 +14,9 @@ public enum QueueItemStatus
     Skipped
 }
 
-/// <summary>One game inside a running compression queue — pure UI state, never persisted.</summary>
-public sealed class CompressionQueueItem(GameInfo game, string algorithm) : INotifyPropertyChanged
+/// <summary>One game inside a running queue — pure UI state, never persisted.</summary>
+public sealed class CompressionQueueItem(GameInfo game, string algorithm, string operation = "compress")
+    : INotifyPropertyChanged
 {
     private QueueItemStatus _status = QueueItemStatus.Pending;
     private string _statusText = Strings.QueueItem_Pending;
@@ -24,7 +25,12 @@ public sealed class CompressionQueueItem(GameInfo game, string algorithm) : INot
 
     public GameInfo Game { get; } = game;
     public string Algorithm { get; } = algorithm;
-    public string Title => $"{Game.Name} · {Algorithm}";
+    public string Operation { get; } = operation;
+    public bool IsDecompression => Operation == "decompress";
+
+    // Decompression has no algorithm to speak of — naming one would suggest the game
+    // is being converted to it.
+    public string Title => IsDecompression ? Game.Name : $"{Game.Name} · {Algorithm}";
 
     public QueueItemStatus Status
     {

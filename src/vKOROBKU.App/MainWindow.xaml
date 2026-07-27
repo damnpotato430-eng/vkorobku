@@ -254,13 +254,23 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding QueueSelectionText}" VerticalAlignment="Center" FontSize="12" />
-                            <ComboBox Grid.Column="1" Width="200" Height="30" Margin="12,0,0,0" VerticalContentAlignment="Center"
+                            <Button Grid.Column="1" Content="{x:Static res:Strings.Queue_SelectAllCompressed}"
+                                    Command="{Binding SelectAllCompressedCommand}" Margin="12,0,0,0" Padding="10,6" FontSize="12"
+                                    Style="{StaticResource SecondaryButton}"
+                                    ToolTip="{x:Static res:Strings.Queue_SelectAllCompressedTooltip}" />
+                            <ComboBox Grid.Column="2" Width="200" Height="30" Margin="12,0,0,0" VerticalContentAlignment="Center"
                                       ItemsSource="{Binding QueueMethodOptions}" SelectedItem="{Binding SelectedQueueMethod}"
                                       Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Queue_MethodTooltip}" />
-                            <Button Grid.Column="2" Content="{x:Static res:Strings.Queue_Start}" Command="{Binding StartQueueCommand}"
+                            <Button Grid.Column="3" Content="{x:Static res:Strings.Queue_Start}" Command="{Binding StartQueueCommand}"
                                     Margin="12,0,0,0" Padding="12,6" FontSize="12" />
+                            <Button Grid.Column="4" Content="{x:Static res:Strings.Queue_StartDecompress}"
+                                    Command="{Binding StartDecompressQueueCommand}" Margin="8,0,0,0" Padding="12,6" FontSize="12"
+                                    Style="{StaticResource SecondaryButton}"
+                                    ToolTip="{x:Static res:Strings.Queue_StartDecompressTooltip}" />
                         </Grid>
                     </Border>
                     </StackPanel>
