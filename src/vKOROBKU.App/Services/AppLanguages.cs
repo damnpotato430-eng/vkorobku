@@ -23,6 +23,8 @@ public static class AppLanguages
         new("es", "Español"),
         new("fr", "Français"),
         new("pt-BR", "Português (Brasil)"),
+        new("pl", "Polski"),
+        new("tr", "Türkçe"),
         new("ja", "日本語"),
         new("ko", "한국어"),
         new("zh-Hans", "简体中文")
