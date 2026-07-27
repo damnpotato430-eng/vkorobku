@@ -19,6 +19,8 @@ public static class AppLanguages
     [
         new("en", "English", IsBase: true),
         new("ru", "Русский"),
+        new("de", "Deutsch"),
+        new("es", "Español"),
         new("zh-Hans", "简体中文")
     ];
 
