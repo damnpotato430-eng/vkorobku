@@ -147,6 +147,9 @@
   <data name="Settings_LanguageSection" xml:space="preserve"><value>ЯЗЫК ИНТЕРФЕЙСА</value></data>
   <data name="Settings_LanguageAuto" xml:space="preserve"><value>Авто (как в системе)</value></data>
   <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>Язык изменится после перезапуска приложения.</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>МАСШТАБ ИНТЕРФЕЙСА</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0}% (как в Windows)</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Применяется поверх масштаба экрана Windows — пригодится на мониторе высокого разрешения, оставленном на 100%. Действует сразу.</value></data>
   <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Проверять обновления сжатых игр при запуске</value></data>
   <data name="Settings_DecayThreshold" xml:space="preserve"><value>ПОРОГ ДЕГРАДАЦИИ СЖАТИЯ, %</value></data>
   <data name="Settings_MinimumSavings" xml:space="preserve"><value>МИНИМАЛЬНАЯ ВЫГОДА ДЛЯ ДОЖАТИЯ, МБ</value></data>

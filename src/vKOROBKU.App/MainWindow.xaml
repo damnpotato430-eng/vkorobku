@@ -6,7 +6,7 @@
         Width="1180" Height="820" MinWidth="1040" MinHeight="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
         WindowStartupLocation="CenterScreen" Closing="OnClosing">
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid x:Name="RootGrid" Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230" />
             <ColumnDefinition Width="*" />
@@ -181,10 +181,14 @@
             </Border>
 
             <Grid Grid.Row="4">
+                <!-- The side panel takes a share of the width instead of a fixed 350px:
+                     that width was cramped on 1080p and wasted the room a 1440p screen
+                     offers. The bounds keep it readable without letting it swallow the
+                     library on very wide windows. -->
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" MinWidth="420" />
                     <ColumnDefinition Width="18" />
-                    <ColumnDefinition Width="350" />
+                    <ColumnDefinition Width="*" MinWidth="340" MaxWidth="560" />
                 </Grid.ColumnDefinitions>
 
                 <Grid>

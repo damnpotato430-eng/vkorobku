@@ -797,6 +797,7 @@ public sealed class MainViewModel : ObservableObject
             Owner = Application.Current.MainWindow
         };
         var previousLanguage = _userPreferences.Language;
+        var previousScale = UiScalePercent;
         var saved = dialog.ShowDialog() == true;
         if (saved)
         {
@@ -804,6 +805,10 @@ public sealed class MainViewModel : ObservableObject
             try { _preferences.Save(_userPreferences); }
             catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
             StatusText = Strings.Status_SettingsSaved;
+            // The scale is a layout transform, so unlike the language it takes effect
+            // immediately — no reason to make the user restart for it.
+            if (UiScalePercent != previousScale)
+                UiScaleChanged?.Invoke(UiScalePercent);
             if (!string.Equals(previousLanguage, _userPreferences.Language, StringComparison.OrdinalIgnoreCase))
                 ShowLanguageRestartNotice(_userPreferences.Language);
         }
@@ -1875,6 +1880,12 @@ public sealed class MainViewModel : ObservableObject
         _analysisCancellation?.Cancel();
         await _workerClient.CancelAsync();
     }
+
+    /// <summary>Raised when the user picks another interface scale, so the window can
+    /// re-apply it without a restart.</summary>
+    public event Action<int>? UiScaleChanged;
+
+    public int UiScalePercent => UiScale.Normalize(_userPreferences.UiScalePercent);
 
     /// <summary>True while something is running that the user would not want to lose
     /// by closing the window.</summary>

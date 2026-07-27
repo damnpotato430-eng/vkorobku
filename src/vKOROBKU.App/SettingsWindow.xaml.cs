@@ -28,6 +28,15 @@ public partial class SettingsWindow : Window
             LanguageBox.Items.Add(option.Display());
         var languageIndex = Array.FindIndex(LanguageOptions, option => option.Value == preferences.Language);
         LanguageBox.SelectedIndex = languageIndex >= 0 ? languageIndex : 0;
+        foreach (var percent in UiScale.SupportedPercents)
+            ScaleBox.Items.Add(percent == 100
+                ? string.Format(Strings.Settings_ScaleDefault, percent)
+                : $"{percent}%");
+        ScaleBox.SelectedIndex = Math.Max(0,
+            UiScale.SupportedPercents.ToList().IndexOf(UiScale.Normalize(preferences.UiScalePercent)));
+        // The dialog follows the same scale as the main window, otherwise changing it
+        // would leave the settings themselves in the old size.
+        UiScale.Apply(this, RootGrid, preferences.UiScalePercent, new Size(520, 420));
         WatcherEnabledBox.IsChecked = preferences.WatcherEnabled;
         DecayBox.Text = preferences.DecayThresholdPercent.ToString(CultureInfo.CurrentCulture);
         SavingsBox.Text = preferences.MinimumSavingsMb.ToString(CultureInfo.CurrentCulture);
@@ -127,8 +136,12 @@ public partial class SettingsWindow : Window
         var language = LanguageBox.SelectedIndex >= 0 && LanguageBox.SelectedIndex < LanguageOptions.Length
             ? LanguageOptions[LanguageBox.SelectedIndex].Value
             : "auto";
+        var scalePercent = ScaleBox.SelectedIndex >= 0 && ScaleBox.SelectedIndex < UiScale.SupportedPercents.Count
+            ? UiScale.SupportedPercents[ScaleBox.SelectedIndex]
+            : 100;
         Result = Result with
         {
+            UiScalePercent = scalePercent,
             WatcherEnabled = WatcherEnabledBox.IsChecked == true,
             DecayThresholdPercent = decay,
             MinimumSavingsMb = savings,
