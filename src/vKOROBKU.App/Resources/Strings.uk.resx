@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>Помилки повторюються, програму буде закрито. Звіти збережено в теці logs.</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>Сталася неочікувана помилка, робота триває. Звіт збережено в теці logs.</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>ПАКУЙ ІГРИ РОЗУМНІШЕ</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>Бібліотека</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>Операції</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Налаштування</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>Про програму</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>АНАЛІЗ І СТИСНЕННЯ</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>Оцінки XPRESS і LZX доступні після вибору гри</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>СИСТЕМА</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>Обкладинки: Steam</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>Бібліотека ігор</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Знайдіть встановлені ігри й оцініть, скільки місця можна зекономити</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>Оновити обкладинки</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>Заново перевірити та завантажити обкладинки всіх ігор</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ Додати теку</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>НАКОПИЧУВАЧІ</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>Дотиснути всі</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Дотиснути всі ігри, що втратили стиснення, однією чергою — права адміністратора запитуються один раз</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>Перевірити зараз</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>Перевіряємо «{0}» ({1} з {2})…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>Потребують дотиснення: {0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — можна повернути ~{0}</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>Спостереження: {0} стиснутих ігор, втрати стиснення немає</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>Не вдалося перевірити оновлення стиснутих ігор — подробиці в теці logs</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Пошук ігор…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Позначте кілька ігор і стисніть їх однією чергою</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>Вибрати кілька</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>Скасувати вибір</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>Позначте ігри на їхніх картках</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>Вибрано: {0} · {1}</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Показати лише ігри, що потребують дотиснення</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>Сортування бібліотеки</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>За назвою</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>Спочатку великі</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Спочатку нестиснуті</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Метод стиснення для всієї черги</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Авто (збалансований)</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>Стиснути чергу · 1 запит прав</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>Стиснути ігор: {0} — однією чергою?
+
+{1}
+
+Права адміністратора буде запитано один раз. Ігри мають бути закриті.</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>Підтвердження черги</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>Дотиснути ігор: {0} — однією чергою?
+
+{1}
+
+Права адміністратора буде запитано один раз. Ігри мають бути закриті.</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>Усі позначені ігри використовують DirectStorage — стискати їх не рекомендовано</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…і ще {0}</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>Пропущено через DirectStorage: {0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>Ігор для дотиснення в бібліотеці не знайдено</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>Розпакувати · 1 запит прав</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>Повернути позначені ігри до початкового стану однією чергою — права адміністратора запитуються один раз</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>Позначити всі стиснуті</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>Позначити всі стиснуті та частково стиснуті ігри</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>Черга розпакування</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>Розпакувати ігор: {0} — однією чергою?
+
+{1}
+
+Файли повернуться до початкового розміру, тобто зекономлене стисненням місце буде віддано назад. Права адміністратора запитуються один раз. Ігри мають бути закриті.</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>Серед позначених ігор немає стиснутих</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>Бракує вільного місця, щоб розпакувати позначені ігри:
+
+{0}
+
+Звільніть місце або зніміть позначки з частини ігор.</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• диск {0} — бракує {1}</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>Черга розпакування · підготовка ({0} ігор)</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>Черга розпакування · {0} з {1}</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>Черга завершена · розпаковано {0} з {1}</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>розпаковано</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>На диску бракує вільного місця: для розпакування потрібно ще {0}</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>Черга стиснення · підготовка ({0} ігор)</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>Черга стиснення · {0} з {1}</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>Черга завершена · стиснуто {0} з {1} · звільнено {2}</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>Чергу перервано: {0}</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>Пропустити</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>Скасувати поточну гру й перейти до наступної</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Стоп після поточної</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Дати поточній грі дотиснутися й зупинити чергу</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>Стоп усе</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Зупинити чергу негайно — перервану гру можна дотиснути пізніше</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>у черзі</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>стискається…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>скасовано</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>зупинено</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>готово · звільнено {0}</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>не виконано</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Перейти до теки</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Додати до черги стиснення</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Оновити обкладинку</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Перевірити стан стиснення</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Прибрати з бібліотеки</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>Гра використовує DirectStorage. Стиснення NTFS ламає швидкий шлях читання й може сповільнити завантаження. Стискати не рекомендовано.</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>Стиснуто · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>Частково стиснуто · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>Не стиснуто</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>Не перевірено</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>Розмір не обчислено</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>Алгоритм: {0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>Фізичний розмір: {0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>очікується</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>Звільнено: {0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>не визначено</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>Стиснутих файлів: {0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>Перевірено: {0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>Додано вручну</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>ОПТИМІЗАЦІЯ ГРИ</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Гру не вибрано</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Експертний режим</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Уточнити гру</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>Гра використовує DirectStorage: стиснення NTFS ламає швидкий шлях читання й може сповільнити завантаження. Стискати не рекомендовано. В експертному режимі це доступно після підтвердження.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>ТОЧНІСТЬ АНАЛІЗУ</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Економія: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Точність: </value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>Стиснення вибірки: {0}%</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>Повторіть аналіз, щоб порівняти швидкість читання</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}: без стиснення {1} → {2} MB/s ({3}%)</value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>АВТОМАТИЧНА ОПТИМІЗАЦІЯ</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU проаналізує файли, виміряє швидкість читання й самостійно добере відповідний режим XPRESS або LZX.</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>Перш ніж змінювати будь-які файли, програма показує прогноз і запитує підтвердження.</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>СТИСНЕННЯ · ОБРАНИЙ РЕЖИМ</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>Режим заблоковано, доки операція не завершиться або її не зупинять.</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>ГРУ СТИСНУТО ЧАСТКОВО</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>Дотиснення обробляє решту файлів тим самим методом — уже стиснуті пропускаються. Метод можна змінити після повного розпакування.</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>ГРУ ВЖЕ СТИСНУТО</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows прозоро розпаковує файли під час читання. Вміст гри не змінюється.</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>Оптимізувати гру</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>Зупинити</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>Розпакувати гру</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>Гру стиснуто частково — її файли можна повністю повернути до початкового стану</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>Стиснути обраним режимом</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>Стиснути решту файлів тим самим методом — уже стиснуті пропускаються</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>Дотиснути</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Налаштування</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Стиснуті ігри перевіряються під час запуску програми та кнопкою «Перевірити зараз».</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>МОВА ІНТЕРФЕЙСУ</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Авто (як у системі)</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>Мова зміниться після перезапуску програми.</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>МАСШТАБ ІНТЕРФЕЙСУ</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0}% (як у Windows)</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Застосовується поверх масштабу екрана Windows — знадобиться на моніторі високої роздільності, залишеному на 100%. Діє одразу.</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Перевіряти оновлення стиснутих ігор під час запуску</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>ПОРІГ ВТРАТИ СТИСНЕННЯ, %</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>МІНІМАЛЬНИЙ ЗИСК ДЛЯ ДОТИСНЕННЯ, MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>НЕСТИСКУВАНІ ТИПИ ФАЙЛІВ</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>Пропускати файли, які завідомо не стискаються (медіа, архіви)</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>Наприклад: .pak або pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>Додати</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>Прибрати вибране</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>Повернути типовий список</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>Прибирає всі додані вручну розширення</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Зберегти</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>Скасувати</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>Типовий список ({0} розширень): {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>Розширення має вигляд «.ext» — крапка й до 15 символів без пробілів.</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>Розширення {0} уже є в типовому списку.</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>Розширення {0} уже додано.</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>Поріг втрати — це число від 1 до 100 відсотків.</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>Мінімальний зиск — ціле число мегабайтів, щонайменше 1.</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>Прибрати всі додані вручну розширення й повернутися до типового списку?</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>Б</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>КБ</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>МБ</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>ГБ</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>ТБ</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>Аналіз</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>Стиснення</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>Розпакування</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>Триває</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>Завершено</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>Скасовано</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>Помилка</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>Перервано</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>{0}% · {1} з {2} на поточному етапі</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>{0}% · {1} з {2}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>{0}% · {1} з {2} файлів</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>Очікування Worker</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>Програму закрито до завершення операції</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} потоків</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>ОЗП: {0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>Невідомий процесор</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · вільно {2}</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>зекономлено {0}</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>Сервіс обкладинок тимчасово недоступний</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>Сервіс обкладинок не відповів вчасно</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>Не вдалося запустити compact.exe.</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe завершився з кодом {0}: {1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>Помилка системного модуля.</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>Системний модуль vKOROBKU.Worker.exe не знайдено.</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>Запит прав адміністратора скасовано.</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>Не вдалося запустити системний модуль.</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>Системний модуль не під'єднався протягом 30 секунд.</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>Не вдалося перевірити справжність системного модуля.</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>Системний модуль несподівано закрив з'єднання.</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>Отримано хибно сформовану відповідь від системного модуля.</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>Системний модуль не зміг прочитати одноразовий файл авторизації. Зазвичай так стається, коли запит адміністратора підтверджує інший обліковий запис Windows. Підтвердьте запит UAC тим самим обліковим записом, під яким працює програма, або запустіть vKOROBKU від імені адміністратора.</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>Системний модуль завершився до під'єднання (код {0}).</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>Назва теки або EXE</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>Введено користувачем</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Каталог Steam</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>Що це за гра?</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>Виправте назву — vKOROBKU спробує знайти гру в Steam і завантажити відповідну обкладинку.</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>НАЗВА ГРИ</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>Знайти та зберегти</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>Введіть назву гри.</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>Не вдалося прочитати {0}</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>Просканованих файлів: {0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>Не вдалося визначити поточного користувача Windows.</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>Перевіряємо файлову систему…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>Формуємо репрезентативну вибірку…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>Усі файли гри належать до відомих нестискуваних типів — стиснення нічого не зекономить.</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>Не вдалося сформувати вибірку файлів.</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>Формуємо вибірку до {0}…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>Вимірюємо швидкість читання без стиснення…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>Стискаємо тестову вибірку: {0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>Обчислюємо результат {0}…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>Вимірюємо читання {0}…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>Готуємо наступний режим після {0}…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>Аналіз завершено</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} Прохід {1} з {2}</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>Готуємо вибірку: {0} з {1}</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>Не вдалося визначити диск гри.</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>Аналіз XPRESS/LZX підтримується лише для ігор на NTFS.</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>Бракує вільного місця для тимчасової вибірки.</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>Висока</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>Середня</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>Низька</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>Імовірно швидше</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>Можливо повільніше</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>Без помітних змін</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Стискає встановлені ігри штатними засобами Windows (XPRESS/LZX), щоб зекономити місце на диску. Ігри працюють як раніше — змінюється лише спосіб зберігання файлів на NTFS.</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>Репозиторій GitHub</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>Ліцензія GPL-3.0</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>Тека logs</value></data>
+  <data name="About_Close" xml:space="preserve"><value>Закрити</value></data>
+  <data name="About_Version" xml:space="preserve"><value>Версія {0}</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>Операції — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>Зараз операцій не виконується</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>Одночасно виконується лише одна безпечна операція. Її поступ і історію показано тут.</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>Зупинити</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>ІСТОРІЯ</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>Готово до пошуку ігор</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>Попередню операцію перервано. Стан гри перевіряється при виборі.</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>Налаштування збережено</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>Скануємо бібліотеки ігор</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>Ігор не знайдено — додайте теку вручну</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>Знайдено ігор: {0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>Не вдалося просканувати бібліотеку: {0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>Визначаємо гру й обчислюємо її розмір…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>Додано гру «{0}»</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>Гру «{0}» прибрано з бібліотеки</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>Шукаємо гру та відповідну обкладинку…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>Назву збережено: {0}</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>Гру визначено: {0}</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>Завантажуємо обкладинки: {0} з {1}</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>Бібліотека готова · перевірено обкладинок: {0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>Сервіс обкладинок недоступний: {0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>Оновлюємо обкладинку «{0}»…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>Обкладинку «{0}» перевірено</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>Теку гри не знайдено: {0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>Відкриваємо теку гри «{0}»</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>Не вдалося відкрити Провідник: {0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>Перевіряємо стан стиснення «{0}»…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>Не вдалося визначити стан стиснення: {0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>Завантажено збережений аналіз «{0}»</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>Знайти ігри</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>Пошук…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>Оновити бібліотеку</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>Виберіть теку гри</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>Прибрати «{0}» з бібліотеки?
+
+Гру буде прибрано лише з бібліотеки vKOROBKU. Файли на диску не змінюються й не видаляються.</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Увага: гра залишиться стиснутою. Щоб повернути файли до початкового стану, спершу розпакуйте її.</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>Очистити журнал</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>Очистити журнал операцій?
+
+Активна операція (якщо триває) залишиться у списку.</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>Сховати «{0}» з бібліотеки?
+
+На диску нічого не змінюється — гра лишається встановленою. Повернути сховані ігри можна в налаштуваннях.</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>Гру «{0}» сховано з бібліотеки</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>СХОВАНІ ІГРИ</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Сховано ігор: {0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>Повернути всі</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Сховані ігри повернуться до бібліотеки після оновлення списку.</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>Не вдалося прибрати гру з бібліотеки. Перевірте доступ до локальних даних vKOROBKU.</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>Помилка прибирання з бібліотеки</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>Авто</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>512 MB–2 GB за розміром гри</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>Швидкий</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>до 512 MB</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>Точний</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>до 1 GB</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>Максимальний</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>до 2 GB</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>Оцінити економію</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Триває аналіз…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Повторити аналіз</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Виберіть гру й запустіть безпечний аналіз вибірки.</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>Закрити vKOROBKU?</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>Операція ще виконується. Якщо закрити програму, її буде перервано: гра залишиться обробленою частково, а під час наступного запуску буде запропоновано її дотиснути.
+
+Усе одно закрити?</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>Розпакування ще триває. Якщо закрити програму, його буде перервано: гра залишиться розпакованою частково, а повернути її до початкового стану можна, запустивши розпакування повторно.
+
+Усе одно закрити?</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>Аналіз ще триває. Якщо закрити програму, його буде перервано — на диску нічого не зміниться.
+
+Усе одно закрити?</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>З ЧОГО ПОЧАТИ</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. Виберіть гру в бібліотеці ліворуч.</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. Натисніть «Аналіз» — оцінимо економію на невеликій вибірці, на диску нічого не зміниться.</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. Натисніть «Оптимізувати» — гру буде стиснуто, і вона запускатиметься так само.</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>Файли не пакуються в архів: Windows розпаковує їх на льоту, поки гра їх читає. Будь-яку гру можна повернути до початкового стану кнопкою «Розпакувати».</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>Ігор поки не знайдено. Якщо гру встановлено не через Steam, Epic Games Store чи GOG, додайте її теку кнопкою «+ Додати теку» вгорі.</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>Автоматичний режим оцінить гру й добере найкращий спосіб зекономити місце.</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>Проводимо інвентаризацію файлів…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>Аналіз «{0}» завершено й збережено</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>Аналіз «{0}» завершено, але кеш записати не вдалося</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>Аналіз скасовано. Тимчасові файли видалено.</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>Аналіз скасовано</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>Аналіз не вдався: {0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>Помилка аналізу</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>Гру оновлено — перед оптимізацією потрібен новий швидкий аналіз.</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>Аналіз від {0} · {1} файлів · вибірка {2} · фізично займає {3}</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>Гра «{0}» використовує DirectStorage. Стиснення NTFS ламає швидкий шлях читання й може сповільнити завантаження.
+
+Усе одно стиснути?</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>Гра: {0}
+Метод: {1} (як при початковому стисненні)
+
+Оброблено буде лише нестиснуті файли — уже стиснуті пропускаються.
+Гра має бути закрита. Продовжити?</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>Дотиснути</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>Гра: {0}
+Алгоритм: {1}
+Очікуваний розмір: {2}
+Економія: {3}
+
+Гра має бути закрита. Продовжити?</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>Підтвердження стиснення</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>Повністю розпакувати файли «{0}»?
+
+Гра має бути закрита.</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>Підтвердження розпакування</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>Стиснення «{0}» ({1}) було перервано.
+
+Продовжити з місця зупинки? Уже стиснуті файли пропускаються автоматично.</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>Продовжити стиснення</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>Стиснення змінює лише спосіб зберігання файлів на NTFS.</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>Операцію скасовано</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>Операція не вдалася: {0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>Системна помилка операції</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>Очікуємо підтвердження прав адміністратора…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {0} з {1} файлів</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · пропущено нестискуваних: {0} ({1})</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · нестиснутих файлів: {0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>Готово · звільнено {0} · загальна економія {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>Розпакування завершено частково · залишилось файлів: {0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>Готово · розпаковано {0} файлів</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>Аналізуємо: {0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>Стискаємо: {0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>Розпаковуємо: {0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>Очікувана економія: {0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>за весь час: {0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · від {0}</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · операцій: {2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>Звільнено стисненням за весь час роботи програми{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>Операцій стиснення: {0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>Усього зекономлено: {0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>Гру «{0}» вже стиснуто: {1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>Гру «{0}» стиснуто частково: {1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>Гру «{0}» не стиснуто</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>Стан стиснення «{0}» не перевірено</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>Гру «{0}» оновлено, потрібне дотиснення</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>Скануємо файли гри…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>Перевіряємо, які файли вже оброблено…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>Підготовку завершено</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>Підготовку завершено — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>уже оброблено: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>пропущено нестискуваних: {0} ({1})</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>Стискаємо файли…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>Розпаковуємо файли…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe повідомив про помилку (код {0}). Обробка триває; пропущені файли буде враховано під час перевірки.</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>Перевіряємо результат…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>Перевіряємо результат (пакетів з помилками: {0})…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>Операцію завершено</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>Операцію завершено з пропущеними файлами</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>Операцію зупинено. Уже оброблені файли лишаються у справному стані.</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>Завдання не отримано.</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>Невідома операція.</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>Невідомий алгоритм стиснення.</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>Хибний шлях до гри.</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>Теку гри не знайдено.</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>Кореня диска обробляти не можна.</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>Коренева тека гри є посиланням або з'єднанням.</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>Стиснення XPRESS/LZX доступне лише на NTFS.</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>У теці немає доступних файлів для обробки.</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>Спершу закрийте процес гри: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Не вдалося запустити compact.exe.</value></data>
+</root>

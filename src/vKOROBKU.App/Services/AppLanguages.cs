@@ -19,7 +19,9 @@ public static class AppLanguages
     [
         new("en", "English", IsBase: true),
         new("ru", "Русский"),
+        new("uk", "Українська"),
         new("de", "Deutsch"),
+        new("it", "Italiano"),
         new("es", "Español"),
         new("fr", "Français"),
         new("pt-BR", "Português (Brasil)"),
