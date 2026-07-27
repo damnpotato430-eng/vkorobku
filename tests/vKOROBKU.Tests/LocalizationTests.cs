@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using vKOROBKU.App.Resources;
+using vKOROBKU.App.Services;
 
 namespace vKOROBKU.Tests;
 
@@ -11,7 +12,25 @@ namespace vKOROBKU.Tests;
 /// resx files — adding a language or a string cannot silently drift.</summary>
 public sealed class LocalizationTests
 {
-    private static readonly string[] TranslatedCultures = ["ru"];
+    // Driven by the shipped-language list rather than a copy of it, so a language
+    // added to the app is automatically held to the same parity rules.
+    private static readonly string[] TranslatedCultures =
+        AppLanguages.Satellites.Select(language => language.Code).ToArray();
+
+    [Fact]
+    public void EveryDeclaredLanguage_ShipsItsResources()
+    {
+        foreach (var language in AppLanguages.All)
+        {
+            var culture = CultureInfo.GetCultureInfo(language.Code);
+            // The base language lives in the neutral resx, the others in satellites;
+            // either way the app must find real strings for a language it offers.
+            var resourceSet = Strings.ResourceManager.GetResourceSet(
+                language.IsBase ? CultureInfo.InvariantCulture : culture, true, tryParents: false);
+            Assert.True(resourceSet is not null, $"Нет ресурсов для языка «{language.Code}»");
+            Assert.False(string.IsNullOrWhiteSpace(language.DisplayName));
+        }
+    }
 
     [Fact]
     public void EverySatellite_CoversExactlyTheBaseKeys()

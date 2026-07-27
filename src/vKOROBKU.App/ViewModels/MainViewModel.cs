@@ -859,7 +859,7 @@ public sealed class MainViewModel : ObservableObject
 
     private static CultureInfo ResolveLanguageCulture(string language)
     {
-        if (language is not ("ru" or "en"))
+        if (!AppLanguages.IsSelectable(language))
             return App.StartupUICulture;
         try { return CultureInfo.GetCultureInfo(language); }
         catch (CultureNotFoundException) { return App.StartupUICulture; }

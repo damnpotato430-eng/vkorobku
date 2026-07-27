@@ -8,13 +8,13 @@ namespace vKOROBKU.App;
 
 public partial class SettingsWindow : Window
 {
-    // Value = what lands in preferences; the display names of the concrete languages
-    // are deliberately not localized — each one is written in its own language.
+    // Value = what lands in preferences. "Auto" is the only translated entry; the
+    // concrete languages are named in their own language by AppLanguages.
     private static readonly (string Value, Func<string> Display)[] LanguageOptions =
     [
-        ("auto", () => Strings.Settings_LanguageAuto),
-        ("ru", () => "Русский"),
-        ("en", () => "English")
+        (AppLanguages.Auto, () => Strings.Settings_LanguageAuto),
+        .. AppLanguages.All.Select(language =>
+            (language.Code, new Func<string>(() => language.DisplayName)))
     ];
 
     private readonly ObservableCollection<string> _userExtensions;

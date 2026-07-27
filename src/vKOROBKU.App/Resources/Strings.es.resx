@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_ErrorRepeated" xml:space="preserve"><value>Los errores se repiten, la aplicación se cerrará. Los informes se guardan en la carpeta logs.</value></data>
+  <data name="App_ErrorContinues" xml:space="preserve"><value>Se produjo un error inesperado, el trabajo continúa. Se guardó un informe en la carpeta logs.</value></data>
+  <data name="Sidebar_Tagline" xml:space="preserve"><value>COMPRIME JUEGOS CON CABEZA</value></data>
+  <data name="Nav_Library" xml:space="preserve"><value>Biblioteca</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>Operaciones</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Ajustes</value></data>
+  <data name="Nav_About" xml:space="preserve"><value>Acerca de</value></data>
+  <data name="Sidebar_AnalysisSection" xml:space="preserve"><value>ANÁLISIS Y COMPRESIÓN</value></data>
+  <data name="Sidebar_AnalysisHint" xml:space="preserve"><value>Las estimaciones de XPRESS y LZX están disponibles al seleccionar un juego</value></data>
+  <data name="Sidebar_SystemSection" xml:space="preserve"><value>SISTEMA</value></data>
+  <data name="Sidebar_CoversSource" xml:space="preserve"><value>Carátulas: Steam</value></data>
+  <data name="Header_Title" xml:space="preserve"><value>Biblioteca de juegos</value></data>
+  <data name="Header_Subtitle" xml:space="preserve"><value>Encuentra los juegos instalados y estima el espacio que puedes ahorrar</value></data>
+  <data name="Header_RefreshCovers" xml:space="preserve"><value>Actualizar carátulas</value></data>
+  <data name="Header_RefreshCoversTooltip" xml:space="preserve"><value>Volver a comprobar y descargar las carátulas de todos los juegos</value></data>
+  <data name="Header_AddFolder" xml:space="preserve"><value>+ Añadir carpeta</value></data>
+  <data name="Drives_Section" xml:space="preserve"><value>UNIDADES</value></data>
+  <data name="Watcher_RecompressAll" xml:space="preserve"><value>Recomprimir todo</value></data>
+  <data name="Watcher_RecompressAllTooltip" xml:space="preserve"><value>Recomprimir en una sola cola todos los juegos degradados: los permisos de administrador se piden una vez</value></data>
+  <data name="Watcher_CheckNow" xml:space="preserve"><value>Comprobar ahora</value></data>
+  <data name="Watcher_CheckingGame" xml:space="preserve"><value>Comprobando {0} ({1} de {2})…</value></data>
+  <data name="Watcher_NeedsFinishingCount" xml:space="preserve"><value>Necesitan terminarse: {0}</value></data>
+  <data name="Watcher_ReclaimableNote" xml:space="preserve"><value> — se pueden recuperar ~{0}</value></data>
+  <data name="Watcher_NoDecay" xml:space="preserve"><value>Vigilando {0} juegos comprimidos: sin pérdida de compresión</value></data>
+  <data name="Watcher_CheckFailed" xml:space="preserve"><value>No se pudo comprobar si los juegos comprimidos se actualizaron: detalles en la carpeta logs</value></data>
+  <data name="Search_Placeholder" xml:space="preserve"><value>Buscar juegos…</value></data>
+  <data name="MultiSelect_Tooltip" xml:space="preserve"><value>Selecciona varios juegos y comprímelos en una sola cola</value></data>
+  <data name="MultiSelect_Start" xml:space="preserve"><value>Selección múltiple</value></data>
+  <data name="MultiSelect_Cancel" xml:space="preserve"><value>Cancelar selección</value></data>
+  <data name="MultiSelect_Hint" xml:space="preserve"><value>Marca los juegos en sus tarjetas</value></data>
+  <data name="MultiSelect_Selected" xml:space="preserve"><value>Seleccionados: {0} · {1}</value></data>
+  <data name="DegradedFilter_Tooltip" xml:space="preserve"><value>Mostrar solo los juegos que necesitan terminarse</value></data>
+  <data name="Sort_Tooltip" xml:space="preserve"><value>Ordenación de la biblioteca</value></data>
+  <data name="Sort_ByName" xml:space="preserve"><value>Por nombre</value></data>
+  <data name="Sort_LargestFirst" xml:space="preserve"><value>Los más grandes primero</value></data>
+  <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Sin comprimir primero</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Método de compresión para toda la cola</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automático (equilibrado)</value></data>
+  <data name="Queue_Start" xml:space="preserve"><value>Comprimir cola · 1 solicitud de permisos</value></data>
+  <data name="Queue_StartPrompt" xml:space="preserve"><value>¿Comprimir {0} juegos en una sola cola?
+
+{1}
+
+Los permisos de administrador se pedirán una vez. Los juegos deben estar cerrados.</value></data>
+  <data name="Queue_StartTitle" xml:space="preserve"><value>Confirmación de la cola</value></data>
+  <data name="Queue_FinishPrompt" xml:space="preserve"><value>¿Terminar la compresión de {0} juegos en una sola cola?
+
+{1}
+
+Los permisos de administrador se pedirán una vez. Los juegos deben estar cerrados.</value></data>
+  <data name="Queue_AllDirectStorage" xml:space="preserve"><value>Todos los juegos seleccionados usan DirectStorage: no se recomienda comprimirlos</value></data>
+  <data name="Queue_AndMore" xml:space="preserve"><value>…y {0} más</value></data>
+  <data name="Queue_DirectStorageSkipped" xml:space="preserve"><value>Omitidos por DirectStorage: {0}</value></data>
+  <data name="Queue_NoDegradedGames" xml:space="preserve"><value>No se encontraron juegos por terminar en la biblioteca</value></data>
+  <data name="Queue_StartDecompress" xml:space="preserve"><value>Descomprimir · 1 solicitud</value></data>
+  <data name="Queue_StartDecompressTooltip" xml:space="preserve"><value>Devolver los juegos marcados a su estado original en una sola cola: los permisos de administrador se piden una vez</value></data>
+  <data name="Queue_SelectAllCompressed" xml:space="preserve"><value>Marcar todos los comprimidos</value></data>
+  <data name="Queue_SelectAllCompressedTooltip" xml:space="preserve"><value>Marcar todos los juegos comprimidos y parcialmente comprimidos</value></data>
+  <data name="Queue_DecompressTitle" xml:space="preserve"><value>Cola de descompresión</value></data>
+  <data name="Queue_DecompressPrompt" xml:space="preserve"><value>¿Descomprimir {0} juego(s) en una sola cola?
+
+{1}
+
+Los archivos vuelven a su tamaño original, así que se devuelve el espacio ahorrado por la compresión. Los permisos de administrador se piden una vez. Los juegos deben estar cerrados.</value></data>
+  <data name="Queue_NoCompressedGames" xml:space="preserve"><value>Ninguno de los juegos marcados está comprimido</value></data>
+  <data name="Queue_NotEnoughSpacePrompt" xml:space="preserve"><value>No hay espacio libre suficiente para descomprimir los juegos marcados:
+
+{0}
+
+Libera espacio o desmarca algunos juegos.</value></data>
+  <data name="Queue_SpaceShortfallLine" xml:space="preserve"><value>• unidad {0} — faltan {1}</value></data>
+  <data name="Queue_DecompressTitlePreparing" xml:space="preserve"><value>Cola de descompresión · preparando ({0} juegos)</value></data>
+  <data name="Queue_DecompressTitleProgress" xml:space="preserve"><value>Cola de descompresión · {0} de {1}</value></data>
+  <data name="Queue_DecompressTitleDone" xml:space="preserve"><value>Cola finalizada · descomprimidos {0} de {1}</value></data>
+  <data name="QueueItem_Decompressed" xml:space="preserve"><value>descomprimido</value></data>
+  <data name="Worker_NotEnoughSpace" xml:space="preserve"><value>No hay espacio libre suficiente en la unidad: se necesitan {0} más para descomprimir</value></data>
+  <data name="Queue_TitlePreparing" xml:space="preserve"><value>Cola de compresión · preparando ({0} juegos)</value></data>
+  <data name="Queue_TitleProgress" xml:space="preserve"><value>Cola de compresión · {0} de {1}</value></data>
+  <data name="Queue_TitleDone" xml:space="preserve"><value>Cola finalizada · comprimidos {0} de {1} · liberados {2}</value></data>
+  <data name="Queue_Aborted" xml:space="preserve"><value>Cola interrumpida: {0}</value></data>
+  <data name="Queue_Skip" xml:space="preserve"><value>Omitir</value></data>
+  <data name="Queue_SkipTooltip" xml:space="preserve"><value>Cancelar el juego actual y pasar al siguiente</value></data>
+  <data name="Queue_StopAfterCurrent" xml:space="preserve"><value>Parar tras el actual</value></data>
+  <data name="Queue_StopAfterCurrentTooltip" xml:space="preserve"><value>Dejar que termine el juego actual y luego detener la cola</value></data>
+  <data name="Queue_StopAll" xml:space="preserve"><value>Parar todo</value></data>
+  <data name="Queue_StopAllTooltip" xml:space="preserve"><value>Detener la cola de inmediato: el juego interrumpido puede terminarse más tarde</value></data>
+  <data name="QueueItem_Pending" xml:space="preserve"><value>en cola</value></data>
+  <data name="QueueItem_Running" xml:space="preserve"><value>comprimiendo…</value></data>
+  <data name="QueueItem_Cancelled" xml:space="preserve"><value>cancelado</value></data>
+  <data name="QueueItem_Stopped" xml:space="preserve"><value>detenido</value></data>
+  <data name="QueueItem_Done" xml:space="preserve"><value>hecho · liberados {0}</value></data>
+  <data name="QueueItem_Failed" xml:space="preserve"><value>no completado</value></data>
+  <data name="Card_OpenFolder" xml:space="preserve"><value>Abrir carpeta</value></data>
+  <data name="Card_AddToQueue" xml:space="preserve"><value>Añadir a la cola de compresión</value></data>
+  <data name="Card_RefreshCover" xml:space="preserve"><value>Actualizar carátula</value></data>
+  <data name="Card_RecheckState" xml:space="preserve"><value>Comprobar el estado de compresión</value></data>
+  <data name="Card_RemoveFromLibrary" xml:space="preserve"><value>Quitar de la biblioteca</value></data>
+  <data name="Card_DirectStorageTooltip" xml:space="preserve"><value>El juego usa DirectStorage. La compresión NTFS rompe su ruta de lectura rápida y puede ralentizar las cargas. No se recomienda comprimirlo.</value></data>
+  <data name="Card_StateCompressed" xml:space="preserve"><value>Comprimido · {0}</value></data>
+  <data name="Card_StatePartial" xml:space="preserve"><value>Parcialmente comprimido · {0}</value></data>
+  <data name="Card_StateUncompressed" xml:space="preserve"><value>Sin comprimir</value></data>
+  <data name="Card_StateUnknown" xml:space="preserve"><value>Sin comprobar</value></data>
+  <data name="Card_SizeUnknown" xml:space="preserve"><value>Tamaño sin calcular</value></data>
+  <data name="Card_InfoAlgorithm" xml:space="preserve"><value>Algoritmo: {0}</value></data>
+  <data name="Card_InfoPhysical" xml:space="preserve"><value>Tamaño físico: {0}</value></data>
+  <data name="Card_InfoPhysicalPending" xml:space="preserve"><value>pendiente</value></data>
+  <data name="Card_InfoFreed" xml:space="preserve"><value>Liberado: {0}</value></data>
+  <data name="Card_InfoFreedUnknown" xml:space="preserve"><value>sin determinar</value></data>
+  <data name="Card_InfoFiles" xml:space="preserve"><value>Archivos comprimidos: {0}</value></data>
+  <data name="Card_InfoChecked" xml:space="preserve"><value>Comprobado: {0}</value></data>
+  <data name="Source_Manual" xml:space="preserve"><value>Añadido manualmente</value></data>
+  <data name="Panel_Section" xml:space="preserve"><value>OPTIMIZACIÓN DEL JUEGO</value></data>
+  <data name="Panel_NoGameSelected" xml:space="preserve"><value>Ningún juego seleccionado</value></data>
+  <data name="Panel_ExpertMode" xml:space="preserve"><value>Modo experto</value></data>
+  <data name="Panel_ReviewIdentity" xml:space="preserve"><value>Corregir juego</value></data>
+  <data name="Panel_DirectStorageWarning" xml:space="preserve"><value>El juego usa DirectStorage: la compresión NTFS rompe su ruta de lectura rápida y puede ralentizar las cargas. No se recomienda comprimirlo. En el modo experto está disponible tras confirmar.</value></data>
+  <data name="Panel_AnalysisAccuracy" xml:space="preserve"><value>PRECISIÓN DEL ANÁLISIS</value></data>
+  <data name="Estimate_SavingsLabel" xml:space="preserve"><value>Ahorro: </value></data>
+  <data name="Estimate_ConfidenceLabel" xml:space="preserve"><value>Fiabilidad: </value></data>
+  <data name="Estimate_SampleRatio" xml:space="preserve"><value>Compresión de la muestra: {0} %</value></data>
+  <data name="Estimate_RepeatForSpeed" xml:space="preserve"><value>Repite el análisis para comparar la velocidad de lectura</value></data>
+  <data name="Estimate_Performance" xml:space="preserve"><value>{0}: sin comprimir {1} → {2} MB/s ({3} %)</value></data>
+  <data name="Info_AutoTitle" xml:space="preserve"><value>OPTIMIZACIÓN AUTOMÁTICA</value></data>
+  <data name="Info_AutoBody" xml:space="preserve"><value>vKOROBKU analizará los archivos, medirá la velocidad de lectura y elegirá por su cuenta un modo XPRESS o LZX adecuado.</value></data>
+  <data name="Info_AutoConfirm" xml:space="preserve"><value>Antes de tocar ningún archivo, la aplicación muestra una previsión y pide confirmación.</value></data>
+  <data name="Info_ActiveTitle" xml:space="preserve"><value>COMPRIMIENDO · MODO ELEGIDO</value></data>
+  <data name="Info_ActiveLocked" xml:space="preserve"><value>El modo queda bloqueado hasta que la operación termine o se detenga.</value></data>
+  <data name="Info_PartialTitle" xml:space="preserve"><value>EL JUEGO ESTÁ PARCIALMENTE COMPRIMIDO</value></data>
+  <data name="Info_PartialBody" xml:space="preserve"><value>Terminar la compresión procesa los archivos restantes con el mismo método; los ya comprimidos se omiten. El método puede cambiarse tras una descompresión completa.</value></data>
+  <data name="Info_CompressedTitle" xml:space="preserve"><value>EL JUEGO YA ESTÁ COMPRIMIDO</value></data>
+  <data name="Info_CompressedBody" xml:space="preserve"><value>Windows descomprime los archivos de forma transparente al leerlos. El contenido del juego no cambia.</value></data>
+  <data name="Action_Optimize" xml:space="preserve"><value>Optimizar juego</value></data>
+  <data name="Action_Stop" xml:space="preserve"><value>Detener</value></data>
+  <data name="Action_Decompress" xml:space="preserve"><value>Descomprimir juego</value></data>
+  <data name="Action_DecompressPartialTooltip" xml:space="preserve"><value>El juego está parcialmente comprimido: sus archivos pueden restaurarse por completo al estado original</value></data>
+  <data name="Action_CompressSelected" xml:space="preserve"><value>Comprimir con el modo elegido</value></data>
+  <data name="Action_FinishTooltip" xml:space="preserve"><value>Comprimir los archivos restantes con el mismo método; los ya comprimidos se omiten</value></data>
+  <data name="Action_Finish" xml:space="preserve"><value>Terminar compresión</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Ajustes</value></data>
+  <data name="Settings_Subtitle" xml:space="preserve"><value>Los juegos comprimidos se comprueban al iniciar la aplicación y con el botón Comprobar ahora.</value></data>
+  <data name="Settings_LanguageSection" xml:space="preserve"><value>IDIOMA DE LA INTERFAZ</value></data>
+  <data name="Settings_LanguageAuto" xml:space="preserve"><value>Automático (del sistema)</value></data>
+  <data name="Settings_LanguageRestartHint" xml:space="preserve"><value>El idioma cambia después de reiniciar la aplicación.</value></data>
+  <data name="Settings_ScaleSection" xml:space="preserve"><value>ESCALA DE LA INTERFAZ</value></data>
+  <data name="Settings_ScaleDefault" xml:space="preserve"><value>{0} % (como en Windows)</value></data>
+  <data name="Settings_ScaleHint" xml:space="preserve"><value>Se aplica sobre la escala de pantalla de Windows: útil en una pantalla de alta resolución dejada al 100 %. Surte efecto de inmediato.</value></data>
+  <data name="Settings_WatcherEnabled" xml:space="preserve"><value>Comprobar al inicio si los juegos comprimidos se actualizaron</value></data>
+  <data name="Settings_DecayThreshold" xml:space="preserve"><value>UMBRAL DE PÉRDIDA DE COMPRESIÓN, %</value></data>
+  <data name="Settings_MinimumSavings" xml:space="preserve"><value>GANANCIA MÍNIMA PARA RECOMPRIMIR, MB</value></data>
+  <data name="Settings_SkipSection" xml:space="preserve"><value>TIPOS DE ARCHIVO INCOMPRIMIBLES</value></data>
+  <data name="Settings_SkipEnabled" xml:space="preserve"><value>Omitir archivos que se sabe que no se comprimen (multimedia, archivos comprimidos)</value></data>
+  <data name="Settings_ExtensionExample" xml:space="preserve"><value>Por ejemplo: .pak o pak</value></data>
+  <data name="Settings_AddExtension" xml:space="preserve"><value>Añadir</value></data>
+  <data name="Settings_RemoveSelected" xml:space="preserve"><value>Quitar seleccionada</value></data>
+  <data name="Settings_ResetList" xml:space="preserve"><value>Restaurar la lista predeterminada</value></data>
+  <data name="Settings_ResetListTooltip" xml:space="preserve"><value>Elimina todas las extensiones añadidas manualmente</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="Settings_Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="Settings_DefaultListFormat" xml:space="preserve"><value>Lista predeterminada ({0} extensiones): {1}</value></data>
+  <data name="Settings_ExtensionFormatError" xml:space="preserve"><value>Una extensión tiene la forma «.ext»: un punto y hasta 15 caracteres sin espacios.</value></data>
+  <data name="Settings_ExtensionInDefault" xml:space="preserve"><value>La extensión {0} ya está en la lista predeterminada.</value></data>
+  <data name="Settings_ExtensionExists" xml:space="preserve"><value>La extensión {0} ya está añadida.</value></data>
+  <data name="Settings_DecayError" xml:space="preserve"><value>El umbral de pérdida es un número del 1 al 100 por ciento.</value></data>
+  <data name="Settings_SavingsError" xml:space="preserve"><value>La ganancia mínima es un número entero de megabytes, al menos 1.</value></data>
+  <data name="Settings_ResetConfirm" xml:space="preserve"><value>¿Eliminar todas las extensiones añadidas manualmente y volver a la lista predeterminada?</value></data>
+  <data name="Unit_Bytes" xml:space="preserve"><value>B</value></data>
+  <data name="Unit_KB" xml:space="preserve"><value>KB</value></data>
+  <data name="Unit_MB" xml:space="preserve"><value>MB</value></data>
+  <data name="Unit_GB" xml:space="preserve"><value>GB</value></data>
+  <data name="Unit_TB" xml:space="preserve"><value>TB</value></data>
+  <data name="Journal_OperationAnalysis" xml:space="preserve"><value>Análisis</value></data>
+  <data name="Journal_OperationCompress" xml:space="preserve"><value>Compresión</value></data>
+  <data name="Journal_OperationDecompress" xml:space="preserve"><value>Descompresión</value></data>
+  <data name="Journal_StateRunning" xml:space="preserve"><value>En curso</value></data>
+  <data name="Journal_StateCompleted" xml:space="preserve"><value>Completada</value></data>
+  <data name="Journal_StateCancelled" xml:space="preserve"><value>Cancelada</value></data>
+  <data name="Journal_StateFailed" xml:space="preserve"><value>Error</value></data>
+  <data name="Journal_StateInterrupted" xml:space="preserve"><value>Interrumpida</value></data>
+  <data name="Journal_ProgressStageBytes" xml:space="preserve"><value>{0} % · {1} de {2} en la etapa actual</value></data>
+  <data name="Journal_ProgressBytes" xml:space="preserve"><value>{0} % · {1} de {2}</value></data>
+  <data name="Journal_ProgressFiles" xml:space="preserve"><value>{0} % · {1} de {2} archivos</value></data>
+  <data name="Journal_WaitingWorker" xml:space="preserve"><value>Esperando al Worker</value></data>
+  <data name="Journal_InterruptedByExit" xml:space="preserve"><value>La aplicación se cerró antes de que terminara la operación</value></data>
+  <data name="System_ProcessorThreads" xml:space="preserve"><value>{0} · {1} hilos</value></data>
+  <data name="System_Memory" xml:space="preserve"><value>RAM: {0}</value></data>
+  <data name="System_UnknownProcessor" xml:space="preserve"><value>Procesador desconocido</value></data>
+  <data name="Drive_Display" xml:space="preserve"><value>{0}  {1} · {2} libres</value></data>
+  <data name="Drive_Savings" xml:space="preserve"><value>ahorrados {0}</value></data>
+  <data name="Covers_Unavailable" xml:space="preserve"><value>El servicio de carátulas no está disponible temporalmente</value></data>
+  <data name="Covers_Timeout" xml:space="preserve"><value>El servicio de carátulas no respondió a tiempo</value></data>
+  <data name="Compact_StartFailed" xml:space="preserve"><value>No se pudo iniciar compact.exe.</value></data>
+  <data name="Compact_ExitCode" xml:space="preserve"><value>compact.exe terminó con el código {0}: {1}</value></data>
+  <data name="Worker_Error" xml:space="preserve"><value>Error del módulo del sistema.</value></data>
+  <data name="Worker_NotFound" xml:space="preserve"><value>No se encontró el módulo del sistema vKOROBKU.Worker.exe.</value></data>
+  <data name="Worker_UacCancelled" xml:space="preserve"><value>Se canceló la solicitud de permisos de administrador.</value></data>
+  <data name="Worker_StartFailed" xml:space="preserve"><value>No se pudo iniciar el módulo del sistema.</value></data>
+  <data name="Worker_ConnectTimeout" xml:space="preserve"><value>El módulo del sistema no se conectó en 30 segundos.</value></data>
+  <data name="Worker_AuthFailed" xml:space="preserve"><value>No se pudo verificar la autenticidad del módulo del sistema.</value></data>
+  <data name="Worker_ConnectionLost" xml:space="preserve"><value>El módulo del sistema cerró la conexión de forma inesperada.</value></data>
+  <data name="Worker_BadResponse" xml:space="preserve"><value>Se recibió una respuesta mal formada del módulo del sistema.</value></data>
+  <data name="Worker_TokenExit" xml:space="preserve"><value>El módulo del sistema no pudo leer el archivo de autorización de un solo uso. Esto suele ocurrir cuando otra cuenta de Windows confirma el aviso de administrador. Confirma la solicitud de UAC con la misma cuenta que ejecuta la aplicación, o inicia vKOROBKU como administrador.</value></data>
+  <data name="Worker_EarlyExit" xml:space="preserve"><value>El módulo del sistema terminó antes de conectarse (código {0}).</value></data>
+  <data name="Identity_SourceFolderName" xml:space="preserve"><value>Nombre de la carpeta o del EXE</value></data>
+  <data name="Identity_SourceUser" xml:space="preserve"><value>Introducido por el usuario</value></data>
+  <data name="Identity_SourceSteamCatalog" xml:space="preserve"><value>Catálogo de Steam</value></data>
+  <data name="Identity_Question" xml:space="preserve"><value>¿Qué juego es este?</value></data>
+  <data name="Identity_Hint" xml:space="preserve"><value>Corrige el nombre: vKOROBKU intentará encontrar el juego en Steam y descargar la carátula correspondiente.</value></data>
+  <data name="Identity_NameLabel" xml:space="preserve"><value>NOMBRE DEL JUEGO</value></data>
+  <data name="Identity_FindAndSave" xml:space="preserve"><value>Buscar y guardar</value></data>
+  <data name="Identity_EnterName" xml:space="preserve"><value>Introduce el nombre del juego.</value></data>
+  <data name="Benchmark_ReadFailed" xml:space="preserve"><value>No se pudo leer {0}</value></data>
+  <data name="Inventory_ScannedFiles" xml:space="preserve"><value>Archivos analizados: {0}</value></data>
+  <data name="WorkerToken_UserUnknown" xml:space="preserve"><value>No se pudo determinar el usuario actual de Windows.</value></data>
+  <data name="Analysis_CheckingFileSystem" xml:space="preserve"><value>Comprobando el sistema de archivos…</value></data>
+  <data name="Analysis_BuildingSample" xml:space="preserve"><value>Construyendo una muestra representativa…</value></data>
+  <data name="Analysis_AllFilesIncompressible" xml:space="preserve"><value>Todos los archivos del juego son de tipos que no se comprimen: comprimir no ahorraría nada.</value></data>
+  <data name="Analysis_SampleFailed" xml:space="preserve"><value>No se pudo construir una muestra de archivos.</value></data>
+  <data name="Analysis_BuildingSampleUpTo" xml:space="preserve"><value>Construyendo una muestra de hasta {0}…</value></data>
+  <data name="Analysis_MeasuringBaseline" xml:space="preserve"><value>Midiendo la velocidad de lectura sin compresión…</value></data>
+  <data name="Analysis_CompressingSample" xml:space="preserve"><value>Comprimiendo la muestra de prueba: {0}…</value></data>
+  <data name="Analysis_CountingResult" xml:space="preserve"><value>Calculando el resultado de {0}…</value></data>
+  <data name="Analysis_MeasuringRead" xml:space="preserve"><value>Midiendo la lectura de {0}…</value></data>
+  <data name="Analysis_PreparingNext" xml:space="preserve"><value>Preparando el siguiente modo después de {0}…</value></data>
+  <data name="Analysis_Done" xml:space="preserve"><value>Análisis completado</value></data>
+  <data name="Analysis_Pass" xml:space="preserve"><value>{0} Pasada {1} de {2}</value></data>
+  <data name="Analysis_PreparingSampleIndex" xml:space="preserve"><value>Preparando la muestra: {0} de {1}</value></data>
+  <data name="Analysis_DriveUnknown" xml:space="preserve"><value>No se pudo determinar la unidad del juego.</value></data>
+  <data name="Analysis_NtfsOnly" xml:space="preserve"><value>El análisis XPRESS/LZX solo se admite para juegos en NTFS.</value></data>
+  <data name="Analysis_NotEnoughSpace" xml:space="preserve"><value>No hay espacio libre suficiente para la muestra temporal.</value></data>
+  <data name="Confidence_High" xml:space="preserve"><value>Alta</value></data>
+  <data name="Confidence_Medium" xml:space="preserve"><value>Media</value></data>
+  <data name="Confidence_Low" xml:space="preserve"><value>Baja</value></data>
+  <data name="Perf_LikelyFaster" xml:space="preserve"><value>Probablemente más rápido</value></data>
+  <data name="Perf_PossiblySlower" xml:space="preserve"><value>Posiblemente más lento</value></data>
+  <data name="Perf_NoChange" xml:space="preserve"><value>Sin cambios apreciables</value></data>
+  <data name="About_Description" xml:space="preserve"><value>Comprime los juegos instalados con las herramientas integradas de Windows (XPRESS/LZX) para ahorrar espacio en disco. Los juegos siguen funcionando igual: solo cambia la forma en que se guardan los archivos en NTFS.</value></data>
+  <data name="About_RepoLink" xml:space="preserve"><value>Repositorio de GitHub</value></data>
+  <data name="About_LicenseLink" xml:space="preserve"><value>Licencia GPL-3.0</value></data>
+  <data name="About_OpenLogs" xml:space="preserve"><value>Carpeta logs</value></data>
+  <data name="About_Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="About_Version" xml:space="preserve"><value>Versión {0}</value></data>
+  <data name="Operations_WindowTitle" xml:space="preserve"><value>Operaciones — vKOROBKU</value></data>
+  <data name="Operations_NoActive" xml:space="preserve"><value>Ahora mismo no hay operaciones activas</value></data>
+  <data name="Operations_Subtitle" xml:space="preserve"><value>Se ejecuta una sola operación segura a la vez. Aquí se muestran su progreso y su historial.</value></data>
+  <data name="Operations_Stop" xml:space="preserve"><value>Detener</value></data>
+  <data name="Operations_History" xml:space="preserve"><value>HISTORIAL</value></data>
+  <data name="Status_ReadyToScan" xml:space="preserve"><value>Listo para buscar juegos</value></data>
+  <data name="Status_PreviousInterrupted" xml:space="preserve"><value>La operación anterior se interrumpió. El estado del juego se comprueba al seleccionarlo.</value></data>
+  <data name="Status_SettingsSaved" xml:space="preserve"><value>Ajustes guardados</value></data>
+  <data name="Status_ScanningLibraries" xml:space="preserve"><value>Analizando las bibliotecas de juegos</value></data>
+  <data name="Status_NoGamesFound" xml:space="preserve"><value>No se encontraron juegos: añade una carpeta manualmente</value></data>
+  <data name="Status_GamesFound" xml:space="preserve"><value>Juegos encontrados: {0}</value></data>
+  <data name="Status_ScanFailed" xml:space="preserve"><value>No se pudo analizar la biblioteca: {0}</value></data>
+  <data name="Status_DetectingGame" xml:space="preserve"><value>Detectando el juego y calculando su tamaño…</value></data>
+  <data name="Status_GameAdded" xml:space="preserve"><value>Juego añadido: {0}</value></data>
+  <data name="Status_GameRemoved" xml:space="preserve"><value>El juego {0} se quitó de la biblioteca</value></data>
+  <data name="Status_SearchingIdentity" xml:space="preserve"><value>Buscando el juego y una carátula que coincida…</value></data>
+  <data name="Status_NameSaved" xml:space="preserve"><value>Nombre guardado: {0}</value></data>
+  <data name="Status_GameIdentified" xml:space="preserve"><value>Juego identificado: {0}</value></data>
+  <data name="Status_LoadingCovers" xml:space="preserve"><value>Cargando carátulas: {0} de {1}</value></data>
+  <data name="Status_LibraryReady" xml:space="preserve"><value>Biblioteca lista · carátulas comprobadas: {0}</value></data>
+  <data name="Status_CoversUnavailable" xml:space="preserve"><value>El servicio de carátulas no está disponible: {0}</value></data>
+  <data name="Status_RefreshingCover" xml:space="preserve"><value>Actualizando la carátula de {0}…</value></data>
+  <data name="Status_CoverChecked" xml:space="preserve"><value>La carátula de {0} está comprobada</value></data>
+  <data name="Status_FolderNotFound" xml:space="preserve"><value>No se encontró la carpeta del juego: {0}</value></data>
+  <data name="Status_OpeningFolder" xml:space="preserve"><value>Abriendo la carpeta del juego {0}</value></data>
+  <data name="Status_ExplorerFailed" xml:space="preserve"><value>No se pudo abrir el Explorador: {0}</value></data>
+  <data name="Status_CheckingState" xml:space="preserve"><value>Comprobando el estado de compresión de {0}…</value></data>
+  <data name="Status_StateCheckFailed" xml:space="preserve"><value>No se pudo determinar el estado de compresión: {0}</value></data>
+  <data name="Status_AnalysisLoaded" xml:space="preserve"><value>Se cargó el análisis guardado de {0}</value></data>
+  <data name="Scan_FindGames" xml:space="preserve"><value>Buscar juegos</value></data>
+  <data name="Scan_InProgress" xml:space="preserve"><value>Buscando…</value></data>
+  <data name="Scan_Refresh" xml:space="preserve"><value>Actualizar biblioteca</value></data>
+  <data name="AddFolder_DialogTitle" xml:space="preserve"><value>Selecciona la carpeta del juego</value></data>
+  <data name="Remove_Prompt" xml:space="preserve"><value>¿Quitar {0} de la biblioteca?
+
+El juego solo se quita de la biblioteca de vKOROBKU. Los archivos del disco no se modifican ni se eliminan.</value></data>
+  <data name="Remove_StillCompressedNote" xml:space="preserve"><value>Atención: el juego sigue comprimido. Para devolver sus archivos al estado original, descomprímelo primero.</value></data>
+  <data name="Operations_Clear" xml:space="preserve"><value>Vaciar historial</value></data>
+  <data name="Operations_ClearConfirm" xml:space="preserve"><value>¿Vaciar el historial de operaciones?
+
+La operación en curso (si la hay) permanece en la lista.</value></data>
+  <data name="Hide_Prompt" xml:space="preserve"><value>¿Ocultar {0} de la biblioteca?
+
+No cambia nada en el disco: el juego sigue instalado e intacto. Los juegos ocultos pueden restaurarse en los ajustes.</value></data>
+  <data name="Status_GameHidden" xml:space="preserve"><value>El juego {0} se ocultó de la biblioteca</value></data>
+  <data name="Settings_HiddenSection" xml:space="preserve"><value>JUEGOS OCULTOS</value></data>
+  <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Juegos ocultos: {0}</value></data>
+  <data name="Settings_RestoreHidden" xml:space="preserve"><value>Restaurar todos</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Los juegos ocultos vuelven a la biblioteca después de actualizar la lista.</value></data>
+  <data name="Remove_Failed" xml:space="preserve"><value>No se pudo quitar el juego de la biblioteca. Comprueba el acceso a los datos locales de vKOROBKU.</value></data>
+  <data name="Remove_FailedTitle" xml:space="preserve"><value>Error al quitar de la biblioteca</value></data>
+  <data name="AnalysisMode_Auto" xml:space="preserve"><value>Automático</value></data>
+  <data name="AnalysisMode_AutoHint" xml:space="preserve"><value>512 MB–2 GB según el tamaño del juego</value></data>
+  <data name="AnalysisMode_Fast" xml:space="preserve"><value>Rápido</value></data>
+  <data name="AnalysisMode_FastHint" xml:space="preserve"><value>hasta 512 MB</value></data>
+  <data name="AnalysisMode_Precise" xml:space="preserve"><value>Preciso</value></data>
+  <data name="AnalysisMode_PreciseHint" xml:space="preserve"><value>hasta 1 GB</value></data>
+  <data name="AnalysisMode_Maximum" xml:space="preserve"><value>Máximo</value></data>
+  <data name="AnalysisMode_MaximumHint" xml:space="preserve"><value>hasta 2 GB</value></data>
+  <data name="Analysis_ButtonCalculate" xml:space="preserve"><value>Estimar el ahorro</value></data>
+  <data name="Analysis_ButtonRunning" xml:space="preserve"><value>Análisis en curso…</value></data>
+  <data name="Analysis_ButtonRepeat" xml:space="preserve"><value>Repetir análisis</value></data>
+  <data name="Analysis_SelectGameHint" xml:space="preserve"><value>Selecciona un juego y ejecuta un análisis seguro por muestreo.</value></data>
+  <data name="Close_Title" xml:space="preserve"><value>¿Cerrar vKOROBKU?</value></data>
+  <data name="Close_OperationPrompt" xml:space="preserve"><value>Todavía hay una operación en curso. Cerrar la aplicación la detiene: el juego quedará parcialmente procesado y en el próximo inicio se te ofrecerá terminarlo.
+
+¿Cerrar de todos modos?</value></data>
+  <data name="Close_DecompressPrompt" xml:space="preserve"><value>La descompresión todavía está en curso. Cerrar la aplicación la detiene: el juego quedará parcialmente descomprimido y podrás devolverlo a su estado original volviendo a ejecutar la descompresión.
+
+¿Cerrar de todos modos?</value></data>
+  <data name="Close_AnalysisPrompt" xml:space="preserve"><value>El análisis todavía está en curso. Cerrar la aplicación lo detiene: no cambia nada en el disco.
+
+¿Cerrar de todos modos?</value></data>
+  <data name="Welcome_Title" xml:space="preserve"><value>POR DÓNDE EMPEZAR</value></data>
+  <data name="Welcome_Step1" xml:space="preserve"><value>1. Elige un juego en la biblioteca de la izquierda.</value></data>
+  <data name="Welcome_Step2" xml:space="preserve"><value>2. Pulsa Analizar: estima el ahorro sobre una muestra pequeña y no cambia nada en el disco.</value></data>
+  <data name="Welcome_Step3" xml:space="preserve"><value>3. Pulsa Optimizar: el juego se comprime y sigue arrancando exactamente igual que antes.</value></data>
+  <data name="Welcome_Reassurance" xml:space="preserve"><value>Los archivos no se meten en un archivo comprimido: Windows los descomprime al vuelo mientras el juego los lee. Cualquier juego puede volver a su estado original con Descomprimir.</value></data>
+  <data name="Welcome_EmptyLibrary" xml:space="preserve"><value>Todavía no se han encontrado juegos. Si un juego está instalado fuera de Steam, Epic Games Store o GOG, añade su carpeta con «+ Añadir carpeta» arriba.</value></data>
+  <data name="Analysis_AutoModeHint" xml:space="preserve"><value>El modo automático evalúa el juego y elige la mejor forma de ahorrar espacio.</value></data>
+  <data name="Analysis_Inventory" xml:space="preserve"><value>Haciendo inventario de archivos…</value></data>
+  <data name="Analysis_DoneSaved" xml:space="preserve"><value>El análisis de {0} está completo y guardado</value></data>
+  <data name="Analysis_DoneCacheFailed" xml:space="preserve"><value>El análisis de {0} está completo, pero no se pudo escribir la caché</value></data>
+  <data name="Analysis_CancelledDetail" xml:space="preserve"><value>Análisis cancelado. Se eliminaron los archivos temporales.</value></data>
+  <data name="Analysis_Cancelled" xml:space="preserve"><value>Análisis cancelado</value></data>
+  <data name="Analysis_Failed" xml:space="preserve"><value>El análisis falló: {0}</value></data>
+  <data name="Analysis_Error" xml:space="preserve"><value>Error de análisis</value></data>
+  <data name="Analysis_StaleHint" xml:space="preserve"><value>El juego se actualizó: hace falta un nuevo análisis rápido antes de optimizar.</value></data>
+  <data name="Analysis_SavedSummary" xml:space="preserve"><value>Análisis del {0} · {1} archivos · muestra {2} · ocupa físicamente {3}</value></data>
+  <data name="DirectStorage_ConfirmPrompt" xml:space="preserve"><value>El juego {0} usa DirectStorage. La compresión NTFS rompe su ruta de lectura rápida y puede ralentizar las cargas.
+
+¿Comprimir de todos modos?</value></data>
+  <data name="Finish_Prompt" xml:space="preserve"><value>Juego: {0}
+Método: {1} (el mismo de la compresión original)
+
+Solo se procesarán los archivos sin comprimir; los ya comprimidos se omiten.
+El juego debe estar cerrado. ¿Continuar?</value></data>
+  <data name="Finish_Title" xml:space="preserve"><value>Terminar compresión</value></data>
+  <data name="Compress_Prompt" xml:space="preserve"><value>Juego: {0}
+Algoritmo: {1}
+Tamaño previsto: {2}
+Ahorro: {3}
+
+El juego debe estar cerrado. ¿Continuar?</value></data>
+  <data name="Compress_Title" xml:space="preserve"><value>Confirmación de compresión</value></data>
+  <data name="Decompress_Prompt" xml:space="preserve"><value>¿Descomprimir por completo los archivos de {0}?
+
+El juego debe estar cerrado.</value></data>
+  <data name="Decompress_Title" xml:space="preserve"><value>Confirmación de descompresión</value></data>
+  <data name="Resume_Prompt" xml:space="preserve"><value>La compresión de {0} ({1}) se interrumpió.
+
+¿Continuar desde donde se detuvo? Los archivos ya comprimidos se omiten automáticamente.</value></data>
+  <data name="Resume_Title" xml:space="preserve"><value>Continuar la compresión</value></data>
+  <data name="Operation_DefaultSummary" xml:space="preserve"><value>La compresión solo cambia la forma en que se guardan los archivos en NTFS.</value></data>
+  <data name="Operation_Cancelled" xml:space="preserve"><value>Operación cancelada</value></data>
+  <data name="Operation_Failed" xml:space="preserve"><value>La operación falló: {0}</value></data>
+  <data name="Operation_SystemError" xml:space="preserve"><value>Error del sistema en la operación</value></data>
+  <data name="Operation_WaitingUac" xml:space="preserve"><value>Esperando la confirmación de los permisos de administrador…</value></data>
+  <data name="Operation_FilesCounter" xml:space="preserve"><value> · {0} de {1} archivos</value></data>
+  <data name="Operation_SkippedNote" xml:space="preserve"><value> · omitidos incomprimibles: {0} ({1})</value></data>
+  <data name="Operation_LeftoverNote" xml:space="preserve"><value> · archivos sin comprimir: {0}</value></data>
+  <data name="Operation_CompressDone" xml:space="preserve"><value>Hecho · liberados {0} · ahorro total {1}</value></data>
+  <data name="Operation_DecompressPartial" xml:space="preserve"><value>Descompresión parcialmente completada · archivos restantes: {0}</value></data>
+  <data name="Operation_DecompressDone" xml:space="preserve"><value>Hecho · descomprimidos {0} archivos</value></data>
+  <data name="Active_Analyzing" xml:space="preserve"><value>Analizando: {0}</value></data>
+  <data name="Active_Compressing" xml:space="preserve"><value>Comprimiendo: {0}</value></data>
+  <data name="Active_Decompressing" xml:space="preserve"><value>Descomprimiendo: {0}</value></data>
+  <data name="Active_ExpectedSavings" xml:space="preserve"><value>Ahorro previsto: {0}</value></data>
+  <data name="Stats_AllTime" xml:space="preserve"><value>en total: {0}</value></data>
+  <data name="Stats_SinceDate" xml:space="preserve"><value> · desde {0}</value></data>
+  <data name="Stats_DriveLine" xml:space="preserve"><value>{0} — {1} · operaciones: {2}</value></data>
+  <data name="Stats_TooltipHeader" xml:space="preserve"><value>Liberado por compresión durante toda la vida de la aplicación{0}</value></data>
+  <data name="Stats_OperationsCount" xml:space="preserve"><value>Operaciones de compresión: {0}</value></data>
+  <data name="Stats_TotalSaved" xml:space="preserve"><value>Ahorro total: {0}</value></data>
+  <data name="State_AlreadyCompressed" xml:space="preserve"><value>El juego {0} ya está comprimido: {1}</value></data>
+  <data name="State_PartiallyCompressed" xml:space="preserve"><value>El juego {0} está parcialmente comprimido: {1}</value></data>
+  <data name="State_NotCompressed" xml:space="preserve"><value>El juego {0} no está comprimido</value></data>
+  <data name="State_NotChecked" xml:space="preserve"><value>El estado de compresión de {0} no está comprobado</value></data>
+  <data name="State_UpdatedNeedsWork" xml:space="preserve"><value>El juego {0} se actualizó y necesita terminarse</value></data>
+  <data name="Worker_ScanningFiles" xml:space="preserve"><value>Analizando los archivos del juego…</value></data>
+  <data name="Worker_CheckingProcessed" xml:space="preserve"><value>Comprobando qué archivos ya están procesados…</value></data>
+  <data name="Worker_Prepared" xml:space="preserve"><value>Preparación completada</value></data>
+  <data name="Worker_PreparedNotes" xml:space="preserve"><value>Preparación completada — {0}</value></data>
+  <data name="Worker_PrepAlreadyProcessed" xml:space="preserve"><value>ya procesados: {0}</value></data>
+  <data name="Worker_PrepSkipped" xml:space="preserve"><value>omitidos incomprimibles: {0} ({1})</value></data>
+  <data name="Worker_Compressing" xml:space="preserve"><value>Comprimiendo archivos…</value></data>
+  <data name="Worker_Decompressing" xml:space="preserve"><value>Descomprimiendo archivos…</value></data>
+  <data name="Worker_CompactError" xml:space="preserve"><value>compact.exe informó de un error (código {0}). El proceso continúa; los archivos omitidos se contabilizan durante la verificación.</value></data>
+  <data name="Worker_Verifying" xml:space="preserve"><value>Verificando el resultado…</value></data>
+  <data name="Worker_VerifyingWithErrors" xml:space="preserve"><value>Verificando el resultado (lotes con errores: {0})…</value></data>
+  <data name="Worker_Completed" xml:space="preserve"><value>Operación completada</value></data>
+  <data name="Worker_CompletedWithSkipped" xml:space="preserve"><value>Operación completada con archivos omitidos</value></data>
+  <data name="Worker_CancelledDetail" xml:space="preserve"><value>Operación detenida. Los archivos ya procesados quedan en un estado válido.</value></data>
+  <data name="Worker_NoJob" xml:space="preserve"><value>No se recibió ninguna tarea.</value></data>
+  <data name="Worker_UnknownOperation" xml:space="preserve"><value>Operación desconocida.</value></data>
+  <data name="Worker_UnknownAlgorithm" xml:space="preserve"><value>Algoritmo de compresión desconocido.</value></data>
+  <data name="Worker_BadPath" xml:space="preserve"><value>Ruta del juego no válida.</value></data>
+  <data name="Worker_DirNotFound" xml:space="preserve"><value>No se encontró la carpeta del juego.</value></data>
+  <data name="Worker_DriveRoot" xml:space="preserve"><value>No se puede procesar la raíz de la unidad.</value></data>
+  <data name="Worker_ReparseRoot" xml:space="preserve"><value>La carpeta raíz del juego es un vínculo o una unión.</value></data>
+  <data name="Worker_NotNtfs" xml:space="preserve"><value>La compresión XPRESS/LZX solo está disponible en NTFS.</value></data>
+  <data name="Worker_NoFiles" xml:space="preserve"><value>No hay archivos disponibles para procesar en la carpeta.</value></data>
+  <data name="Worker_GameRunning" xml:space="preserve"><value>Cierra primero el proceso del juego: {0}.exe</value></data>
+  <data name="Worker_CompactStartFailed" xml:space="preserve"><value>No se pudo iniciar compact.exe.</value></data>
+</root>
