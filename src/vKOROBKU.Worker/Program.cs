@@ -58,33 +58,9 @@ internal static class Program
                 }
 
                 processedAnyJob = true;
-                using var cancellation = new CancellationTokenSource();
-                var monitorTask = MonitorCommandsAsync(inbox.Reader, cancellation);
-                try
-                {
-                    await ExecuteAsync(job, writer, cancellation.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    await SendAsync(writer, new WorkerMessage("cancelled", Code: WorkerCodes.Cancelled));
-                }
-                catch (WorkerJobException jobException)
-                {
-                    await SendAsync(writer, new WorkerMessage(
-                        "error", Code: jobException.Code, CodeArg: jobException.Arg, CodeValue: jobException.Value));
-                }
-                catch (Exception exception)
-                {
-                    // A failed job ends only that job — the queue decides whether to
-                    // continue with the next game or shut the session down. Only truly
-                    // unexpected failures fall back to the raw (unlocalized) message.
-                    await SendAsync(writer, new WorkerMessage("error", exception.Message));
-                }
-                finally
-                {
-                    cancellation.Cancel();
-                    try { await monitorTask; } catch { }
-                }
+                if (await RunJobAsync(token => ExecuteAsync(job, writer, token), inbox.Reader,
+                        message => SendAsync(writer, message)))
+                    return 0;
             }
         }
         catch
@@ -114,7 +90,38 @@ internal static class Program
         catch (JsonException) { return null; }
     }
 
-    private static async Task ExecuteAsync(WorkerJob job, StreamWriter writer, CancellationToken cancellationToken)
+    // Stop consuming commands BEFORE publishing the terminal response. The client
+    // may immediately send its next job or shutdown after receiving that response.
+    internal static async Task<bool> RunJobAsync(Func<CancellationToken, Task<WorkerMessage>> execute,
+        ChannelReader<string> inbox, Func<WorkerMessage, Task> sendTerminal)
+    {
+        using var cancellation = new CancellationTokenSource();
+        var monitorTask = MonitorCommandsAsync(inbox, cancellation);
+        WorkerMessage terminal;
+        bool shutdown;
+        try { terminal = await execute(cancellation.Token); }
+        catch (OperationCanceledException)
+        {
+            terminal = new WorkerMessage("cancelled", Code: WorkerCodes.Cancelled);
+        }
+        catch (WorkerJobException exception)
+        {
+            terminal = new WorkerMessage("error", Code: exception.Code, CodeArg: exception.Arg, CodeValue: exception.Value);
+        }
+        catch (Exception exception)
+        {
+            terminal = new WorkerMessage("error", exception.Message);
+        }
+        finally
+        {
+            cancellation.Cancel();
+            shutdown = await monitorTask;
+        }
+        await sendTerminal(terminal);
+        return shutdown;
+    }
+
+    private static async Task<WorkerMessage> ExecuteAsync(WorkerJob job, StreamWriter writer, CancellationToken cancellationToken)
     {
         var rootPath = ValidateJob(job);
         EnsureGameIsNotRunning(rootPath);
@@ -213,7 +220,7 @@ internal static class Program
         var (errorCount, errorBytes) = CompressionResultVerifier.CountErrors(candidates, job, cancellationToken);
         var physicalAfter = MeasurePhysicalSize(files);
         var skipListedPhysical = skipListed.Count == 0 ? 0 : MeasurePhysicalSize(skipListed);
-        await SendAsync(writer, new WorkerMessage(
+        return new WorkerMessage(
             "completed",
             Code: errorCount == 0 ? WorkerCodes.CompletedOk : WorkerCodes.CompletedWithSkipped,
             ProcessedBytes: processedBytes,
@@ -227,7 +234,7 @@ internal static class Program
             SkipListedPhysicalBytes: skipListedPhysical,
             PhysicalBefore: physicalBefore,
             PhysicalAfter: physicalAfter,
-            ExcludedPhysicalBytes: excludedPhysicalBytes));
+            ExcludedPhysicalBytes: excludedPhysicalBytes);
     }
 
     internal static bool IsSkipListed(WorkerFile file, HashSet<string> skipExtensions, long clusterSize) =>
@@ -434,7 +441,7 @@ internal static class Program
     // ReadAsync does not consume an item, so the next job line stays in the channel
     // for the main loop. A closed channel means the app side is gone — the current
     // job is cancelled so the worker never keeps compressing without supervision.
-    private static async Task MonitorCommandsAsync(ChannelReader<string> inbox, CancellationTokenSource cancellation)
+    private static async Task<bool> MonitorCommandsAsync(ChannelReader<string> inbox, CancellationTokenSource cancellation)
     {
         try
         {
@@ -445,7 +452,7 @@ internal static class Program
                 if (command?.Type is "cancel" or "shutdown")
                 {
                     cancellation.Cancel();
-                    break;
+                    return command.Type == "shutdown";
                 }
             }
         }
@@ -453,7 +460,9 @@ internal static class Program
         catch (ChannelClosedException)
         {
             cancellation.Cancel();
+            return true;
         }
+        return false;
     }
 
     private static Task SendAsync(StreamWriter writer, WorkerMessage message) =>
