@@ -11,7 +11,7 @@ namespace vKOROBKU.App.Controls;
 public sealed class VirtualizingTilePanel : VirtualizingPanel, IScrollInfo
 {
     public const double TileWidth = 286;
-    public const double TileHeight = 264;
+    public const double TileHeight = 284;
     private int _columns = 1;
     public bool CanHorizontallyScroll { get; set; }
     public bool CanVerticallyScroll { get; set; }

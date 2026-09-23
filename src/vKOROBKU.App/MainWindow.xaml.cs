@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         _viewModel.UiScaleChanged += ApplyUiScale;
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
+        Closed += (_, _) => _viewModel.StopBackgroundRefresh();
         ApplyUiScale(_viewModel.UiScalePercent);
     }
 

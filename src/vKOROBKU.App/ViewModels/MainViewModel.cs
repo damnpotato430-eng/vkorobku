@@ -52,6 +52,8 @@ public sealed class MainViewModel : ObservableObject
     private AnalysisModeOption? _selectedAnalysisMode;
     private CancellationTokenSource? _analysisCancellation;
     private CancellationTokenSource? _compressionCheckCancellation;
+    private CancellationTokenSource? _libraryStatusCancellation;
+    private LibraryStatusRefresher? _libraryStatusRefresher;
     private string _statusText = Strings.Status_ReadyToScan;
     private string _scanButtonText = Strings.Scan_FindGames;
     private string _analysisButtonText = Strings.Analysis_ButtonCalculate;
@@ -283,6 +285,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _isQueueRunning, value))
                 return;
+            if (value) _libraryStatusRefresher?.InterruptRead();
             OnPropertyChanged(nameof(QueueControlsVisibility));
             SkipQueueItemCommand.RaiseCanExecuteChanged();
             StopQueueAfterCurrentCommand.RaiseCanExecuteChanged();
@@ -409,6 +412,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _isAnalyzing, value))
                 return;
+            if (value) _libraryStatusRefresher?.InterruptRead();
             AnalyzeCommand.RaiseCanExecuteChanged();
             CancelAnalysisCommand.RaiseCanExecuteChanged();
             CompressCommand.RaiseCanExecuteChanged();
@@ -429,6 +433,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _isOperating, value))
                 return;
+            if (value) _libraryStatusRefresher?.InterruptRead();
             AnalyzeCommand.RaiseCanExecuteChanged();
             CompressCommand.RaiseCanExecuteChanged();
             DecompressCommand.RaiseCanExecuteChanged();
@@ -706,7 +711,6 @@ public sealed class MainViewModel : ObservableObject
         if (interrupted > 0)
             StatusText = Strings.Status_PreviousInterrupted;
         await OfferToResumeInterruptedCompressionAsync();
-        _ = CheckWatchedGamesAsync(false);
     }
 
     private async Task CheckWatchedGamesAsync(bool force)
@@ -720,6 +724,7 @@ public sealed class MainViewModel : ObservableObject
         }
 
         _isWatcherCheckRunning = true;
+        _libraryStatusRefresher?.InterruptRead();
         CheckWatchedGamesCommand.RaiseCanExecuteChanged();
         try
         {
@@ -982,6 +987,7 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task ScanLibrariesInternalAsync()
     {
+        _libraryStatusCancellation?.Cancel();
         ScanButtonText = Strings.Scan_InProgress;
         StatusText = Strings.Status_ScanningLibraries;
 
@@ -1044,6 +1050,7 @@ public sealed class MainViewModel : ObservableObject
                 : string.Format(Strings.Status_GamesFound, foundGames.Count);
             RefreshCoversCommand.RaiseCanExecuteChanged();
             RefreshSavingsSummary();
+            StartLibraryStatusRefresh();
         }
         catch (Exception exception)
         {
@@ -1052,6 +1059,71 @@ public sealed class MainViewModel : ObservableObject
         finally
         {
             ScanButtonText = Strings.Scan_Refresh;
+        }
+    }
+
+    private void StartLibraryStatusRefresh()
+    {
+        _libraryStatusCancellation?.Cancel();
+        var cancellation = new CancellationTokenSource();
+        var refresher = new LibraryStatusRefresher();
+        _libraryStatusCancellation = cancellation;
+        _libraryStatusRefresher = refresher;
+        _ = RefreshLibraryStatusesAsync(Games.ToArray(), refresher, cancellation);
+    }
+
+    public void StopBackgroundRefresh() => _libraryStatusCancellation?.Cancel();
+
+    private async Task RefreshLibraryStatusesAsync(GameInfo[] games, LibraryStatusRefresher refresher,
+        CancellationTokenSource cancellation)
+    {
+        try
+        {
+            await CheckWatchedGamesAsync(false);
+            while (_isWatcherCheckRunning)
+                await Task.Delay(250, cancellation.Token);
+            var saved = await Task.Run(_compressionStatusStore.LoadAll, cancellation.Token);
+            await refresher.RefreshAsync(games,
+                async (game, token) =>
+                {
+                    await Task.Run(() =>
+                    {
+                        // Do not turn a disconnected/inaccessible installation into
+                        // an apparently empty, uncompressed game.
+                        using var entries = Directory.EnumerateFileSystemEntries(game.InstallPath).GetEnumerator();
+                        _ = entries.MoveNext();
+                    }, token);
+                    var detected = await _compressionDetector.DetectAsync(game.InstallPath, token);
+                    var directStorage = await Task.Run(() => _directStorageDetector.Detect(game.InstallPath, token), token);
+                    var previous = saved.GetValueOrDefault(game.InstallPath);
+                    return CompressionStatusRefreshPolicy.Create(game, previous, detected, directStorage, DateTimeOffset.Now);
+                },
+                async (game, status) =>
+                {
+                    if (_degradedPaths.Contains(game.InstallPath) && status.State == GameCompressionState.Compressed)
+                        status = status with { State = GameCompressionState.PartiallyCompressed };
+                    UpdateGameCompressionStatus(game.InstallPath, status.State, status.Algorithm,
+                        status.SavedBytes, status.PhysicalBytes, status.CompressedFiles, status.CheckedAt,
+                        status.LogicalBytes, status.HasDirectStorage);
+                    // Disk writes are outside the UI thread; the store rejects older
+                    // timestamps if a foreground operation saves in the meantime.
+                    await Task.Run(() => _compressionStatusStore.Save(status));
+                },
+                () => IsAnalyzing || IsOperating || IsQueueRunning || _isWatcherCheckRunning,
+                game => Games.Contains(game),
+                (game, error) => AppLog.Error($"Фоновая проверка игры {game.Name} не удалась", error),
+                cancellation.Token);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception error) { AppLog.Error("Фоновое обновление библиотеки не удалось", error); }
+        finally
+        {
+            if (ReferenceEquals(_libraryStatusCancellation, cancellation))
+            {
+                _libraryStatusCancellation = null;
+                _libraryStatusRefresher = null;
+            }
+            cancellation.Dispose();
         }
     }
 
@@ -1790,14 +1862,9 @@ public sealed class MainViewModel : ObservableObject
                 return;
 
             var savedStatus = _compressionStatusStore.Load(game.InstallPath);
-            var state = detected.State;
-            var buildChanged = state == GameCompressionState.Compressed &&
-                               savedStatus?.State is GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed &&
-                               !string.IsNullOrWhiteSpace(savedStatus.SteamBuildId) &&
-                               !string.IsNullOrWhiteSpace(game.SteamBuildId) &&
-                               !string.Equals(savedStatus.SteamBuildId, game.SteamBuildId, StringComparison.Ordinal);
-            if (buildChanged)
-                state = GameCompressionState.PartiallyCompressed;
+            var status = CompressionStatusRefreshPolicy.Create(game, savedStatus, detected, hasDirectStorage, DateTimeOffset.Now);
+            var state = status.State;
+            var buildChanged = state != detected.State;
 
             UpdateGameCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
@@ -1806,7 +1873,7 @@ public sealed class MainViewModel : ObservableObject
             TrySaveCompressionStatus(
                 game.InstallPath, state, detected.Algorithm,
                 detected.SavedBytes, detected.PhysicalBytes, detected.LogicalBytes, detected.CompressedFiles,
-                buildChanged ? savedStatus?.SteamBuildId : game.SteamBuildId, hasDirectStorage);
+                status.SteamBuildId, hasDirectStorage);
             StatusText = state switch
             {
                 GameCompressionState.Compressed => string.Format(Strings.State_AlreadyCompressed, game.Name, detected.Algorithm ?? "Windows"),
