@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>За назвою</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Спочатку великі</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Спочатку нестиснуті</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Метод стиснення для всієї черги</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Авто (збалансований)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Авто використовує збережений аналіз поточної версії гри, інакше — XPRESS16K. Нове вимірювання не виконується.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Авто</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Стиснути чергу · 1 запит прав</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>Стиснути ігор: {0} — однією чергою?
 
@@ -293,7 +293,7 @@
   <data name="Settings_HiddenSection" xml:space="preserve"><value>СХОВАНІ ІГРИ</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Сховано ігор: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Повернути всі</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Сховані ігри повернуться до бібліотеки після оновлення списку.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Приховані ігри повернуться після збереження налаштувань.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Не вдалося прибрати гру з бібліотеки. Перевірте доступ до локальних даних vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Помилка прибирання з бібліотеки</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Авто</value></data>
@@ -409,4 +409,10 @@
   <data name="Worker_NoFiles" xml:space="preserve"><value>У теці немає доступних файлів для обробки.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Спершу закрийте процес гри: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Не вдалося запустити compact.exe.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>обрано вручну</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>продовження поточним алгоритмом</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>за збереженим аналізом</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>аналіз застарів; стандартний режим без нового вимірювання</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>аналізу немає; стандартний режим без вимірювання</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Увага: {0} — виміряне читання повільніше на {1}%; прогноз економії: {2}. Продовжити попри уповільнення?</value></data>
 </root>

@@ -77,6 +77,7 @@ public sealed class MainViewModel : ObservableObject
     private bool _queueStopAfterCurrent;
     private bool _queueStopAll;
     private bool _isQueueRunning;
+    private CancellationTokenSource? _queuePreparationCancellation;
 
     private const string AutoQueueMethod = "auto";
 
@@ -146,7 +147,7 @@ public sealed class MainViewModel : ObservableObject
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed, IsAnalysisStale: false } && SelectedEstimate is not null && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
         DecompressCommand = new AsyncRelayCommand(DecompressSelectedGameAsync,
             () => SelectedGame is { CompressionState: GameCompressionState.Compressed or GameCompressionState.PartiallyCompressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
-        CancelOperationCommand = new AsyncRelayCommand(_workerClient.CancelAsync, () => IsOperating);
+        CancelOperationCommand = new AsyncRelayCommand(CancelCurrentAsync, () => IsOperating);
         CancelCurrentCommand = new AsyncRelayCommand(CancelCurrentAsync, () => IsAnalyzing || IsOperating);
         ToggleMultiSelectCommand = new RelayCommand(ToggleMultiSelectMode, () => Games.Count > 0 && !IsOperating);
         StartQueueCommand = new AsyncRelayCommand(StartQueueAsync,
@@ -648,7 +649,8 @@ public sealed class MainViewModel : ObservableObject
         CheckWatchedGamesCommand.RaiseCanExecuteChanged();
         try
         {
-            _watcher.SeedFromLibrary(Games, _compressionStatusStore.Load);
+            var savedStatuses = await Task.Run(_compressionStatusStore.LoadAll);
+            _watcher.SeedFromLibrary(Games, path => savedStatuses.GetValueOrDefault(path));
             var outcome = await _watcher.CheckAsync(
                 _userPreferences,
                 FindGameByPath,
@@ -814,9 +816,7 @@ public sealed class MainViewModel : ObservableObject
                 ShowLanguageRestartNotice(_userPreferences.Language);
         }
 
-        // Restoring hidden games is an immediate action, honoured even when the
-        // dialog itself is cancelled — the click already expressed the intent.
-        if (dialog.RestoreHiddenRequested)
+        if (saved && dialog.RestoreHiddenRequested)
         {
             try { _hiddenGames.Clear(); }
             catch (Exception exception) { AppLog.Error("Не удалось восстановить скрытые игры", exception); }
@@ -914,6 +914,7 @@ public sealed class MainViewModel : ObservableObject
         try
         {
             var foundGames = await ScanAllLibrariesAsync();
+            var savedStatuses = await Task.Run(_compressionStatusStore.LoadAll);
             var hiddenPaths = _hiddenGames.Load();
             if (hiddenPaths.Count > 0)
                 foundGames = foundGames
@@ -927,7 +928,7 @@ public sealed class MainViewModel : ObservableObject
             Games.Clear();
             foreach (var foundGame in foundGames)
             {
-                var game = ApplySavedCompressionStatus(foundGame);
+                var game = ApplySavedCompressionStatus(foundGame, savedStatuses);
                 if (previousGames.TryGetValue(game.InstallPath, out var previous))
                     game.CoverPath = previous.CoverPath;
                 Games.Add(game);
@@ -952,7 +953,7 @@ public sealed class MainViewModel : ObservableObject
                     manualPath,
                     savedManualGame.LogicalSizeBytes,
                     GameInfo.ManualSource,
-                    savedManualGame.SteamAppId)));
+                    savedManualGame.SteamAppId), savedStatuses));
             }
 
             foreach (var manualGame in previousGames.Values.Where(game =>
@@ -1469,9 +1470,11 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    private GameInfo ApplySavedCompressionStatus(GameInfo game)
+    private GameInfo ApplySavedCompressionStatus(GameInfo game,
+        IReadOnlyDictionary<string, SavedCompressionStatus>? snapshot = null)
     {
-        var saved = _compressionStatusStore.Load(game.InstallPath);
+        var saved = snapshot is null ? _compressionStatusStore.Load(game.InstallPath)
+            : snapshot.GetValueOrDefault(game.InstallPath);
         if (saved is not null)
         {
             if (saved.LogicalBytes > 0)
@@ -1516,7 +1519,7 @@ public sealed class MainViewModel : ObservableObject
 
         var hasBaseline = estimates.Any(estimate => estimate.BaselineReadMegabytesPerSecond > 0);
         var eligible = hasBaseline
-            ? estimates.Where(estimate => estimate.ReadSpeedChangePercent >= MaximumReadSlowdownPercent).ToArray()
+            ? estimates.Where(estimate => !QueueCompressionPolicy.NeedsSlowdownConfirmation(estimate)).ToArray()
             : estimates.ToArray();
         if (eligible.Length == 0)
             eligible = estimates.ToArray();
@@ -1879,6 +1882,7 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task CancelCurrentAsync()
     {
+        _queuePreparationCancellation?.Cancel();
         _analysisCancellation?.Cancel();
         await _workerClient.CancelAsync();
     }
@@ -1907,6 +1911,7 @@ public sealed class MainViewModel : ObservableObject
     // compact.exe on its own terms instead of racing the process exit.
     public async Task StopAllWorkAsync()
     {
+        _queuePreparationCancellation?.Cancel();
         _queueStopAll = true;
         _analysisCancellation?.Cancel();
         try { await _workerClient.CancelAsync(); }
@@ -1926,7 +1931,11 @@ public sealed class MainViewModel : ObservableObject
         var confirmation = MessageBox.Show(
             Application.Current.MainWindow,
             string.Format(Strings.Compress_Prompt,
-                game.Name, estimate.AlgorithmText, estimate.EstimatedSizeText, estimate.SavingsText),
+                game.Name, estimate.AlgorithmText, estimate.EstimatedSizeText, estimate.SavingsText) +
+                (QueueCompressionPolicy.NeedsSlowdownConfirmation(estimate)
+                    ? "\n\n" + string.Format(Strings.Compress_SlowdownWarning,
+                        game.Name, $"{-estimate.ReadSpeedChangePercent:0.#}", estimate.SavingsText)
+                    : string.Empty),
             Strings.Compress_Title,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -2003,7 +2012,9 @@ public sealed class MainViewModel : ObservableObject
                 job.Operation == "compress" ? Strings.Active_Compressing : Strings.Active_Decompressing,
                 targetGame?.Name ?? job.RootPath),
             job.RootPath);
-        var selectedEstimate = SelectedEstimate;
+        var selectedEstimate = IsQueueRunning
+            ? QueueItems.FirstOrDefault(item => item.Game.InstallPath == job.RootPath)?.Estimate
+            : targetGame is not null && IsGameSelected(targetGame) ? SelectedEstimate : null;
         _activeOperationIsDecompression = job.Operation == "decompress";
         _activeCompressionAlgorithm = job.Operation == "compress" ? job.Algorithm : null;
         _activeCompressionSavings = job.Operation == "compress" && selectedEstimate is not null &&
@@ -2214,29 +2225,25 @@ public sealed class MainViewModel : ObservableObject
             : string.Format(Strings.MultiSelect_Selected, selected.Count, ByteFormatter.Format(selected.Sum(game => game.LogicalSizeBytes)));
     }
 
-    private string ResolveQueueAlgorithm(GameInfo game)
-    {
-        if (SelectedQueueMethod.Id != AutoQueueMethod)
-            return SelectedQueueMethod.Id;
-        // A partially compressed game keeps its current algorithm — mixing methods
-        // inside one game is exactly the mess the queue must not create.
-        if (game.CompressionState == GameCompressionState.PartiallyCompressed &&
-            IsResumableAlgorithm(game.CompressionAlgorithm))
-            return game.CompressionAlgorithm!;
-        var saved = _analysisCache.Load(game.InstallPath);
-        var balanced = saved is null ? null : ChooseBalancedEstimate(saved.Result.Estimates);
-        return balanced?.AlgorithmText ?? "XPRESS16K";
-    }
-
     private async Task StartQueueAsync()
     {
         var selected = Games.Where(game => game.IsQueueSelected).ToList();
         if (selected.Count == 0)
             return;
 
+        var analyses = _analysisCache.LoadAll();
         var directStorage = selected.Where(game => game.HasDirectStorage == true && !IsExpertMode).ToList();
         var items = selected.Except(directStorage)
-            .Select(game => new CompressionQueueItem(game, ResolveQueueAlgorithm(game)))
+            .Select(game =>
+            {
+                var decision = QueueCompressionPolicy.Resolve(game, SelectedQueueMethod.Id,
+                    analyses.GetValueOrDefault(game.InstallPath), ChooseBalancedEstimate);
+                return new CompressionQueueItem(game, decision.Algorithm)
+                {
+                    MethodDescription = decision.Description,
+                    Estimate = decision.Estimate
+                };
+            })
             .ToList();
         if (items.Count == 0)
         {
@@ -2244,19 +2251,20 @@ public sealed class MainViewModel : ObservableObject
             return;
         }
 
-        var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
-        if (items.Count > 12)
-            preview += "\n" + string.Format(Strings.Queue_AndMore, items.Count - 12);
+        var preview = string.Join("\n", items.Select(item => $"• {item.Title}"));
         var directStorageNote = directStorage.Count > 0
             ? "\n\n" + string.Format(Strings.Queue_DirectStorageSkipped, directStorage.Count)
             : string.Empty;
-        var confirmation = MessageBox.Show(
-            Application.Current.MainWindow,
-            string.Format(Strings.Queue_StartPrompt, items.Count, preview + directStorageNote),
+        var slowdownNote = string.Join("\n", items
+            .Where(item => QueueCompressionPolicy.NeedsSlowdownConfirmation(item.Estimate))
+            .Select(item => string.Format(Strings.Compress_SlowdownWarning, item.Game.Name,
+                $"{-item.Estimate!.ReadSpeedChangePercent:0.#}", item.Estimate.SavingsText)));
+        var confirmation = OperationConfirmationWindow.Confirm(
             Strings.Queue_StartTitle,
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-        if (confirmation != MessageBoxResult.Yes)
+            string.Format(Strings.Queue_StartPrompt, items.Count, preview + directStorageNote) +
+                (slowdownNote.Length == 0 ? string.Empty : "\n\n" + slowdownNote),
+            Strings.Queue_Start, UiScalePercent);
+        if (!confirmation)
             return;
 
         IsMultiSelectMode = false;
@@ -2286,16 +2294,12 @@ public sealed class MainViewModel : ObservableObject
         if (!ConfirmDecompressionFits(selected))
             return;
 
-        var preview = string.Join("\n", selected.Take(12).Select(game => $"• {game.Name}"));
-        if (selected.Count > 12)
-            preview += "\n" + string.Format(Strings.Queue_AndMore, selected.Count - 12);
-        var confirmation = MessageBox.Show(
-            Application.Current.MainWindow,
-            string.Format(Strings.Queue_DecompressPrompt, selected.Count, preview),
+        var preview = string.Join("\n", selected.Select(game => $"• {game.Name}"));
+        var confirmation = OperationConfirmationWindow.Confirm(
             Strings.Queue_DecompressTitle,
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-        if (confirmation != MessageBoxResult.Yes)
+            string.Format(Strings.Queue_DecompressPrompt, selected.Count, preview),
+            Strings.Queue_StartDecompress, UiScalePercent);
+        if (!confirmation)
             return;
 
         IsMultiSelectMode = false;
@@ -2359,14 +2363,12 @@ public sealed class MainViewModel : ObservableObject
             return;
         }
 
-        var preview = string.Join("\n", items.Take(12).Select(item => $"• {item.Title}"));
-        var confirmation = MessageBox.Show(
-            Application.Current.MainWindow,
-            string.Format(Strings.Queue_FinishPrompt, items.Count, preview),
+        var preview = string.Join("\n", items.Select(item => $"• {item.Title}"));
+        var confirmation = OperationConfirmationWindow.Confirm(
             Strings.Watcher_RecompressAll,
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (confirmation != MessageBoxResult.Yes)
+            string.Format(Strings.Queue_FinishPrompt, items.Count, preview),
+            Strings.Watcher_RecompressAll, UiScalePercent);
+        if (!confirmation)
             return;
 
         await RunQueueAsync(items);
@@ -2374,6 +2376,7 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task StopQueueAsync()
     {
+        _queuePreparationCancellation?.Cancel();
         _queueStopAll = true;
         await _workerClient.CancelAsync();
     }
@@ -2396,11 +2399,31 @@ public sealed class MainViewModel : ObservableObject
         AppLog.Info($"Очередь запущена: {items.Count} игр — {string.Join(", ", items.Select(item => item.Title))}");
         try
         {
-            await using var session = await _workerClient.StartSessionAsync();
+            // Every batch compression entry point (including "finish all") passes this
+            // preflight. Unknown and cached-negative flags must be checked again.
+            using var preparation = new CancellationTokenSource();
+            _queuePreparationCancellation = preparation;
+            await new CompressionQueuePreflight().PrepareAsync(items, IsExpertMode,
+                directStorageItems => OperationConfirmationWindow.Confirm("DirectStorage",
+                    string.Format(Strings.DirectStorage_ConfirmPrompt,
+                        string.Join(", ", directStorageItems.Select(item => item.Game.Name))),
+                    Strings.Queue_Start, UiScalePercent),
+                game =>
+                {
+                    OperationSummary = string.Format(Strings.Status_CheckingState, game.Name);
+                    StatusText = OperationSummary;
+                }, preparation.Token);
+            preparation.Token.ThrowIfCancellationRequested();
+            if (items.All(item => item.Status == QueueItemStatus.Skipped))
+                return;
+            await using var session = await _workerClient.StartSessionAsync(preparation.Token);
+            _queuePreparationCancellation = null;
             var position = 0;
             foreach (var item in items)
             {
                 position++;
+                if (item.Status == QueueItemStatus.Skipped)
+                    continue;
                 if (_queueStopAll || _queueStopAfterCurrent)
                 {
                     item.MarkSkipped(Strings.QueueItem_Stopped);
@@ -2450,6 +2473,7 @@ public sealed class MainViewModel : ObservableObject
         }
         finally
         {
+            _queuePreparationCancellation = null;
             foreach (var item in QueueItems)
             {
                 if (item.Status is QueueItemStatus.Pending or QueueItemStatus.Running)

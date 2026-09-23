@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>By name</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Largest first</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Uncompressed first</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Compression method for the whole queue</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Auto (balanced)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Auto uses the saved analysis for the current game build; otherwise XPRESS16K. No new benchmark is run.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Auto</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Compress queue · 1 admin prompt</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>Compress {0} games in one queue?
 
@@ -293,7 +293,7 @@ Nothing on disk changes — the game stays installed and untouched. Hidden games
   <data name="Settings_HiddenSection" xml:space="preserve"><value>HIDDEN GAMES</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Hidden games: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Restore all</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Hidden games return to the library after the list is refreshed.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Hidden games will be restored when you save these settings.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Could not remove the game from the library. Check access to the local vKOROBKU data.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Library removal error</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Auto</value></data>
@@ -409,4 +409,10 @@ Continue from where it stopped? Already compressed files are skipped automatical
   <data name="Worker_NoFiles" xml:space="preserve"><value>There are no available files to process in the folder.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Close the game process first: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Could not start compact.exe.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>manual selection</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>continue with the current algorithm</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>saved analysis</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>outdated analysis; standard mode, without a new benchmark</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>no analysis; standard mode, without a benchmark</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Warning: {0} — measured reading is {1}% slower; estimated savings: {2}. Continue despite the slowdown?</value></data>
 </root>

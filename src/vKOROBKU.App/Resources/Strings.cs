@@ -13,6 +13,13 @@ public static class Strings
     public static ResourceManager ResourceManager { get; } =
         new("vKOROBKU.App.Resources.Strings", typeof(Strings).Assembly);
 
+    public static string Queue_BasisManual => Get(nameof(Queue_BasisManual));
+    public static string Queue_BasisResume => Get(nameof(Queue_BasisResume));
+    public static string Queue_BasisAnalysis => Get(nameof(Queue_BasisAnalysis));
+    public static string Queue_BasisStale => Get(nameof(Queue_BasisStale));
+    public static string Queue_BasisDefault => Get(nameof(Queue_BasisDefault));
+    public static string Compress_SlowdownWarning => Get(nameof(Compress_SlowdownWarning));
+
     private static string Get(string key) => ResourceManager.GetString(key) ?? key;
 
     public static string App_ErrorRepeated => Get(nameof(App_ErrorRepeated));

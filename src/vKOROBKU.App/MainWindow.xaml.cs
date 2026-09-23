@@ -16,7 +16,7 @@ public partial class MainWindow : Window
     private bool _closeApproved;
 
     // The designer sizes are the 100% baseline the scale multiplies from.
-    private static readonly Size BaseMinimumSize = new(1040, 700);
+    private static readonly Size BaseMinimumSize = new(1100, 700);
 
     public MainWindow()
     {

@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>Ada göre</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Önce büyükler</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Önce sıkıştırılmamışlar</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Tüm kuyruk için sıkıştırma yöntemi</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Otomatik (dengeli)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Oyunun mevcut sürümünün kayıtlı analizini, yoksa XPRESS16K kullanır. Yeni ölçüm yapılmaz.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Otomatik</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Kuyruğu sıkıştır · 1 izin isteği</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>{0} oyun tek kuyrukta sıkıştırılsın mı?
 
@@ -293,7 +293,7 @@ Diskte hiçbir şey değişmez — oyun kurulu ve dokunulmamış kalır. Gizlene
   <data name="Settings_HiddenSection" xml:space="preserve"><value>GİZLENEN OYUNLAR</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Gizlenen oyunlar: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Tümünü geri getir</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Liste yenilendikten sonra gizlenen oyunlar kitaplığa döner.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Gizli oyunlar ayarlar kaydedildiğinde geri yüklenir.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Oyun kitaplıktan kaldırılamadı. vKOROBKU'nun yerel verilerine erişimi denetleyin.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Kitaplıktan kaldırma hatası</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Otomatik</value></data>
@@ -409,4 +409,10 @@ Kaldığı yerden sürdürülsün mü? Zaten sıkıştırılmış dosyalar kendi
   <data name="Worker_NoFiles" xml:space="preserve"><value>Klasörde işlenebilecek dosya yok.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Önce oyunun sürecini kapatın: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>compact.exe başlatılamadı.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>elle seçim</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>mevcut algoritmayla devam</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>kayıtlı analiz</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>eski analiz; yeni ölçüm olmadan standart mod</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>analiz yok; ölçüm olmadan standart mod</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Uyarı: {0} — ölçülen okuma %{1} daha yavaş; tahmini tasarruf: {2}. Yavaşlamaya rağmen devam edilsin mi?</value></data>
 </root>

@@ -16,6 +16,13 @@ public sealed class CompressionStatusStore
         "vKOROBKU", "compression-status.json");
     private readonly object _sync = new();
 
+    public IReadOnlyDictionary<string, SavedCompressionStatus> LoadAll()
+    {
+        lock (_sync)
+            return Read().GroupBy(item => item.InstallPath, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.Last(), StringComparer.OrdinalIgnoreCase);
+    }
+
     public SavedCompressionStatus? Load(string installPath)
     {
         lock (_sync)

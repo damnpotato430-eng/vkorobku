@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>Per nome</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Prima i più grandi</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Prima i non compressi</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Metodo di compressione per l’intera coda</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatico (bilanciato)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Usa l’analisi salvata della versione attuale del gioco, altrimenti XPRESS16K. Non esegue nuove misurazioni.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatico</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Comprimi la coda · 1 richiesta di permessi</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>Comprimere {0} giochi in un’unica coda?
 
@@ -293,7 +293,7 @@ Sul disco non cambia nulla — il gioco resta installato e intatto. I giochi nas
   <data name="Settings_HiddenSection" xml:space="preserve"><value>GIOCHI NASCOSTI</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Giochi nascosti: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Ripristina tutti</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>I giochi nascosti tornano nella libreria dopo l’aggiornamento dell’elenco.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>I giochi nascosti verranno ripristinati al salvataggio delle impostazioni.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Impossibile rimuovere il gioco dalla libreria. Controlla l’accesso ai dati locali di vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Errore nella rimozione dalla libreria</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Automatica</value></data>
@@ -409,4 +409,10 @@ Riprendere da dove si era fermata? I file già compressi vengono saltati automat
   <data name="Worker_NoFiles" xml:space="preserve"><value>Nella cartella non ci sono file da elaborare.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Chiudi prima il processo del gioco: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Impossibile avviare compact.exe.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>selezione manuale</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>continua con l’algoritmo attuale</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>analisi salvata</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>analisi obsoleta; modalità standard senza nuova misurazione</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>nessuna analisi; modalità standard senza misurazione</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Attenzione: {0} — lettura misurata più lenta del {1}%; risparmio stimato: {2}. Continuare nonostante il rallentamento?</value></data>
 </root>

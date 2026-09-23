@@ -51,8 +51,7 @@ public partial class SettingsWindow : Window
 
     public UserPreferences Result { get; private set; }
 
-    // Set as soon as the user clicks "restore" — the caller honours it even when
-    // the dialog is later cancelled, so the click is never silently lost.
+    // Staged alongside the other preferences; Cancel discards this request.
     public bool RestoreHiddenRequested { get; private set; }
 
     private void UpdateHiddenGamesRow(int count)
