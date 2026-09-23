@@ -40,6 +40,7 @@ public sealed class OperationConfirmationWindow : Window
             Style = (Style)FindResource("SecondaryButton"), Margin = new Thickness(0, 0, 0, 8)
         };
         cancel.Click += (_, _) => DialogResult = false;
+        Loaded += (_, _) => cancel.Focus();
         buttons.Children.Add(confirm);
         buttons.Children.Add(cancel);
         Grid.SetRow(buttons, 1);
