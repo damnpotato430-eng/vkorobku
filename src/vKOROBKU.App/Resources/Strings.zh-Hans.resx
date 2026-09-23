@@ -415,4 +415,14 @@
   <data name="Queue_BasisStale" xml:space="preserve"><value>分析已过期；不重新测量，使用标准模式</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>尚无分析；不进行测量，使用标准模式</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>注意：{0} — 实测读取速度降低了 {1}%；预计节省空间：{2}。仍要继续吗？</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>磁盘</value></data>
+  <data name="UI_More" xml:space="preserve"><value>更多操作</value></data>
+  <data name="UI_View" xml:space="preserve"><value>查看</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>未找到游戏。请更改搜索条件或筛选器。</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>磁盘占用</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>使用少量样本估算节省空间。不会更改游戏文件。</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>高级设置</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>估算节省空间</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>已压缩</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>部分压缩</value></data>
 </root>

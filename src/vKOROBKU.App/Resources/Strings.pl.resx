@@ -415,4 +415,14 @@ Kontynuować od miejsca przerwania? Już skompresowane pliki są pomijane automa
   <data name="Queue_BasisStale" xml:space="preserve"><value>nieaktualna analiza; tryb standardowy bez nowego pomiaru</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>brak analizy; tryb standardowy bez pomiaru</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Uwaga: {0} — zmierzony odczyt jest wolniejszy o {1}%; szacowana oszczędność: {2}. Kontynuować mimo spowolnienia?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Dyski</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Więcej działań</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Zobacz</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>Nie znaleziono gier. Zmień wyszukiwanie lub filtr.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>Na dysku</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Oszacuj oszczędność na małej próbce. Pliki gry nie zostaną zmienione.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Ustawienia zaawansowane</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Oszacuj oszczędność</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Skompresowana</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Częściowo</value></data>
 </root>

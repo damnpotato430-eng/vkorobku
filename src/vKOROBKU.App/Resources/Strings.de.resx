@@ -415,4 +415,14 @@ Dort fortsetzen, wo sie stehen geblieben ist? Bereits komprimierte Dateien werde
   <data name="Queue_BasisStale" xml:space="preserve"><value>veraltete Analyse; Standardmodus ohne neue Messung</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>keine Analyse; Standardmodus ohne Messung</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Achtung: {0} — gemessene Lesegeschwindigkeit um {1}% geringer; geschätzte Ersparnis: {2}. Trotz Verlangsamung fortfahren?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Laufwerke</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Weitere Aktionen</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Ansehen</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>Keine Spiele gefunden. Suche oder Filter ändern.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>Auf Datenträger</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Einsparung anhand einer kleinen Stichprobe schätzen. Spieldateien bleiben unverändert.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Erweiterte Einstellungen</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Einsparung schätzen</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Komprimiert</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Teilweise</value></data>
 </root>

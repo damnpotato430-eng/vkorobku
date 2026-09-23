@@ -20,6 +20,17 @@ public static class Strings
     public static string Queue_BasisDefault => Get(nameof(Queue_BasisDefault));
     public static string Compress_SlowdownWarning => Get(nameof(Compress_SlowdownWarning));
 
+    public static string UI_Drives => Get(nameof(UI_Drives));
+    public static string UI_More => Get(nameof(UI_More));
+    public static string UI_View => Get(nameof(UI_View));
+    public static string UI_NoResults => Get(nameof(UI_NoResults));
+    public static string UI_DiskSize => Get(nameof(UI_DiskSize));
+    public static string UI_AnalysisHint => Get(nameof(UI_AnalysisHint));
+    public static string UI_Advanced => Get(nameof(UI_Advanced));
+    public static string UI_Assess => Get(nameof(UI_Assess));
+    public static string UI_Compressed => Get(nameof(UI_Compressed));
+    public static string UI_Partial => Get(nameof(UI_Partial));
+
     private static string Get(string key) => ResourceManager.GetString(key) ?? key;
 
     public static string App_ErrorRepeated => Get(nameof(App_ErrorRepeated));

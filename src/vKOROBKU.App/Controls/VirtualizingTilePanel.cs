@@ -10,8 +10,8 @@ namespace vKOROBKU.App.Controls;
 /// of overscan on either side. Off-screen images and bindings can be collected.</summary>
 public sealed class VirtualizingTilePanel : VirtualizingPanel, IScrollInfo
 {
-    public const double TileWidth = 246;
-    public const double TileHeight = 320;
+    public const double TileWidth = 286;
+    public const double TileHeight = 264;
     private int _columns = 1;
     public bool CanHorizontallyScroll { get; set; }
     public bool CanVerticallyScroll { get; set; }

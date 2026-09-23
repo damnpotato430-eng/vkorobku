@@ -415,4 +415,14 @@ Continue from where it stopped? Already compressed files are skipped automatical
   <data name="Queue_BasisStale" xml:space="preserve"><value>outdated analysis; standard mode, without a new benchmark</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>no analysis; standard mode, without a benchmark</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Warning: {0} — measured reading is {1}% slower; estimated savings: {2}. Continue despite the slowdown?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Drives</value></data>
+  <data name="UI_More" xml:space="preserve"><value>More actions</value></data>
+  <data name="UI_View" xml:space="preserve"><value>View</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>No games found. Change your search or filter.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>On disk</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Estimate savings using a small sample. Game files will not change.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Advanced settings</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Estimate savings</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Compressed</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Partial</value></data>
 </root>

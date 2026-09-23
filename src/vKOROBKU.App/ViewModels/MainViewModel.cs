@@ -138,6 +138,8 @@ public sealed class MainViewModel : ObservableObject
         RefreshSelectedCoverCommand = new AsyncRelayCommand(RefreshSelectedCoverAsync, () => SelectedGame is not null);
         AnalyzeCommand = new AsyncRelayCommand(AnalyzeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } && !IsAnalyzing && !IsOperating && !IsCheckingCompression);
+        PrimaryGameCommand = new AsyncRelayCommand(ExecutePrimaryGameAsync, CanExecutePrimaryGame);
+        ClearGameSelectionCommand = new RelayCommand(() => SelectedGame = null);
         OptimizeCommand = new AsyncRelayCommand(OptimizeSelectedGameAsync,
             () => SelectedGame is { CompressionState: not GameCompressionState.Compressed } &&
                   !(SelectedGame?.HasDirectStorage == true && !IsExpertMode) &&
@@ -164,6 +166,7 @@ public sealed class MainViewModel : ObservableObject
         AddToQueueCommand = new RelayCommand(AddSelectedGameToQueue, () => SelectedGame is not null && !IsOperating);
         Games.CollectionChanged += OnGamesCollectionChanged;
         QueueItems.CollectionChanged += (_, _) => OnPropertyChanged(nameof(QueuePanelVisibility));
+        Estimates.CollectionChanged += (_, _) => NotifyModernDetails();
         RefreshAllTimeStats();
     }
 
@@ -291,6 +294,8 @@ public sealed class MainViewModel : ObservableObject
     public Visibility QueuePanelVisibility => QueueItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public AsyncRelayCommand RefreshCoversCommand { get; }
     public AsyncRelayCommand AnalyzeCommand { get; }
+    public AsyncRelayCommand PrimaryGameCommand { get; }
+    public RelayCommand ClearGameSelectionCommand { get; }
     public AsyncRelayCommand OptimizeCommand { get; }
     public RelayCommand CancelAnalysisCommand { get; }
     public AsyncRelayCommand CompressCommand { get; }
@@ -360,7 +365,10 @@ public sealed class MainViewModel : ObservableObject
         set
         {
             if (SetProperty(ref _selectedEstimate, value))
+            {
                 CompressCommand.RaiseCanExecuteChanged();
+                NotifyModernDetails();
+            }
         }
     }
 
@@ -410,6 +418,7 @@ public sealed class MainViewModel : ObservableObject
             RemoveGameCommand.RaiseCanExecuteChanged();
             RecheckCompressionCommand.RaiseCanExecuteChanged();
             FinishCompressionCommand.RaiseCanExecuteChanged();
+            NotifyModernDetails();
         }
     }
 
@@ -446,6 +455,8 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!SetProperty(ref _isExpertMode, value))
                 return;
+            if (!value && Estimates.Count > 0)
+                SelectedEstimate = ChooseBalancedEstimate(Estimates.ToArray());
             _userPreferences = _userPreferences with { ExpertMode = value };
             try { _preferences.Save(_userPreferences); }
             catch (Exception exception) { AppLog.Error("Не удалось сохранить настройки", exception); }
@@ -456,6 +467,70 @@ public sealed class MainViewModel : ObservableObject
 
     public Visibility IdentityReviewVisibility =>
         SelectedGame?.NeedsIdentityReview == true ? Visibility.Visible : Visibility.Collapsed;
+
+    public bool HasSelectedGame => SelectedGame is not null;
+    public bool HasFreshSelectedAnalysis => SelectedGame is { IsAnalysisStale: false } &&
+        Estimates.Count > 0 && SelectedEstimate is not null;
+    public string LibraryCountText => string.Format(Strings.Status_GamesFound, Games.Count);
+    public string ActiveOperationText => _activeOperationDescription;
+    public Visibility BusyVisibility => IsAnalyzing || IsOperating ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility PrimaryActionVisibility => HasSelectedGame && !IsAnalyzing && !IsOperating
+        ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility PredictionVisibility => HasFreshSelectedAnalysis &&
+        SelectedGame?.CompressionState != GameCompressionState.Compressed && !IsPartialResumeAvailable &&
+        !IsAnalyzing && !IsOperating ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility AnalysisIntroVisibility => PrimaryAction == GamePrimaryAction.Analyze &&
+        !IsAnalyzing && !IsOperating ? Visibility.Visible : Visibility.Collapsed;
+
+    private GamePrimaryAction PrimaryAction => GameActionPolicy.Resolve(
+        SelectedGame?.CompressionState ?? GameCompressionState.Unknown,
+        SelectedGame?.CompressionAlgorithm, HasFreshSelectedAnalysis);
+
+    public string PrimaryGameActionText => PrimaryAction switch
+    {
+        GamePrimaryAction.Compress => Strings.Action_Optimize,
+        GamePrimaryAction.Finish => Strings.Action_Finish,
+        GamePrimaryAction.Decompress => Strings.Action_Decompress,
+        _ => Strings.UI_Assess
+    };
+
+    private bool CanExecutePrimaryGame() => HasSelectedGame && !IsAnalyzing && !IsOperating &&
+        !IsCheckingCompression && (PrimaryAction is GamePrimaryAction.Analyze or GamePrimaryAction.Decompress ||
+                                  SelectedGame?.HasDirectStorage != true || IsExpertMode);
+
+    private async Task ExecutePrimaryGameAsync()
+    {
+        switch (PrimaryAction)
+        {
+            case GamePrimaryAction.Analyze:
+                await AnalyzeSelectedGameAsync(IsExpertMode ? SelectedAnalysisMode?.MaximumSampleBytes ?? 0 : 0);
+                break;
+            case GamePrimaryAction.Compress:
+                if (!IsExpertMode)
+                    SelectedEstimate = ChooseBalancedEstimate(Estimates.ToArray());
+                await CompressSelectedGameAsync();
+                break;
+            case GamePrimaryAction.Finish:
+                await FinishCompressionAsync();
+                break;
+            case GamePrimaryAction.Decompress:
+                await DecompressSelectedGameAsync();
+                break;
+        }
+    }
+
+    private void NotifyModernDetails()
+    {
+        OnPropertyChanged(nameof(HasSelectedGame));
+        OnPropertyChanged(nameof(HasFreshSelectedAnalysis));
+        OnPropertyChanged(nameof(PrimaryGameActionText));
+        OnPropertyChanged(nameof(PrimaryActionVisibility));
+        OnPropertyChanged(nameof(PredictionVisibility));
+        OnPropertyChanged(nameof(AnalysisIntroVisibility));
+        OnPropertyChanged(nameof(BusyVisibility));
+        OnPropertyChanged(nameof(ActiveOperationText));
+        PrimaryGameCommand.RaiseCanExecuteChanged();
+    }
 
     // The panel has nothing to say about a game when none is picked, so that space
     // carries the "what is this and what do I do" answer instead — the moment a new
@@ -506,7 +581,7 @@ public sealed class MainViewModel : ObservableObject
             : Strings.Action_Finish;
 
     public Visibility DirectStorageWarningVisibility =>
-        SelectedGame?.HasDirectStorage == true && UncompressedPanelVisibility == Visibility.Visible
+        SelectedGame?.HasDirectStorage == true && SelectedGame.CompressionState != GameCompressionState.Compressed
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -600,8 +675,7 @@ public sealed class MainViewModel : ObservableObject
     // While a compression runs, the estimate list is replaced with a read-only card of
     // the chosen mode, so the selection cannot be toyed with mid-operation.
     public Visibility ActiveCompressionInfoVisibility =>
-        IsOperating && _activeCompressionAlgorithm is not null &&
-        SelectedGame?.CompressionState != GameCompressionState.Compressed
+        IsOperating && _activeCompressionAlgorithm is not null
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -1623,6 +1697,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void NotifyActiveOperationLabel()
     {
+        OnPropertyChanged(nameof(ActiveOperationText));
         OnPropertyChanged(nameof(ActiveOperationLabel));
         OnPropertyChanged(nameof(ActiveOperationLabelVisibility));
     }
@@ -1785,6 +1860,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void NotifyCompressionPanelVisibility()
     {
+        NotifyModernDetails();
         OnPropertyChanged(nameof(UncompressedPanelVisibility));
         OnPropertyChanged(nameof(AutoOptimizationVisibility));
         OnPropertyChanged(nameof(ExpertOptimizationVisibility));
@@ -1822,6 +1898,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void RaiseActionCommands()
     {
+        NotifyModernDetails();
         AnalyzeCommand.RaiseCanExecuteChanged();
         OptimizeCommand.RaiseCanExecuteChanged();
         CompressCommand.RaiseCanExecuteChanged();
@@ -2202,6 +2279,8 @@ public sealed class MainViewModel : ObservableObject
 
     private void NotifyWelcomeVisibility()
     {
+        OnPropertyChanged(nameof(LibraryCountText));
+        NotifyModernDetails();
         OnPropertyChanged(nameof(WelcomeVisibility));
         OnPropertyChanged(nameof(WelcomeStepsVisibility));
         OnPropertyChanged(nameof(EmptyLibraryVisibility));
@@ -2210,6 +2289,8 @@ public sealed class MainViewModel : ObservableObject
 
     private void OnGamePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (ReferenceEquals(sender, SelectedGame))
+            NotifyModernDetails();
         if (e.PropertyName != nameof(GameInfo.IsQueueSelected))
             return;
         UpdateQueueSelectionSummary();

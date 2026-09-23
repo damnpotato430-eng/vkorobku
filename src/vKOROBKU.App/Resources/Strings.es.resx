@@ -415,4 +415,14 @@ El juego debe estar cerrado.</value></data>
   <data name="Queue_BasisStale" xml:space="preserve"><value>análisis obsoleto; modo estándar sin nueva medición</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>sin análisis; modo estándar sin medición</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Atención: {0} — lectura medida un {1}% más lenta; ahorro estimado: {2}. ¿Continuar pese a la ralentización?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Unidades</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Más acciones</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Ver</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>No se encontraron juegos. Cambia la búsqueda o el filtro.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>En disco</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Estima el ahorro con una pequeña muestra. Los archivos del juego no cambiarán.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Opciones avanzadas</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Estimar ahorro</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Comprimido</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Parcial</value></data>
 </root>

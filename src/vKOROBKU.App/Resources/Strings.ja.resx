@@ -415,4 +415,14 @@ vKOROBKU のライブラリから外れるだけです。ディスク上のフ�
   <data name="Queue_BasisStale" xml:space="preserve"><value>分析が古いため、再測定せず標準モードを使用</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>分析がないため、測定せず標準モードを使用</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>注意：{0} — 測定された読み込み速度は{1}%低下しています。推定節約容量：{2}。速度低下を了承して続行しますか？</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>ドライブ</value></data>
+  <data name="UI_More" xml:space="preserve"><value>その他の操作</value></data>
+  <data name="UI_View" xml:space="preserve"><value>表示</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>ゲームが見つかりません。検索条件やフィルターを変更してください。</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>ディスク上</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>少量のサンプルで削減量を推定します。ゲームファイルは変更されません。</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>詳細設定</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>削減量を推定</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>圧縮済み</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>一部圧縮</value></data>
 </root>

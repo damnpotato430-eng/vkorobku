@@ -16,7 +16,7 @@ public partial class MainWindow : Window
     private bool _closeApproved;
 
     // The designer sizes are the 100% baseline the scale multiplies from.
-    private static readonly Size BaseMinimumSize = new(1100, 700);
+    private static readonly Size BaseMinimumSize = new(1040, 700);
 
     public MainWindow()
     {
@@ -75,6 +75,15 @@ public partial class MainWindow : Window
     {
         if (sender is ListBoxItem item)
             item.IsSelected = true;
+    }
+
+    private void OpenMoreMenu(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { ContextMenu: { } menu } button)
+        {
+            menu.PlacementTarget = button;
+            menu.IsOpen = true;
+        }
     }
 
     [DllImport("dwmapi.dll")]

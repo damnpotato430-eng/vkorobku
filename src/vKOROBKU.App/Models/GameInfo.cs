@@ -78,6 +78,7 @@ public sealed class GameInfo : INotifyPropertyChanged
                 OnPropertyChanged(nameof(SizeText));
                 OnPropertyChanged(nameof(OriginalSizeBracketText));
                 OnPropertyChanged(nameof(HasCompressedSize));
+                OnPropertyChanged(nameof(DiskSizeText));
             }
         }
     }
@@ -123,6 +124,8 @@ public sealed class GameInfo : INotifyPropertyChanged
                 OnPropertyChanged(nameof(CompressionStatusText));
                 OnPropertyChanged(nameof(CompressionInfoText));
                 OnPropertyChanged(nameof(HasCompressedSize));
+                OnPropertyChanged(nameof(DiskSizeText));
+                OnPropertyChanged(nameof(CompactStatusText));
             }
         }
     }
@@ -149,6 +152,14 @@ public sealed class GameInfo : INotifyPropertyChanged
         CompressedPhysicalBytes > 0 && LogicalSizeBytes > 0;
 
     public string ActualSizeText => ByteFormatter.Format(CompressedPhysicalBytes);
+    public string DiskSizeText => HasCompressedSize ? ActualSizeText : SizeText;
+    public string CompactStatusText => CompressionState switch
+    {
+        GameCompressionState.Compressed => Strings.UI_Compressed,
+        GameCompressionState.PartiallyCompressed => Strings.UI_Partial,
+        GameCompressionState.Uncompressed => Strings.Card_StateUncompressed,
+        _ => Strings.Card_StateUnknown
+    };
     public string OriginalSizeBracketText => $"({ByteFormatter.Format(LogicalSizeBytes)})";
 
     public long CompressionSavedBytes
@@ -170,6 +181,7 @@ public sealed class GameInfo : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(CompressionInfoText));
                 OnPropertyChanged(nameof(ActualSizeText));
+                OnPropertyChanged(nameof(DiskSizeText));
                 OnPropertyChanged(nameof(HasCompressedSize));
             }
         }

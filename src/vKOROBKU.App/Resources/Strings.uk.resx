@@ -415,4 +415,14 @@
   <data name="Queue_BasisStale" xml:space="preserve"><value>аналіз застарів; стандартний режим без нового вимірювання</value></data>
   <data name="Queue_BasisDefault" xml:space="preserve"><value>аналізу немає; стандартний режим без вимірювання</value></data>
   <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Увага: {0} — виміряне читання повільніше на {1}%; прогноз економії: {2}. Продовжити попри уповільнення?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Диски</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Інші дії</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Переглянути</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>Нічого не знайдено. Змініть запит або фільтр.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>На диску</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Оцінимо економію на невеликій вибірці. Файли гри не зміняться.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Додаткові параметри</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Оцінити економію</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Стиснута</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Частково</value></data>
 </root>
