@@ -27,11 +27,29 @@ public sealed class VirtualizingTilePanel : VirtualizingPanel, IScrollInfo
     {
         var owner = ItemsControl.GetItemsOwner(this);
         var count = owner?.Items.Count ?? 0;
+        var previousColumns = _columns;
+        var firstVisibleIndex = (int)(VerticalOffset / TileHeight) * previousColumns;
+        var selectedIndex = (owner as Selector)?.SelectedIndex ?? -1;
+        var previousSelectedTop = selectedIndex / previousColumns * TileHeight;
+        var selectionWasVisible = selectedIndex >= 0 &&
+            previousSelectedTop + TileHeight > VerticalOffset && previousSelectedTop < VerticalOffset + ViewportHeight;
         ViewportWidth = double.IsFinite(availableSize.Width) ? availableSize.Width : TileWidth;
         ViewportHeight = double.IsFinite(availableSize.Height) ? availableSize.Height : TileHeight;
         _columns = Math.Max(1, (int)(ViewportWidth / TileWidth));
         ExtentWidth = ViewportWidth;
         ExtentHeight = Math.Ceiling(count / (double)_columns) * TileHeight;
+        if (_columns != previousColumns)
+        {
+            // Anchor the visible content when the inspector changes the column count.
+            // Keep the clicked/focused tile alive before recycling off-screen rows.
+            VerticalOffset = firstVisibleIndex / _columns * TileHeight + VerticalOffset % TileHeight;
+            if (selectionWasVisible)
+            {
+                var selectedTop = selectedIndex / _columns * TileHeight;
+                VerticalOffset = Math.Min(VerticalOffset, selectedTop);
+                VerticalOffset = Math.Max(VerticalOffset, selectedTop + TileHeight - ViewportHeight);
+            }
+        }
         VerticalOffset = Math.Clamp(VerticalOffset, 0, Math.Max(0, ExtentHeight - ViewportHeight));
         ScrollOwner?.InvalidateScrollInfo();
 

@@ -3,12 +3,94 @@ using System.Runtime.ExceptionServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Input;
 using vKOROBKU.App.Controls;
 
 namespace vKOROBKU.Tests;
 
 public sealed class VirtualizingTilePanelTests
 {
+    [Fact]
+    public void InspectorReflow_KeepsLastCardOfEightColumnRowSelectedAndVisible() => OnSta(() =>
+    {
+        var list = CreateGameList();
+        list.ItemsSource = Enumerable.Range(0, 1000).Select(i => $"Game {i}").ToArray();
+        var wide = VirtualizingTilePanel.TileWidth * 8 + 24;
+        var narrow = VirtualizingTilePanel.TileWidth * 5 + 24;
+        Layout(list, wide, 600);
+        var panel = FindPanel(list)!;
+        panel.SetVerticalOffset(9 * VirtualizingTilePanel.TileHeight);
+        Layout(list, wide, 600);
+        list.SelectedIndex = 87; // Last card of row 11, after scrolling.
+        var selected = list.SelectedItem;
+        var container = list.ItemContainerGenerator.ContainerFromIndex(87);
+        Assert.NotNull(container);
+
+        foreach (var width in new[] { narrow, wide, narrow })
+        {
+            Layout(list, width, 600);
+            Assert.Same(selected, list.SelectedItem);
+            Assert.Equal(87, list.SelectedIndex);
+            Assert.Same(container, list.ItemContainerGenerator.ContainerFromIndex(87));
+            var tile = (ListBoxItem)container;
+            Assert.True(tile.IsSelected);
+            var position = tile.TranslatePoint(new Point(), panel);
+            Assert.InRange(position.Y, 0, 600 - VirtualizingTilePanel.TileHeight);
+        }
+    });
+
+    [Fact]
+    public void GameListRejectsDragSelectionCapture_ButCheckboxKeepsItsOwnCapture() => OnSta(() =>
+    {
+        var standard = new ListBox();
+        var games = CreateGameList();
+        bool? retainedCapture = null;
+        games.IsMouseCapturedChanged += (_, e) =>
+        {
+            if (e.NewValue is true) retainedCapture = games.IsMouseCaptured;
+        };
+        var checkbox = new CheckBox { Content = "Queue" };
+        games.Items.Add(new ListBoxItem { Content = checkbox });
+        var grid = new Grid();
+        grid.RowDefinitions.Add(new RowDefinition());
+        grid.RowDefinitions.Add(new RowDefinition());
+        grid.Children.Add(standard);
+        Grid.SetRow(games, 1);
+        grid.Children.Add(games);
+        var window = new Window { Content = grid, Width = 600, Height = 600,
+            Left = -10000, Top = -10000, ShowActivated = false, ShowInTaskbar = false };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Assert.True(standard.CaptureMouse()); // Verify this test has a working input source.
+            standard.ReleaseMouseCapture();
+            games.CaptureMouse();
+            Assert.Equal(false, retainedCapture);
+            Assert.False(games.IsMouseCaptured);
+            Assert.True(checkbox.CaptureMouse());
+            Assert.True(checkbox.IsMouseCaptured);
+        }
+        finally
+        {
+            Mouse.Capture(null);
+            window.Close();
+        }
+    });
+
+    private static GameLibraryListBox CreateGameList()
+    {
+        var list = new GameLibraryListBox
+        {
+            ItemsPanel = new ItemsPanelTemplate(new FrameworkElementFactory(typeof(VirtualizingTilePanel)))
+        };
+        var scroll = new FrameworkElementFactory(typeof(ScrollViewer));
+        scroll.SetValue(ScrollViewer.CanContentScrollProperty, true);
+        scroll.AppendChild(new FrameworkElementFactory(typeof(ItemsPresenter)));
+        list.Template = new ControlTemplate(typeof(ListBox)) { VisualTree = scroll };
+        return list;
+    }
+
     [Fact]
     public void ThousandGames_RealizesViewportOnly_AndHandlesScrollResizeAndRemoval() => OnSta(() =>
     {
