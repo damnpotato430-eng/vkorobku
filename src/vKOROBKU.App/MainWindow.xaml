@@ -2,509 +2,227 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:res="clr-namespace:vKOROBKU.App.Resources"
-        Title="vKOROBKU" Icon="Assets/vkorobku.ico"
-        Width="1180" Height="820" MinWidth="1040" MinHeight="700"
+        xmlns:controls="clr-namespace:vKOROBKU.App.Controls"
+        Title="vKOROBKU" Icon="Assets/vkorobku.ico" FontSize="14"
+        Width="1480" Height="900" MinWidth="1040" MinHeight="700"
         Background="{StaticResource BackgroundBrush}" Foreground="{StaticResource TextBrush}"
         WindowStartupLocation="CenterScreen" Closing="OnClosing">
-    <Grid x:Name="RootGrid" Background="{StaticResource BackgroundBrush}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="230" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Border Grid.Column="0" Background="#111318" BorderBrush="#252932" BorderThickness="0,0,1,0">
-            <Grid Margin="24">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="28" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <StackPanel>
-                    <TextBlock Text="vKOROBKU" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="{x:Static res:Strings.Sidebar_Tagline}" Margin="0,4,0,0" FontSize="10" FontWeight="Bold"
-                               Foreground="{StaticResource MutedTextBrush}" />
-                </StackPanel>
-
-                <StackPanel Grid.Row="2">
-                    <Border Background="#222B1D" CornerRadius="8" Padding="12,10">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="7" Height="7" Fill="{StaticResource AccentBrush}" Margin="0,0,9,0" />
-                            <TextBlock Text="{x:Static res:Strings.Nav_Library}" FontWeight="SemiBold" />
-                        </StackPanel>
-                    </Border>
-                    <Button Content="{x:Static res:Strings.Nav_Operations}" Command="{Binding ShowOperationsCommand}"
-                            Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <Button Content="{x:Static res:Strings.Nav_Settings}" Command="{Binding ShowSettingsCommand}"
-                            Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <Button Content="{x:Static res:Strings.Nav_About}" Command="{Binding ShowAboutCommand}"
-                            Margin="0,8,0,0" Style="{StaticResource SecondaryButton}" />
-                    <TextBlock Text="{x:Static res:Strings.Sidebar_AnalysisSection}" Margin="12,24,0,7" FontSize="10" FontWeight="Bold"
-                               Foreground="{StaticResource MutedTextBrush}" />
-                    <TextBlock Text="{x:Static res:Strings.Sidebar_AnalysisHint}" Margin="12,0" TextWrapping="Wrap"
-                               Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
-                </StackPanel>
-
-
-                <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="10" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="{x:Static res:Strings.Sidebar_SystemSection}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                        <TextBlock Text="{Binding Computer.ProcessorText}" Margin="0,7,0,0" TextWrapping="Wrap" FontSize="11"
-                                   Foreground="{StaticResource TextBrush}" />
-                        <TextBlock Text="{Binding Computer.OperatingSystem}" Margin="0,4,0,0" TextWrapping="Wrap" FontSize="11"
-                                   Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{Binding Computer.MemoryText}" Margin="0,4,0,0" FontSize="11"
-                                   Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{x:Static res:Strings.Sidebar_CoversSource}" Margin="0,8,0,0" FontSize="10"
-                                   Foreground="{StaticResource MutedTextBrush}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
-
-        <Grid Grid.Column="1" Margin="34,28,34,24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="22" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="18" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="{x:Static res:Strings.Header_Title}" FontSize="30" FontWeight="Bold" />
-                    <TextBlock Text="{x:Static res:Strings.Header_Subtitle}"
-                               Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" />
-                </StackPanel>
-                <Button Grid.Column="1" Content="{Binding ScanButtonText}" Command="{Binding RefreshLibraryCommand}"
-                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center" />
-                <Button Grid.Column="3" Content="{x:Static res:Strings.Header_RefreshCovers}" Command="{Binding RefreshCoversCommand}"
-                        Style="{StaticResource SecondaryButton}" VerticalAlignment="Center"
-                        ToolTip="{x:Static res:Strings.Header_RefreshCoversTooltip}" />
-                <Button Grid.Column="5" Content="{x:Static res:Strings.Header_AddFolder}" Command="{Binding AddFolderCommand}"
-                        VerticalAlignment="Center" />
-            </Grid>
-
-            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="18,15">
-                <StackPanel>
-                    <Grid>
-                        <TextBlock Text="{x:Static res:Strings.Drives_Section}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="{Binding TotalSavingsText}" FontSize="10"
-                                       FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                            <TextBlock Text="{Binding AllTimeStatsText}" FontSize="10" FontWeight="Bold"
-                                       Margin="10,0,0,0" Foreground="{StaticResource MutedTextBrush}"
-                                       ToolTip="{Binding AllTimeStatsTooltip}" ToolTipService.InitialShowDelay="200">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding AllTimeStatsText}" Value="">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                    <ItemsControl ItemsSource="{Binding Computer.Drives}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="2" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="0,6,8,0" Background="#111318" BorderBrush="#292D35" BorderThickness="1"
-                                        CornerRadius="6" Padding="10,6">
-                                    <Grid>
-                                        <TextBlock Text="{Binding DisplayText}" />
-                                        <TextBlock Text="{Binding SavingsText}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <Grid Margin="0,10,0,0" Visibility="{Binding WatcherSummaryVisibility}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding WatcherSummaryText}" VerticalAlignment="Center"
-                                   FontSize="11" TextWrapping="Wrap">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WatcherHasFindings}" Value="True">
-                                            <Setter Property="Foreground" Value="#FFB84D" />
-                                            <Setter Property="FontWeight" Value="SemiBold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Content="{x:Static res:Strings.Watcher_RecompressAll}" Command="{Binding RecompressDegradedCommand}"
-                                    Padding="10,6" FontSize="11" Margin="12,0,0,0"
-                                    ToolTip="{x:Static res:Strings.Watcher_RecompressAllTooltip}">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding WatcherHasFindings}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                            <Button Content="{x:Static res:Strings.Watcher_CheckNow}" Command="{Binding CheckWatchedGamesCommand}"
-                                    Style="{StaticResource SecondaryButton}" Padding="10,6" FontSize="11"
-                                    Margin="12,0,0,0" />
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </Border>
-
-            <Grid Grid.Row="4">
-                <!-- The side panel takes a share of the width instead of a fixed 350px:
-                     that width was cramped on 1080p and wasted the room a 1440p screen
-                     offers. The bounds keep it readable without letting it swallow the
-                     library on very wide windows. -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" MinWidth="420" />
-                    <ColumnDefinition Width="18" />
-                    <ColumnDefinition Width="*" MinWidth="340" MaxWidth="560" />
-                </Grid.ColumnDefinitions>
-
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="12" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="210" />
-                        </Grid.ColumnDefinitions>
-                        <Grid>
-                            <TextBox x:Name="SearchBox" Height="34" Padding="12,0" VerticalContentAlignment="Center"
-                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                     Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}"
-                                     BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
-                            <TextBlock Text="{x:Static res:Strings.Search_Placeholder}" IsHitTestVisible="False" Margin="13,0,0,0" VerticalAlignment="Center"
-                                       Foreground="{StaticResource MutedTextBrush}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
-                        <ToggleButton Grid.Column="2" Margin="0,0,12,0" Padding="12,8" FontSize="12"
-                                      VerticalAlignment="Center" Style="{StaticResource ExpertToggle}"
-                                      IsChecked="{Binding IsMultiSelectMode, Mode=OneWay}"
-                                      Command="{Binding ToggleMultiSelectCommand}"
-                                      Content="{Binding MultiSelectToggleText}"
-                                      ToolTip="{x:Static res:Strings.MultiSelect_Tooltip}" />
-                        <ToggleButton Grid.Column="3" Margin="0,0,12,0" Padding="12,8" FontSize="12"
-                                      VerticalAlignment="Center"
-                                      IsChecked="{Binding ShowOnlyDegraded}"
-                                      Content="{Binding DegradedFilterLabel}"
-                                      ToolTip="{x:Static res:Strings.DegradedFilter_Tooltip}">
-                            <ToggleButton.Style>
-                                <Style TargetType="ToggleButton" BasedOn="{StaticResource ExpertToggle}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WatcherHasFindings}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ToggleButton.Style>
-                        </ToggleButton>
-                        <ComboBox Grid.Column="4" Height="34" VerticalContentAlignment="Center"
-                                  ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption}"
-                                  Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Sort_Tooltip}" />
-                    </Grid>
-                    <Border Margin="0,10,0,0" Background="{StaticResource SurfaceBrush}" CornerRadius="8"
-                            Padding="12,8" Visibility="{Binding MultiSelectVisibility}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding QueueSelectionText}" VerticalAlignment="Center" FontSize="12" />
-                            <Button Grid.Column="1" Content="{x:Static res:Strings.Queue_SelectAllCompressed}"
-                                    Command="{Binding SelectAllCompressedCommand}" Margin="12,0,0,0" Padding="10,6" FontSize="12"
-                                    Style="{StaticResource SecondaryButton}"
-                                    ToolTip="{x:Static res:Strings.Queue_SelectAllCompressedTooltip}" />
-                            <ComboBox Grid.Column="2" Width="200" Height="30" Margin="12,0,0,0" VerticalContentAlignment="Center"
-                                      ItemsSource="{Binding QueueMethodOptions}" SelectedItem="{Binding SelectedQueueMethod}"
-                                      Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Queue_MethodTooltip}" />
-                            <Button Grid.Column="3" Content="{x:Static res:Strings.Queue_Start}" Command="{Binding StartQueueCommand}"
-                                    Margin="12,0,0,0" Padding="12,6" FontSize="12" />
-                            <Button Grid.Column="4" Content="{x:Static res:Strings.Queue_StartDecompress}"
-                                    Command="{Binding StartDecompressQueueCommand}" Margin="8,0,0,0" Padding="12,6" FontSize="12"
-                                    Style="{StaticResource SecondaryButton}"
-                                    ToolTip="{x:Static res:Strings.Queue_StartDecompressTooltip}" />
-                        </Grid>
-                    </Border>
-                    </StackPanel>
-                    <ListBox Grid.Row="2" ItemsSource="{Binding GamesView}" SelectedItem="{Binding SelectedGame}"
-                         Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-                            <Setter Property="Width" Value="260" />
-                            <Setter Property="Margin" Value="0,0,14,14" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
-                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnGameItemPreviewMouseRightButtonDown" />
-                            <Setter Property="ContextMenu">
-                                <Setter.Value>
-                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Header="{x:Static res:Strings.Card_OpenFolder}" Command="{Binding OpenGameFolderCommand}" />
-                                        <MenuItem Header="{x:Static res:Strings.Card_AddToQueue}" Command="{Binding AddToQueueCommand}" />
-                                        <MenuItem Header="{x:Static res:Strings.Card_RefreshCover}" Command="{Binding RefreshSelectedCoverCommand}" />
-                                        <MenuItem Header="{x:Static res:Strings.Card_RecheckState}" Command="{Binding RecheckCompressionCommand}" />
-                                        <MenuItem Header="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}" />
-                                    </ContextMenu>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <Border x:Name="Card" Background="{StaticResource SurfaceBrush}" CornerRadius="12"
-                                                BorderBrush="Transparent" BorderThickness="1" Padding="17">
-                                            <ContentPresenter />
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVisibility" />
+        <Style x:Key="Disclosure" TargetType="Expander">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <StackPanel>
+                            <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          HorizontalContentAlignment="Stretch" Cursor="Hand">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="HeaderBorder" Background="Transparent" Padding="4,12">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="22" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                                <TextBlock x:Name="Arrow" Text="›" FontSize="22" Foreground="{StaticResource MutedTextBrush}"
+                                                           VerticalAlignment="Center" HorizontalAlignment="Left" RenderTransformOrigin="0.5,0.5" />
+                                                <ContentPresenter Grid.Column="1" Content="{Binding Header, RelativeSource={RelativeSource AncestorType=Expander}}"
+                                                                  VerticalAlignment="Center" TextElement.Foreground="{StaticResource TextBrush}" />
+                                            </Grid>
                                         </Border>
                                         <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Card" Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Arrow" Property="RenderTransform"><Setter.Value><RotateTransform Angle="90" /></Setter.Value></Setter>
                                             </Trigger>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="HeaderBorder" Property="Background" Value="#20242C" /></Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ExpandedContent" Visibility="Collapsed" ContentSource="Content" Margin="4,4,4,12" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True"><Setter TargetName="ExpandedContent" Property="Visibility" Value="Visible" /></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="16,14" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+        <Style x:Key="CardStatus" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CompressionState}" Value="Compressed"><Setter Property="Foreground" Value="{StaticResource AccentBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding CompressionState}" Value="PartiallyCompressed"><Setter Property="Foreground" Value="#FFBD55" /></DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid x:Name="RootGrid" Background="{StaticResource BackgroundBrush}">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="190" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <Border Grid.RowSpan="3" Background="#111318" BorderBrush="#252932" BorderThickness="0,0,1,0" Padding="18,28,18,20">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="vKOROBKU" FontSize="25" FontWeight="Black" Foreground="{StaticResource AccentBrush}" Margin="4,0,0,0" />
+                    <TextBlock Text="{x:Static res:Strings.Sidebar_Tagline}" FontSize="9" Foreground="{StaticResource MutedTextBrush}" Margin="4,4,0,30" />
+                    <Border Background="#222D1B" CornerRadius="8" Padding="16,14"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8F1;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,10,0" Foreground="{StaticResource AccentBrush}" /><TextBlock Text="{x:Static res:Strings.Nav_Library}" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" /></StackPanel></Border>
+                    <Button Command="{Binding ShowOperationsCommand}" Style="{StaticResource NavButton}" AutomationProperties.Name="{x:Static res:Strings.Nav_Operations}"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE81C;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,10,0" /><TextBlock Text="{x:Static res:Strings.Nav_Operations}" /></StackPanel></Button>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Button Command="{Binding ShowSettingsCommand}" Style="{StaticResource NavButton}" AutomationProperties.Name="{x:Static res:Strings.Nav_Settings}"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,10,0" /><TextBlock Text="{x:Static res:Strings.Nav_Settings}" /></StackPanel></Button>
+                    <Button Command="{Binding ShowAboutCommand}" Style="{StaticResource NavButton}" AutomationProperties.Name="{x:Static res:Strings.Nav_About}"><StackPanel Orientation="Horizontal"><TextBlock Text="&#xE946;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Margin="0,0,10,0" /><TextBlock Text="{x:Static res:Strings.Nav_About}" /></StackPanel></Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="24,28,24,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.6*" MinWidth="300" />
+                <ColumnDefinition>
+                    <ColumnDefinition.Style><Style TargetType="ColumnDefinition"><Setter Property="Width" Value="24" /><Style.Triggers><DataTrigger Binding="{Binding HasSelectedGame}" Value="False"><Setter Property="Width" Value="0" /></DataTrigger></Style.Triggers></Style></ColumnDefinition.Style>
+                </ColumnDefinition>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style><Style TargetType="ColumnDefinition"><Setter Property="Width" Value="*" /><Setter Property="MinWidth" Value="320" /><Setter Property="MaxWidth" Value="440" /><Style.Triggers><DataTrigger Binding="{Binding HasSelectedGame}" Value="False"><Setter Property="Width" Value="0" /><Setter Property="MinWidth" Value="0" /></DataTrigger></Style.Triggers></Style></ColumnDefinition.Style>
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{x:Static res:Strings.Header_Title}" FontSize="28" FontWeight="Bold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding LibraryCountText}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,5,0,0" />
+                    </StackPanel>
+                    <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <Button Content="{x:Static res:Strings.Header_AddFolder}" Command="{Binding AddFolderCommand}" Style="{StaticResource SecondaryButton}" Padding="14,11" FontSize="13" />
+                        <Button Content="⋯" FontSize="20" Margin="8,0,0,0" Padding="12,5" Style="{StaticResource SecondaryButton}"
+                                Click="OpenMoreMenu" ToolTip="{x:Static res:Strings.UI_More}" AutomationProperties.Name="{x:Static res:Strings.UI_More}">
+                            <Button.ContextMenu><ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{Binding ScanButtonText}" Command="{Binding RefreshLibraryCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Header_RefreshCovers}" Command="{Binding RefreshCoversCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Watcher_CheckNow}" Command="{Binding CheckWatchedGamesCommand}" />
+                            </ContextMenu></Button.ContextMenu>
+                        </Button>
+                    </WrapPanel>
+                </Grid>
+                <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="#292D35" BorderThickness="1" CornerRadius="8" Padding="12,0" Margin="0,0,0,10">
+                    <Expander x:Name="DrivesExpander" Style="{StaticResource Disclosure}">
+                        <Expander.Header><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                            <TextBlock Text="{x:Static res:Strings.UI_Drives}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalSavingsText}" Foreground="{StaticResource AccentBrush}" HorizontalAlignment="Right" TextWrapping="Wrap" Margin="12,0,0,0" FontSize="12" VerticalAlignment="Center" />
+                        </Grid></Expander.Header>
+                        <StackPanel>
+                            <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Computer.Drives}"><ItemsControl.ItemTemplate><DataTemplate>
+                                    <Border Background="#111318" CornerRadius="5" Padding="10,8" Margin="0,0,0,6">
+                                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding DisplayText}" FontSize="12" TextWrapping="Wrap" />
+                                            <TextBlock Grid.Column="1" Text="{Binding SavingsText}" FontSize="12" Foreground="{StaticResource AccentBrush}" Margin="12,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                            </ScrollViewer>
+                            <TextBlock Text="{Binding AllTimeStatsText}" ToolTip="{Binding AllTimeStatsTooltip}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,6,0,0" />
+                            <Button Content="{x:Static res:Strings.Watcher_CheckNow}" Command="{Binding CheckWatchedGamesCommand}" Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                        </StackPanel>
+                    </Expander>
+                </Border>
+                <Border Grid.Row="2" Background="#282215" BorderBrush="#55401C" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,0,0,12"
+                        Visibility="{Binding WatcherHasFindings, Converter={StaticResource BoolVisibility}}">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding WatcherSummaryText}" Foreground="#FFBD55" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        <ToggleButton Grid.Column="1" Content="{x:Static res:Strings.UI_View}" IsChecked="{Binding ShowOnlyDegraded}" Style="{StaticResource ExpertToggle}" Margin="12,0,0,0" ToolTip="{x:Static res:Strings.DegradedFilter_Tooltip}" />
+                    </Grid>
+                </Border>
+                <StackPanel Grid.Row="3" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Grid>
+                            <TextBox x:Name="SearchBox" Height="40" Padding="12,0" VerticalContentAlignment="Center" FontSize="13"
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=150}" Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource TextBrush}" BorderBrush="#353A44" CaretBrush="{StaticResource AccentBrush}" />
+                            <TextBlock Text="{x:Static res:Strings.Search_Placeholder}" IsHitTestVisible="False" Margin="13,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" FontSize="13">
+                                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value=""><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <ToggleButton Grid.Column="1" Content="{Binding MultiSelectToggleText}" IsChecked="{Binding IsMultiSelectMode, Mode=OneWay}" Command="{Binding ToggleMultiSelectCommand}" Style="{StaticResource ExpertToggle}" Margin="8,0" ToolTip="{x:Static res:Strings.MultiSelect_Tooltip}" />
+                        <ComboBox Grid.Column="2" Width="145" Height="40" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption}" Style="{StaticResource DarkComboBox}" ToolTip="{x:Static res:Strings.Sort_Tooltip}" />
+                    </Grid>
+                    <Border Padding="12" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Margin="0,10,0,0" Visibility="{Binding MultiSelectVisibility}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding QueueSelectionText}" FontSize="12" Margin="0,0,0,8" />
+                            <WrapPanel>
+                                <Button Content="{x:Static res:Strings.Queue_SelectAllCompressed}" Command="{Binding SelectAllCompressedCommand}" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="0,0,8,8" />
+                                <ComboBox Width="160" Height="32" ItemsSource="{Binding QueueMethodOptions}" SelectedItem="{Binding SelectedQueueMethod}" Style="{StaticResource DarkComboBox}" Margin="0,0,8,8" ToolTip="{x:Static res:Strings.Queue_MethodTooltip}" />
+                                <Button Content="{x:Static res:Strings.Queue_Start}" Command="{Binding StartQueueCommand}" Padding="10,7" Margin="0,0,8,8" />
+                                <Button Content="{x:Static res:Strings.Queue_StartDecompress}" Command="{Binding StartDecompressQueueCommand}" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="0,0,8,8" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                    <Button Content="{x:Static res:Strings.Watcher_RecompressAll}" Command="{Binding RecompressDegradedCommand}" Style="{StaticResource SecondaryButton}" Margin="0,10,0,0" HorizontalAlignment="Left"
+                            Visibility="{Binding ShowOnlyDegraded, Converter={StaticResource BoolVisibility}}" />
+                </StackPanel>
+                <Grid Grid.Row="4">
+                    <controls:GameLibraryListBox x:Name="GameList" ItemsSource="{Binding GamesView}" SelectedItem="{Binding SelectedGame}" Background="Transparent" BorderThickness="0" Padding="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True">
+                        <ListBox.ItemsPanel><ItemsPanelTemplate><controls:VirtualizingTilePanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem">
+                            <Setter Property="Width" Value="272" /><Setter Property="Margin" Value="0,0,14,14" /><Setter Property="Padding" Value="0" />
+                            <Setter Property="Foreground" Value="{StaticResource TextBrush}" /><Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnGameItemPreviewMouseRightButtonDown" />
+                            <Setter Property="ContextMenu"><Setter.Value><ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="{x:Static res:Strings.Card_OpenFolder}" Command="{Binding OpenGameFolderCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Card_AddToQueue}" Command="{Binding AddToQueueCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Card_RefreshCover}" Command="{Binding RefreshSelectedCoverCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Card_RecheckState}" Command="{Binding RecheckCompressionCommand}" />
+                                <MenuItem Header="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}" />
+                            </ContextMenu></Setter.Value></Setter>
+                            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="Card" Background="{StaticResource SurfaceBrush}" CornerRadius="9" BorderBrush="Transparent" BorderThickness="1.5" Padding="10"><ContentPresenter /></Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="Background" Value="{StaticResource SurfaceHoverBrush}" /></Trigger>
+                                    <Trigger Property="IsSelected" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource AccentBrush}" /></Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate></Setter.Value></Setter>
+                        </Style></ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate><DataTemplate>
                             <StackPanel>
-                                <Border Height="120" Background="#101217" CornerRadius="9" ClipToBounds="True">
+                                <Border Height="140" Background="#101217" CornerRadius="6" ClipToBounds="True">
                                     <Grid>
-                                        <TextBlock Text="▰" Foreground="{StaticResource AccentBrush}" FontSize="26"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        <Image Source="{Binding CoverPath, Converter={StaticResource LocalImageConverter}}"
-                                               Stretch="UniformToFill" />
-                                        <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,6,0"
-                                                Background="#CC14171D" CornerRadius="6" Padding="4"
-                                                Visibility="{Binding DataContext.MultiSelectVisibility, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}">
-                                            <CheckBox IsChecked="{Binding IsQueueSelected}" />
-                                        </Border>
+                                        <TextBlock Text="{Binding SourceText}" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                                        <Image Source="{Binding CoverPath, Converter={StaticResource LocalImageConverter}}" Stretch="UniformToFill" />
+                                        <Border Background="#DD171A20" Padding="6" CornerRadius="4" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="6" Visibility="{Binding DataContext.MultiSelectVisibility, RelativeSource={RelativeSource AncestorType=ListBox}}"><CheckBox IsChecked="{Binding IsQueueSelected}" AutomationProperties.Name="{Binding Name}" /></Border>
                                     </Grid>
                                 </Border>
-                                <TextBlock Text="{Binding Name}" Margin="0,14,0,0" FontSize="17" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="{Binding InstallPath}" Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}"
-                                           FontSize="11" TextTrimming="CharacterEllipsis" />
-                                <Grid Margin="0,15,0,0">
-                                    <TextBlock Text="{Binding SourceText}" Foreground="{StaticResource AccentBrush}" FontSize="11" />
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Text="{Binding ActualSizeText}" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource AccentBrush}" Margin="0,0,4,0">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                        <TextBlock FontWeight="SemiBold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="{Binding SizeText}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding HasCompressedSize}" Value="True">
-                                                            <Setter Property="Text" Value="{Binding OriginalSizeBracketText}" />
-                                                            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="15" Margin="0,10,0,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                                <Grid Margin="0,12,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding SourceText}" FontSize="11" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding InstallPath}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0">
+                                        <TextBlock Text="{Binding DiskSizeText}" FontSize="12" FontWeight="SemiBold"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Foreground" Value="{StaticResource TextBrush}" /><Style.Triggers><DataTrigger Binding="{Binding HasCompressedSize}" Value="True"><Setter Property="Foreground" Value="{StaticResource AccentBrush}" /></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+                                        <TextBlock Text="{Binding OriginalSizeBracketText}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="4,0,0,0" Visibility="{Binding HasCompressedSize, Converter={StaticResource BoolVisibility}}" />
                                     </StackPanel>
                                 </Grid>
-                                <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
-                                <Border CornerRadius="5" Padding="8,4" HorizontalAlignment="Left">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#20242C" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding CompressionState}" Value="Compressed">
-                                                    <Setter Property="Background" Value="#26331F" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding CompressionState}" Value="PartiallyCompressed">
-                                                    <Setter Property="Background" Value="#3A2E14" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="{Binding CompressionStatusText}" FontSize="11" FontWeight="SemiBold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding CompressionState}" Value="Compressed">
-                                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding CompressionState}" Value="PartiallyCompressed">
-                                                        <Setter Property="Foreground" Value="#FFB84D" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding CompressionState}" Value="Uncompressed">
-                                                        <Setter Property="Foreground" Value="#C7CBD4" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Border>
-                                <Border CornerRadius="5" Padding="8,4" Margin="6,0,0,0" Background="#1B2333"
-                                        ToolTip="{x:Static res:Strings.Card_DirectStorageTooltip}">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasDirectStorage}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <TextBlock Text="DirectStorage" FontSize="11" FontWeight="SemiBold" Foreground="#7FB2FF" />
-                                </Border>
-                                </StackPanel>
+                                <Border Background="#222730" CornerRadius="5" Padding="7,4" HorizontalAlignment="Left" Margin="0,8,0,0" MaxWidth="245"><TextBlock Text="{Binding CompressionStatusText}" Style="{StaticResource CardStatus}" TextTrimming="CharacterEllipsis" ToolTip="{Binding CompressionStatusText}" /></Border>
                             </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    </ListBox>
+                        </DataTemplate></ListBox.ItemTemplate>
+                    </controls:GameLibraryListBox>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="440" Margin="20">
+                        <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><DataTrigger Binding="{Binding Items.Count, ElementName=GameList}" Value="0"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+                        <TextBlock Text="{x:Static res:Strings.UI_NoResults}" FontSize="18" TextAlignment="Center" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" />
+                        <TextBlock Text="{x:Static res:Strings.Welcome_EmptyLibrary}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,12,0,0" Foreground="{StaticResource MutedTextBrush}" Visibility="{Binding EmptyLibraryVisibility}" />
+                    </StackPanel>
                 </Grid>
-
-                <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="20">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="{x:Static res:Strings.Panel_Section}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                            <TextBlock Text="{Binding SelectedGame.Name, TargetNullValue={x:Static res:Strings.Panel_NoGameSelected}}"
-                                       Margin="0,7,0,0" FontSize="21" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{Binding SelectedGame.CompressionStatusText}" Margin="0,5,0,0" FontSize="12"
-                                       FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
-                            <WrapPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                <ToggleButton Content="{x:Static res:Strings.Panel_ExpertMode}" IsChecked="{Binding IsExpertMode}"
-                                              Visibility="{Binding UncompressedPanelVisibility}"
-                                              Style="{StaticResource ExpertToggle}" />
-                                <Button Content="{x:Static res:Strings.Panel_ReviewIdentity}" Command="{Binding ReviewIdentityCommand}"
-                                        Margin="8,0,0,0" Padding="10,6"
-                                        Visibility="{Binding IdentityReviewVisibility}"
-                                        Style="{StaticResource SecondaryButton}" />
-                                <Button Content="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}"
-                                        Margin="8,0,0,0" Padding="10,6"
-                                        Style="{StaticResource SecondaryButton}" />
-                            </WrapPanel>
-                            <StackPanel Visibility="{Binding UncompressedPanelVisibility}">
-                                <Border Margin="0,10,0,0" Padding="10,8" Background="#1B2333" CornerRadius="6"
-                                        Visibility="{Binding DirectStorageWarningVisibility}">
-                                    <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#7FB2FF"
-                                               Text="{x:Static res:Strings.Panel_DirectStorageWarning}" />
-                                </Border>
-                                <TextBlock Text="{Binding AnalysisSummary}" Margin="0,8,0,0" TextWrapping="Wrap"
-                                           Visibility="{Binding AnalysisSummaryVisibility}"
-                                           Foreground="{StaticResource MutedTextBrush}" FontSize="13" />
-
-                                <Border Margin="0,10,0,0" Padding="14,12" Background="#151A23" CornerRadius="8"
-                                        Visibility="{Binding WelcomeVisibility}">
-                                    <StackPanel>
-                                        <TextBlock Text="{x:Static res:Strings.Welcome_Title}" FontSize="10" FontWeight="Bold"
-                                                   Foreground="{StaticResource AccentBrush}" />
-                                        <StackPanel Visibility="{Binding WelcomeStepsVisibility}">
-                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step1}" Margin="0,9,0,0"
-                                                       TextWrapping="Wrap" FontSize="12" />
-                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step2}" Margin="0,6,0,0"
-                                                       TextWrapping="Wrap" FontSize="12" />
-                                            <TextBlock Text="{x:Static res:Strings.Welcome_Step3}" Margin="0,6,0,0"
-                                                       TextWrapping="Wrap" FontSize="12" />
-                                        </StackPanel>
-                                        <TextBlock Text="{x:Static res:Strings.Welcome_EmptyLibrary}" Margin="0,9,0,0"
-                                                   Visibility="{Binding EmptyLibraryVisibility}"
-                                                   TextWrapping="Wrap" FontSize="12" />
-                                        <TextBlock Text="{x:Static res:Strings.Welcome_Reassurance}" Margin="0,11,0,0"
-                                                   TextWrapping="Wrap" FontSize="11"
-                                                   Foreground="{StaticResource MutedTextBrush}" />
-                                    </StackPanel>
-                                </Border>
-                                <StackPanel Visibility="{Binding ExpertOptimizationVisibility}">
-                                    <TextBlock Text="{x:Static res:Strings.Panel_AnalysisAccuracy}" Margin="0,13,0,5" FontSize="9" FontWeight="Bold"
-                                               Foreground="{StaticResource MutedTextBrush}" />
-                                    <ComboBox ItemsSource="{Binding AnalysisModes}" SelectedItem="{Binding SelectedAnalysisMode}"
-                                              DisplayMemberPath="DisplayText" Height="34" Padding="8,4"
-                                              Style="{StaticResource DarkComboBox}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <Border Grid.Row="1" Margin="0,14,0,0" Background="#101217" CornerRadius="8" Padding="12,10"
-                                Visibility="{Binding QueuePanelVisibility}">
-                            <StackPanel>
-                                <TextBlock Text="{Binding QueueTitle}" FontSize="12" FontWeight="SemiBold"
-                                           Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" />
-                                <ItemsControl ItemsSource="{Binding QueueItems}" Margin="0,8,0,0" MaxHeight="180">
+                <Expander Grid.Row="5" Header="{Binding QueueTitle}" Style="{StaticResource Disclosure}" Visibility="{Binding QueuePanelVisibility}" IsExpanded="{Binding IsQueueRunning, Mode=OneWay}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <ScrollViewer MaxHeight="130" VerticalScrollBarVisibility="Auto">                                <ItemsControl ItemsSource="{Binding QueueItems}" Margin="0,8,0,0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Grid Margin="0,2,0,2">
@@ -537,22 +255,51 @@
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <WrapPanel Margin="0,8,0,0" Visibility="{Binding QueueControlsVisibility}">
-                                    <Button Content="{x:Static res:Strings.Queue_Skip}" Command="{Binding SkipQueueItemCommand}"
-                                            Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
-                                            ToolTip="{x:Static res:Strings.Queue_SkipTooltip}" />
-                                    <Button Content="{x:Static res:Strings.Queue_StopAfterCurrent}" Command="{Binding StopQueueAfterCurrentCommand}"
-                                            Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource SecondaryButton}"
-                                            ToolTip="{x:Static res:Strings.Queue_StopAfterCurrentTooltip}" />
-                                    <Button Content="{x:Static res:Strings.Queue_StopAll}" Command="{Binding StopQueueCommand}"
-                                            Margin="6,0,0,0" Padding="8,5" FontSize="11" Style="{StaticResource StopButton}"
-                                            ToolTip="{x:Static res:Strings.Queue_StopAllTooltip}" />
-                                </WrapPanel>
+                                </ItemsControl></ScrollViewer>
+                        <WrapPanel Margin="0,8,0,0" Visibility="{Binding QueueControlsVisibility}">
+                            <Button Content="{x:Static res:Strings.Queue_Skip}" Command="{Binding SkipQueueItemCommand}" Style="{StaticResource SecondaryButton}" Padding="10,6" Margin="0,0,8,8" />
+                            <Button Content="{x:Static res:Strings.Queue_StopAfterCurrent}" Command="{Binding StopQueueAfterCurrentCommand}" Style="{StaticResource SecondaryButton}" Padding="10,6" Margin="0,0,8,8" />
+                            <Button Content="{x:Static res:Strings.Queue_StopAll}" Command="{Binding StopQueueCommand}" Style="{StaticResource StopButton}" Padding="10,6" Margin="0,0,8,8" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Expander>
+            </Grid>
+
+            <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="#292D35" BorderThickness="1" CornerRadius="10"
+                    Visibility="{Binding HasSelectedGame, Converter={StaticResource BoolVisibility}}">
+                <DockPanel>
+                    <Border DockPanel.Dock="Bottom" BorderBrush="#292D35" BorderThickness="0,1,0,0" Padding="20,14" Visibility="{Binding PrimaryActionVisibility}">
+                        <Button Content="{Binding PrimaryGameActionText}" Command="{Binding PrimaryGameCommand}" Style="{StaticResource PrimaryActionButton}" />
+                    </Border>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="20">
+                    <StackPanel>
+                        <Button Content="×" Command="{Binding ClearGameSelectionCommand}" Style="{StaticResource SecondaryButton}" Padding="8,2" FontSize="18" HorizontalAlignment="Right" Margin="0,0,0,8" ToolTip="{x:Static res:Strings.MultiSelect_Cancel}" />
+                        <Border Height="180" Background="#101217" CornerRadius="8" ClipToBounds="True">
+                            <Grid><TextBlock Text="{Binding SelectedGame.SourceText}" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" /><Image Source="{Binding SelectedGame.CoverPath, Converter={StaticResource LocalImageConverter}}" Stretch="UniformToFill" /></Grid>
+                        </Border>
+                        <TextBlock Text="{Binding SelectedGame.Name}" FontSize="24" FontWeight="Bold" Margin="0,18,0,0" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding SelectedGame.SourceText}" FontSize="13" Foreground="{StaticResource MutedTextBrush}" Margin="0,6,0,0" />
+                        <Border BorderBrush="#30353F" BorderThickness="0,1,0,1" Padding="0,18" Margin="0,18,0,0">
+                            <StackPanel><TextBlock Text="{x:Static res:Strings.UI_DiskSize}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                <TextBlock Text="{Binding SelectedGame.DiskSizeText}" FontSize="30" FontWeight="Bold" Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding SelectedGame.CompactStatusText}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
-
-                        <ListBox Grid.Row="2" Margin="0,16,0,12" ItemsSource="{Binding Estimates}"
+                        <TextBlock Text="{x:Static res:Strings.UI_AnalysisHint}" Visibility="{Binding AnalysisIntroVisibility}" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,18,0,0" FontSize="14" LineHeight="22" />
+                        <Border Background="#1B2333" Padding="12" CornerRadius="6" Margin="0,14,0,0" Visibility="{Binding DirectStorageWarningVisibility}"><TextBlock Text="{x:Static res:Strings.Panel_DirectStorageWarning}" TextWrapping="Wrap" Foreground="#A8C6FF" FontSize="12" /></Border>
+                        <StackPanel Margin="0,18,0,0" Visibility="{Binding PredictionVisibility}">
+                            <TextBlock Text="{x:Static res:Strings.Estimate_SavingsLabel}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                            <TextBlock Text="{Binding SelectedEstimate.SavingsText}" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            <TextBlock Text="{Binding SelectedEstimate.PerformanceText}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        </StackPanel>
+                        <Expander Header="{x:Static res:Strings.UI_Advanced}" Style="{StaticResource Disclosure}" Margin="0,14,0,0">
+                            <StackPanel>
+                                <ToggleButton Content="{x:Static res:Strings.Panel_ExpertMode}" IsChecked="{Binding IsExpertMode}" Style="{StaticResource ExpertToggle}" HorizontalAlignment="Left" />
+                                <StackPanel Visibility="{Binding ExpertOptimizationVisibility}" Margin="0,12,0,0">
+                                    <TextBlock Text="{x:Static res:Strings.Panel_AnalysisAccuracy}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,6" />
+                                    <ComboBox ItemsSource="{Binding AnalysisModes}" SelectedItem="{Binding SelectedAnalysisMode}" DisplayMemberPath="DisplayText" Height="36" Style="{StaticResource DarkComboBox}" />
+                                </StackPanel>
+                                                        <ListBox Margin="0,12,0,0" ItemsSource="{Binding Estimates}"
                                  SelectedItem="{Binding SelectedEstimate}" Background="Transparent" BorderThickness="0"
                                  Visibility="{Binding EstimateListVisibility}">
                             <ListBox.ItemContainerStyle>
@@ -603,180 +350,41 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-
-                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
-                                VerticalAlignment="Top" Visibility="{Binding AutoInfoVisibility}">
-                            <StackPanel>
-                                <TextBlock Text="{x:Static res:Strings.Info_AutoTitle}" Foreground="{StaticResource AccentBrush}"
-                                           FontSize="11" FontWeight="Bold" />
-                                <TextBlock Margin="0,12,0,0" FontSize="13" LineHeight="21" TextWrapping="Wrap"
-                                           Text="{x:Static res:Strings.Info_AutoBody}" />
-                                <TextBlock Text="{x:Static res:Strings.Info_AutoConfirm}"
-                                           Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"
-                                           Foreground="{StaticResource MutedTextBrush}" />
+                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}" Style="{StaticResource SecondaryButton}" Margin="0,12,0,0" Visibility="{Binding UncompressedPanelVisibility}" />
+                                <TextBlock Text="{Binding AnalysisSummary}" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" FontSize="11" Margin="0,10,0,0" Visibility="{Binding UncompressedPanelVisibility}" />
+                                <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" TextWrapping="Wrap" FontSize="12" Margin="0,12,0,0" Visibility="{Binding CompressedPanelVisibility}" />
+                                <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}" Style="{StaticResource SecondaryButton}" Margin="0,12,0,0" Visibility="{Binding PartiallyCompressedVisibility}" />
+                                <Button Content="{x:Static res:Strings.Card_RecheckState}" Command="{Binding RecheckCompressionCommand}" Style="{StaticResource SecondaryButton}" Margin="0,8,0,0" />
+                                <Button Content="{x:Static res:Strings.Panel_ReviewIdentity}" Command="{Binding ReviewIdentityCommand}" Style="{StaticResource SecondaryButton}" Margin="0,8,0,0" Visibility="{Binding IdentityReviewVisibility}" />
+                                <Button Content="{x:Static res:Strings.Card_RemoveFromLibrary}" Command="{Binding RemoveGameCommand}" Style="{StaticResource SecondaryButton}" Margin="0,8,0,0" />
                             </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
-                                VerticalAlignment="Top" Visibility="{Binding ActiveCompressionInfoVisibility}">
-                            <StackPanel>
-                                <TextBlock Text="{x:Static res:Strings.Info_ActiveTitle}" Foreground="{StaticResource AccentBrush}"
-                                           FontSize="11" FontWeight="Bold" />
-                                <TextBlock Text="{Binding ActiveCompressionModeText}" Margin="0,10,0,0"
-                                           FontSize="21" FontWeight="Bold" />
-                                <TextBlock Text="{Binding ActiveCompressionDetailsText}" Margin="0,6,0,0" FontSize="12"
-                                           TextWrapping="Wrap" Foreground="{StaticResource TextBrush}" />
-                                <TextBlock Text="{x:Static res:Strings.Info_ActiveLocked}"
-                                           Margin="0,10,0,0" FontSize="11" TextWrapping="Wrap"
-                                           Foreground="{StaticResource MutedTextBrush}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
-                                VerticalAlignment="Top" Visibility="{Binding PartialInfoVisibility}">
-                            <StackPanel>
-                                <TextBlock Text="{x:Static res:Strings.Info_PartialTitle}" Foreground="#FFB84D" FontSize="11" FontWeight="Bold" />
-                                <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
-                                           FontSize="13" LineHeight="22" TextWrapping="Wrap" />
-                                <TextBlock Text="{x:Static res:Strings.Info_PartialBody}"
-                                           Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
-                                           Foreground="{StaticResource MutedTextBrush}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Row="2" Margin="0,18,0,12" Padding="18" Background="#111318" CornerRadius="10"
-                                VerticalAlignment="Top" Visibility="{Binding CompressedPanelVisibility}">
-                            <StackPanel>
-                                <TextBlock Text="{x:Static res:Strings.Info_CompressedTitle}" Foreground="{StaticResource AccentBrush}"
-                                           FontSize="11" FontWeight="Bold" />
-                                <TextBlock Text="{Binding SelectedGame.CompressionInfoText}" Margin="0,12,0,0"
-                                           FontSize="13" LineHeight="22" TextWrapping="Wrap" />
-                                <TextBlock Text="{x:Static res:Strings.Info_CompressedBody}"
-                                           Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
-                                           Foreground="{StaticResource MutedTextBrush}" />
-                            </StackPanel>
-                        </Border>
-
-                        <StackPanel Grid.Row="3" Visibility="{Binding AutoOptimizationVisibility}">
-                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
-                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
-                                       Foreground="{StaticResource AccentBrush}" />
-                            <Grid Height="22">
-                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
-                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
-                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
-                            </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
-                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="{x:Static res:Strings.Action_Optimize}" Command="{Binding OptimizeCommand}"
-                                        Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelCurrentCommand}"
-                                        Style="{StaticResource StopButton}" />
-                            </Grid>
-                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
-                                    Visibility="{Binding PartiallyCompressedVisibility}"
-                                    ToolTip="{x:Static res:Strings.Action_DecompressPartialTooltip}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="3" Visibility="{Binding ExpertOptimizationVisibility}">
-                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
-                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
-                                       Foreground="{StaticResource AccentBrush}" />
-                            <Grid Height="22">
-                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
-                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
-                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
-                            </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
-                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="{Binding AnalysisButtonText}" Command="{Binding AnalyzeCommand}"
-                                        Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelCurrentCommand}"
-                                        Style="{StaticResource StopButton}" />
-                            </Grid>
-                            <Button Content="{x:Static res:Strings.Action_CompressSelected}" Command="{Binding CompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource PrimaryActionButton}" />
-                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}"
-                                    Visibility="{Binding PartiallyCompressedVisibility}"
-                                    ToolTip="{x:Static res:Strings.Action_DecompressPartialTooltip}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="3" Visibility="{Binding PartialPanelVisibility}">
-                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
-                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
-                                       Foreground="{StaticResource AccentBrush}" />
-                            <Grid Height="22">
-                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
-                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
-                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
-                            </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
-                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="{Binding FinishCompressionButtonText}" Command="{Binding FinishCompressionCommand}"
-                                        Style="{StaticResource PrimaryActionButton}"
-                                        ToolTip="{x:Static res:Strings.Action_FinishTooltip}" />
-                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelOperationCommand}"
-                                        Style="{StaticResource StopButton}" />
-                            </Grid>
-                            <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
-                                    Margin="0,8,0,0" Style="{StaticResource SecondaryActionButton}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="3" Visibility="{Binding CompressedPanelVisibility}">
-                            <TextBlock Text="{Binding ActiveOperationLabel}" Visibility="{Binding ActiveOperationLabelVisibility}"
-                                       Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"
-                                       Foreground="{StaticResource AccentBrush}" />
-                            <Grid Height="22">
-                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding OperationProgress, Mode=OneWay}"
-                                             Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
-                                <TextBlock Text="{Binding OperationProgressText}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" FontSize="11" FontWeight="Bold" Foreground="White" />
-                            </Grid>
-                            <TextBlock Text="{Binding OperationSummary}" Margin="0,8,0,10" TextWrapping="Wrap"
-                                       FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Button Content="{x:Static res:Strings.Action_Decompress}" Command="{Binding DecompressCommand}"
-                                        Style="{StaticResource PrimaryActionButton}" />
-                                <Button Grid.Column="2" Content="{x:Static res:Strings.Action_Stop}" Command="{Binding CancelOperationCommand}"
-                                        Style="{StaticResource StopButton}" />
-                            </Grid>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <Border Grid.Row="5" Background="#111318" CornerRadius="8" Padding="12,9">
-                <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                        </Expander>
+                        <Button Content="{x:Static res:Strings.Card_OpenFolder}" Command="{Binding OpenGameFolderCommand}" Style="{StaticResource SecondaryButton}" Margin="0,12,0,0" Padding="12,12" />
+                        <TextBlock Text="{x:Static res:Strings.Info_AutoConfirm}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,18,0,8" Visibility="{Binding UncompressedPanelVisibility}" />
+                    </StackPanel>
+                </ScrollViewer>
+                </DockPanel>
             </Border>
+        </Grid>
+
+        <Border Grid.Column="1" Grid.Row="1" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16,12" Margin="24,12,24,0" Visibility="{Binding BusyVisibility}">
+            <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,20,0">
+                    <TextBlock Text="{Binding ActiveOperationText}" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap" />
+                    <TextBlock Visibility="{Binding ActiveCompressionInfoVisibility}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" TextWrapping="Wrap"><Run Text="{Binding ActiveCompressionModeText, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding ActiveCompressionDetailsText, Mode=OneWay}" /></TextBlock>
+                    <ProgressBar Value="{Binding OperationProgress, Mode=OneWay}" Minimum="0" Maximum="100" Height="6" Margin="0,8,0,0" Background="#292D35" Foreground="{StaticResource AccentBrush}" BorderThickness="0" />
+                    <TextBlock Text="{Binding OperationSummary}" FontSize="12" Foreground="{StaticResource MutedTextBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" VerticalAlignment="Center">
+                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource StopButton}">
+                        <Setter Property="Content" Value="{x:Static res:Strings.Action_Stop}" /><Setter Property="Command" Value="{Binding CancelCurrentCommand}" />
+                        <Style.Triggers><DataTrigger Binding="{Binding IsQueueRunning}" Value="True"><Setter Property="Content" Value="{x:Static res:Strings.Queue_StopAll}" /><Setter Property="Command" Value="{Binding StopQueueCommand}" /></DataTrigger></Style.Triggers>
+                    </Style></Button.Style>
+                </Button>
+            </Grid>
+        </Border>
+        <Grid Grid.Column="1" Grid.Row="2" Margin="24,12,24,16">
+            <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StatusText}" />
         </Grid>
     </Grid>
 </Window>

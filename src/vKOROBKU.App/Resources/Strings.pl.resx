@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>Według nazwy</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Najpierw największe</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Najpierw nieskompresowane</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Metoda kompresji dla całej kolejki</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatycznie (zrównoważona)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Używa zapisanej analizy bieżącej wersji gry, a w przeciwnym razie XPRESS16K. Nie wykonuje nowego pomiaru.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatycznie</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Skompresuj kolejkę · 1 pytanie o uprawnienia</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>Skompresować {0} gier w jednej kolejce?
 
@@ -293,7 +293,7 @@ Na dysku nic się nie zmienia — gra pozostaje zainstalowana i nietknięta. Ukr
   <data name="Settings_HiddenSection" xml:space="preserve"><value>UKRYTE GRY</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Ukryte gry: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Przywróć wszystkie</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Ukryte gry wracają do biblioteki po odświeżeniu listy.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Ukryte gry zostaną przywrócone po zapisaniu ustawień.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Nie udało się usunąć gry z biblioteki. Sprawdź dostęp do lokalnych danych vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Błąd usuwania z biblioteki</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Automatycznie</value></data>
@@ -409,4 +409,20 @@ Kontynuować od miejsca przerwania? Już skompresowane pliki są pomijane automa
   <data name="Worker_NoFiles" xml:space="preserve"><value>W folderze nie ma plików do przetworzenia.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Najpierw zamknij proces gry: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>Nie udało się uruchomić compact.exe.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>wybór ręczny</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>kontynuacja bieżącym algorytmem</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>zapisana analiza</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>nieaktualna analiza; tryb standardowy bez nowego pomiaru</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>brak analizy; tryb standardowy bez pomiaru</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Uwaga: {0} — zmierzony odczyt jest wolniejszy o {1}%; szacowana oszczędność: {2}. Kontynuować mimo spowolnienia?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Dyski</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Więcej działań</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Zobacz</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>Nie znaleziono gier. Zmień wyszukiwanie lub filtr.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>Na dysku</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Oszacuj oszczędność na małej próbce. Pliki gry nie zostaną zmienione.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Ustawienia zaawansowane</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Oszacuj oszczędność</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Skompresowana</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Częściowo</value></data>
 </root>

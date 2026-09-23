@@ -26,11 +26,14 @@ public sealed class CompressionQueueItem(GameInfo game, string algorithm, string
     public GameInfo Game { get; } = game;
     public string Algorithm { get; } = algorithm;
     public string Operation { get; } = operation;
+    public string? MethodDescription { get; init; }
+    public CompressionEstimate? Estimate { get; init; }
     public bool IsDecompression => Operation == "decompress";
 
     // Decompression has no algorithm to speak of — naming one would suggest the game
     // is being converted to it.
-    public string Title => IsDecompression ? Game.Name : $"{Game.Name} · {Algorithm}";
+    public string Title => IsDecompression ? Game.Name : $"{Game.Name} · {Algorithm}" +
+        (MethodDescription is null ? string.Empty : $" — {MethodDescription}");
 
     public QueueItemStatus Status
     {

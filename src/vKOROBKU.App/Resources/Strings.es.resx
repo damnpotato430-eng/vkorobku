@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>Por nombre</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Los más grandes primero</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Sin comprimir primero</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Método de compresión para toda la cola</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automático (equilibrado)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Usa el análisis guardado de la versión actual del juego; de lo contrario, XPRESS16K. No realiza una nueva medición.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automático</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Comprimir cola · 1 solicitud de permisos</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>¿Comprimir {0} juegos en una sola cola?
 
@@ -293,7 +293,7 @@ No cambia nada en el disco: el juego sigue instalado e intacto. Los juegos ocult
   <data name="Settings_HiddenSection" xml:space="preserve"><value>JUEGOS OCULTOS</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Juegos ocultos: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Restaurar todos</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Los juegos ocultos vuelven a la biblioteca después de actualizar la lista.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Los juegos ocultos se restaurarán al guardar los ajustes.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>No se pudo quitar el juego de la biblioteca. Comprueba el acceso a los datos locales de vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Error al quitar de la biblioteca</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Automático</value></data>
@@ -409,4 +409,20 @@ El juego debe estar cerrado.</value></data>
   <data name="Worker_NoFiles" xml:space="preserve"><value>No hay archivos disponibles para procesar en la carpeta.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Cierra primero el proceso del juego: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>No se pudo iniciar compact.exe.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>selección manual</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>continuar con el algoritmo actual</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>análisis guardado</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>análisis obsoleto; modo estándar sin nueva medición</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>sin análisis; modo estándar sin medición</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Atención: {0} — lectura medida un {1}% más lenta; ahorro estimado: {2}. ¿Continuar pese a la ralentización?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Unidades</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Más acciones</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Ver</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>No se encontraron juegos. Cambia la búsqueda o el filtro.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>En disco</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Estima el ahorro con una pequeña muestra. Los archivos del juego no cambiarán.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Opciones avanzadas</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Estimar ahorro</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Comprimido</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Parcial</value></data>
 </root>

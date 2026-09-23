@@ -18,6 +18,13 @@ public sealed class AnalysisCacheStore
         "vKOROBKU", "analysis-cache.json");
     private readonly object _sync = new();
 
+    public IReadOnlyDictionary<string, SavedGameAnalysis> LoadAll()
+    {
+        lock (_sync)
+            return ReadCache().Analyses.GroupBy(item => item.InstallPath, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.Last(), StringComparer.OrdinalIgnoreCase);
+    }
+
     public SavedGameAnalysis? Load(string installPath)
     {
         lock (_sync)

@@ -11,10 +11,19 @@ public sealed class CompressionStatusStore
         WriteIndented = true,
         Converters = { new JsonStringEnumConverter() }
     };
-    private readonly string _path = Path.Combine(
+    private readonly string _path;
+    private readonly object _sync = new();
+
+    public CompressionStatusStore(string? path = null) => _path = path ?? Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "vKOROBKU", "compression-status.json");
-    private readonly object _sync = new();
+
+    public IReadOnlyDictionary<string, SavedCompressionStatus> LoadAll()
+    {
+        lock (_sync)
+            return Read().GroupBy(item => item.InstallPath, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.Last(), StringComparer.OrdinalIgnoreCase);
+    }
 
     public SavedCompressionStatus? Load(string installPath)
     {
@@ -27,6 +36,9 @@ public sealed class CompressionStatusStore
         lock (_sync)
         {
             var items = Read();
+            if (items.Any(item => string.Equals(item.InstallPath, status.InstallPath, StringComparison.OrdinalIgnoreCase) &&
+                                  item.CheckedAt > status.CheckedAt))
+                return;
             items.RemoveAll(item => string.Equals(item.InstallPath, status.InstallPath, StringComparison.OrdinalIgnoreCase));
             items.Add(status);
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);

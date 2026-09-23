@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>名前順</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>容量の大きい順</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>未圧縮を先に</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>キュー全体で使う圧縮方式</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>自動（バランス重視）</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>現在のゲームバージョンの保存済み分析を使用し、なければXPRESS16Kを使用します。新たな測定は行いません。</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>自動</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>キューを圧縮 · 権限確認 1 回</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>{0} 本のゲームをひとつのキューで圧縮しますか？
 
@@ -293,7 +293,7 @@ vKOROBKU のライブラリから外れるだけです。ディスク上のフ�
   <data name="Settings_HiddenSection" xml:space="preserve"><value>隠したゲーム</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>隠したゲーム: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>すべて戻す</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>一覧を更新すると、隠したゲームがライブラリに戻ります。</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>設定を保存すると、非表示のゲームが復元されます。</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>ゲームをライブラリから外せませんでした。vKOROBKU のローカルデータへのアクセス権を確認してください。</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>ライブラリからの削除エラー</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>自動</value></data>
@@ -409,4 +409,20 @@ vKOROBKU のライブラリから外れるだけです。ディスク上のフ�
   <data name="Worker_NoFiles" xml:space="preserve"><value>フォルダーに処理できるファイルがありません。</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>先にゲームのプロセスを終了してください: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>compact.exe を起動できませんでした。</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>手動選択</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>現在のアルゴリズムで続行</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>保存済みの分析</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>分析が古いため、再測定せず標準モードを使用</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>分析がないため、測定せず標準モードを使用</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>注意：{0} — 測定された読み込み速度は{1}%低下しています。推定節約容量：{2}。速度低下を了承して続行しますか？</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>ドライブ</value></data>
+  <data name="UI_More" xml:space="preserve"><value>その他の操作</value></data>
+  <data name="UI_View" xml:space="preserve"><value>表示</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>ゲームが見つかりません。検索条件やフィルターを変更してください。</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>ディスク上</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>少量のサンプルで削減量を推定します。ゲームファイルは変更されません。</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>詳細設定</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>削減量を推定</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>圧縮済み</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>一部圧縮</value></data>
 </root>

@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>按名称</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>体积大的优先</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>未压缩的优先</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>整个队列使用的压缩方式</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>自动（均衡）</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>使用当前游戏版本已保存的分析；否则使用 XPRESS16K。不会重新测量。</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>自动</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>压缩队列 · 1 次权限确认</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>将 {0} 个游戏放入同一队列压缩？
 
@@ -293,7 +293,7 @@
   <data name="Settings_HiddenSection" xml:space="preserve"><value>已隐藏的游戏</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>已隐藏的游戏：{0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>全部恢复</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>刷新列表后，隐藏的游戏会回到游戏库中。</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>保存设置后将恢复隐藏的游戏。</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>无法将游戏从游戏库移除。请检查对 vKOROBKU 本地数据的访问权限。</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>移除游戏出错</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>自动</value></data>
@@ -409,4 +409,20 @@
   <data name="Worker_NoFiles" xml:space="preserve"><value>该文件夹中没有可处理的文件。</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>请先关闭游戏进程：{0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>无法启动 compact.exe。</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>手动选择</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>使用当前算法继续</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>已保存的分析</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>分析已过期；不重新测量，使用标准模式</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>尚无分析；不进行测量，使用标准模式</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>注意：{0} — 实测读取速度降低了 {1}%；预计节省空间：{2}。仍要继续吗？</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>磁盘</value></data>
+  <data name="UI_More" xml:space="preserve"><value>更多操作</value></data>
+  <data name="UI_View" xml:space="preserve"><value>查看</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>未找到游戏。请更改搜索条件或筛选器。</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>磁盘占用</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>使用少量样本估算节省空间。不会更改游戏文件。</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>高级设置</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>估算节省空间</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>已压缩</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>部分压缩</value></data>
 </root>

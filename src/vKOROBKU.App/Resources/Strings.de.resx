@@ -40,8 +40,8 @@
   <data name="Sort_ByName" xml:space="preserve"><value>Nach Name</value></data>
   <data name="Sort_LargestFirst" xml:space="preserve"><value>Größte zuerst</value></data>
   <data name="Sort_UncompressedFirst" xml:space="preserve"><value>Unkomprimierte zuerst</value></data>
-  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Komprimierungsverfahren für die gesamte Warteschlange</value></data>
-  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatisch (ausgewogen)</value></data>
+  <data name="Queue_MethodTooltip" xml:space="preserve"><value>Automatisch nutzt die gespeicherte Analyse der aktuellen Spielversion, sonst XPRESS16K. Es erfolgt keine neue Messung.</value></data>
+  <data name="Queue_MethodAuto" xml:space="preserve"><value>Automatisch</value></data>
   <data name="Queue_Start" xml:space="preserve"><value>Warteschlange komprimieren · 1 Rechteabfrage</value></data>
   <data name="Queue_StartPrompt" xml:space="preserve"><value>{0} Spiele in einer Warteschlange komprimieren?
 
@@ -293,7 +293,7 @@ Auf der Festplatte ändert sich nichts – das Spiel bleibt installiert und unan
   <data name="Settings_HiddenSection" xml:space="preserve"><value>AUSGEBLENDETE SPIELE</value></data>
   <data name="Settings_HiddenGamesCount" xml:space="preserve"><value>Ausgeblendete Spiele: {0}</value></data>
   <data name="Settings_RestoreHidden" xml:space="preserve"><value>Alle wiederherstellen</value></data>
-  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Ausgeblendete Spiele kehren nach dem Aktualisieren der Liste in die Bibliothek zurück.</value></data>
+  <data name="Settings_RestoreHiddenTooltip" xml:space="preserve"><value>Ausgeblendete Spiele werden beim Speichern der Einstellungen wiederhergestellt.</value></data>
   <data name="Remove_Failed" xml:space="preserve"><value>Das Spiel konnte nicht aus der Bibliothek entfernt werden. Prüfen Sie den Zugriff auf die lokalen Daten von vKOROBKU.</value></data>
   <data name="Remove_FailedTitle" xml:space="preserve"><value>Fehler beim Entfernen aus der Bibliothek</value></data>
   <data name="AnalysisMode_Auto" xml:space="preserve"><value>Automatisch</value></data>
@@ -409,4 +409,20 @@ Dort fortsetzen, wo sie stehen geblieben ist? Bereits komprimierte Dateien werde
   <data name="Worker_NoFiles" xml:space="preserve"><value>Im Ordner gibt es keine verfügbaren Dateien zum Bearbeiten.</value></data>
   <data name="Worker_GameRunning" xml:space="preserve"><value>Schließen Sie zuerst den Spielprozess: {0}.exe</value></data>
   <data name="Worker_CompactStartFailed" xml:space="preserve"><value>compact.exe konnte nicht gestartet werden.</value></data>
+  <data name="Queue_BasisManual" xml:space="preserve"><value>manuell gewählt</value></data>
+  <data name="Queue_BasisResume" xml:space="preserve"><value>mit aktuellem Algorithmus fortsetzen</value></data>
+  <data name="Queue_BasisAnalysis" xml:space="preserve"><value>gespeicherte Analyse</value></data>
+  <data name="Queue_BasisStale" xml:space="preserve"><value>veraltete Analyse; Standardmodus ohne neue Messung</value></data>
+  <data name="Queue_BasisDefault" xml:space="preserve"><value>keine Analyse; Standardmodus ohne Messung</value></data>
+  <data name="Compress_SlowdownWarning" xml:space="preserve"><value>Achtung: {0} — gemessene Lesegeschwindigkeit um {1}% geringer; geschätzte Ersparnis: {2}. Trotz Verlangsamung fortfahren?</value></data>
+  <data name="UI_Drives" xml:space="preserve"><value>Laufwerke</value></data>
+  <data name="UI_More" xml:space="preserve"><value>Weitere Aktionen</value></data>
+  <data name="UI_View" xml:space="preserve"><value>Ansehen</value></data>
+  <data name="UI_NoResults" xml:space="preserve"><value>Keine Spiele gefunden. Suche oder Filter ändern.</value></data>
+  <data name="UI_DiskSize" xml:space="preserve"><value>Auf Datenträger</value></data>
+  <data name="UI_AnalysisHint" xml:space="preserve"><value>Einsparung anhand einer kleinen Stichprobe schätzen. Spieldateien bleiben unverändert.</value></data>
+  <data name="UI_Advanced" xml:space="preserve"><value>Erweiterte Einstellungen</value></data>
+  <data name="UI_Assess" xml:space="preserve"><value>Einsparung schätzen</value></data>
+  <data name="UI_Compressed" xml:space="preserve"><value>Komprimiert</value></data>
+  <data name="UI_Partial" xml:space="preserve"><value>Teilweise</value></data>
 </root>

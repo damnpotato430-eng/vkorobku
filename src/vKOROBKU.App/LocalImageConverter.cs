@@ -16,6 +16,9 @@ public sealed class LocalImageConverter : IValueConverter
             var image = new BitmapImage();
             image.BeginInit();
             image.CacheOption = BitmapCacheOption.OnLoad;
+            // Covers are displayed at ~224 DIPs; retain detail at high DPI without
+            // decoding the full artwork for every card.
+            image.DecodePixelWidth = 672;
             image.UriSource = new Uri(path, UriKind.Absolute);
             image.EndInit();
             image.Freeze();

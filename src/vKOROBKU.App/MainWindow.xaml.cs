@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         _viewModel.UiScaleChanged += ApplyUiScale;
         SourceInitialized += OnSourceInitialized;
         Loaded += OnLoaded;
+        Closed += (_, _) => _viewModel.StopBackgroundRefresh();
         ApplyUiScale(_viewModel.UiScalePercent);
     }
 
@@ -75,6 +76,15 @@ public partial class MainWindow : Window
     {
         if (sender is ListBoxItem item)
             item.IsSelected = true;
+    }
+
+    private void OpenMoreMenu(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { ContextMenu: { } menu } button)
+        {
+            menu.PlacementTarget = button;
+            menu.IsOpen = true;
+        }
     }
 
     [DllImport("dwmapi.dll")]
