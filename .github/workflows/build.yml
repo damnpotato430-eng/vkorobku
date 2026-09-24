@@ -26,3 +26,9 @@ jobs:
 
       - name: Test
         run: dotnet test vKOROBKU.sln --configuration Release --no-build
+
+      - name: Verify release packaging (no publication)
+        shell: pwsh
+        run: |
+          ./scripts/build-release.ps1
+          ./scripts/test-release-failures.ps1
